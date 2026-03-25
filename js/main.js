@@ -5,14 +5,13 @@
 // ─── Theme Toggle ───
 const html = document.documentElement;
 const themeBtn = document.getElementById('themeToggle');
-const saved = localStorage.getItem('fanup-theme');
-
-// 저장된 테마 or 시스템 설정 적용
-if (saved) {
-  html.setAttribute('data-theme', saved);
-} else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-  html.setAttribute('data-theme', 'dark');
-}
+// 테마는 <head> 인라인 스크립트에서 이미 적용됨 (FOUC 방지)
+// 초기 렌더링 완료 후 테마 전환 트랜지션 활성화 (번쩍거림 방지)
+requestAnimationFrame(() => {
+  requestAnimationFrame(() => {
+    document.body.classList.add('theme-ready');
+  });
+});
 
 themeBtn?.addEventListener('click', () => {
   const current = html.getAttribute('data-theme');
@@ -49,14 +48,17 @@ window.addEventListener('scroll', () => {
 
 // ─── Scroll Fade Animations ───
 const fadeEls = document.querySelectorAll('.fade-up');
+// 히어로 영역 fade-up은 CSS animation으로 처리되므로 제외
+const scrollFadeEls = document.querySelectorAll('.fade-up:not(.hero .fade-up)');
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(e => {
     if (e.isIntersecting) {
       e.target.classList.add('visible');
+      observer.unobserve(e.target); // 한 번 보이면 해제
     }
   });
-}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-fadeEls.forEach(el => observer.observe(el));
+}, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+scrollFadeEls.forEach(el => observer.observe(el));
 
 // ─── Stat Counter Animation ───
 function animateCounter(el, target, duration = 1800) {
@@ -99,6 +101,15 @@ const rankObserver = new IntersectionObserver((entries) => {
 }, { threshold: 0.3 });
 document.querySelectorAll('.ranking-list').forEach(el => rankObserver.observe(el));
 
+// ─── Ranking Bar Fallback (IO 미작동 시) ───
+setTimeout(() => {
+  document.querySelectorAll('.rank-bar-fill').forEach(bar => {
+    if (bar.style.width === '0%') {
+      bar.style.width = bar.dataset.width || '0%';
+    }
+  });
+}, 3000);
+
 // ─── Chart Filter Tabs ───
 document.querySelectorAll('.chart-filter-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -112,7 +123,7 @@ function createParticles() {
   const container = document.querySelector('.hero-bg');
   if (!container) return;
   const colors = ['#8B5CF6', '#EC4899', '#22D3EE', '#FACC15'];
-  for (let i = 0; i < 18; i++) {
+  for (let i = 0; i < 8; i++) {
     const p = document.createElement('div');
     p.className = 'particle';
     p.style.cssText = `
@@ -155,15 +166,19 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 });
 
 // ─── Mobile Nav Toggle ───
-const mobileBtn = document.querySelector('.nav-mobile-btn');
-const navLinks = document.querySelector('.nav-links');
-if (mobileBtn && navLinks) {
-  mobileBtn.addEventListener('click', () => {
-    const isOpen = navLinks.classList.toggle('open');
-    mobileBtn.setAttribute('aria-expanded', isOpen);
-    navLinks.style.cssText = isOpen
-      ? 'display:flex;flex-direction:column;position:absolute;top:64px;left:0;right:0;background:rgba(7,7,15,0.95);backdrop-filter:blur(20px);padding:16px 24px;gap:4px;border-bottom:1px solid rgba(139,92,246,0.15);'
-      : '';
+const hamburger = document.querySelector('.nav-hamburger');
+const navMenu = document.querySelector('.nav-menu');
+if (hamburger && navMenu) {
+  hamburger.addEventListener('click', () => {
+    const isOpen = navMenu.classList.toggle('open');
+    hamburger.setAttribute('aria-expanded', isOpen);
+  });
+  // 메뉴 링크 클릭 시 닫기
+  navMenu.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      navMenu.classList.remove('open');
+      hamburger.setAttribute('aria-expanded', 'false');
+    });
   });
 }
 
@@ -190,21 +205,23 @@ if (mouseGlow && window.innerWidth > 768) {
   });
 }
 
-// ─── 3D Card Tilt ───
-const tiltCards = document.querySelectorAll('.feat-card, .phone-mockup');
-tiltCards.forEach(card => {
-  card.addEventListener('mousemove', (e) => {
-    const rect = card.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    card.style.transform = `perspective(600px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg) translateY(-4px)`;
+// ─── 3D Card Tilt (데스크탑 전용) ───
+if (window.innerWidth > 768) {
+  const tiltCards = document.querySelectorAll('.feat-card, .phone-mockup');
+  tiltCards.forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      card.style.transition = 'none';
+      card.style.transform = `perspective(600px) rotateY(${x * 6}deg) rotateX(${-y * 6}deg) translateY(-4px)`;
+    }, { passive: true });
+    card.addEventListener('mouseleave', () => {
+      card.style.transition = 'transform 0.4s ease';
+      card.style.transform = '';
+    });
   });
-  card.addEventListener('mouseleave', () => {
-    card.style.transform = '';
-    card.style.transition = 'transform 0.4s ease';
-    setTimeout(() => card.style.transition = '', 400);
-  });
-});
+}
 
 // ─── Cheese Particle Burst ───
 const CHEESE_EMOJIS = ['🧀', '⭐', '💜', '✨', '🎉'];
@@ -213,7 +230,7 @@ document.querySelectorAll('.btn-primary').forEach(btn => {
     const rect = btn.getBoundingClientRect();
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 5; i++) {
       const el = document.createElement('span');
       el.className = 'cheese-particle';
       el.textContent = CHEESE_EMOJIS[Math.floor(Math.random() * CHEESE_EMOJIS.length)];

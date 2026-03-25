@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" data-theme="light">
+<html lang="ko">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
@@ -16,7 +16,7 @@
 
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="FANUP">
-  <meta property="og:url" content="https://fanup.cheez.im">
+  <meta property="og:url" content="https://about.fanup.im">
   <meta property="og:title" content="FANUP | 팬심은 더 가깝게, 수익은 더 똑똑하게">
   <meta property="og:description" content="AI 아바타가 팬들과 24시간 대화하고, 팬선물은 주소 노출 없이 안전하게. 새로운 팬덤 커머스 플랫폼.">
 
@@ -24,6 +24,14 @@
   <link rel="stylesheet" as="style" crossorigin
     href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <link rel="stylesheet" href="css/styles.css">
+  <!-- 테마 깜빡임(FOUC) 방지: CSS 로드 직후 즉시 실행 -->
+  <script>
+    (function(){
+      var t = localStorage.getItem('fanup-theme');
+      if (!t && window.matchMedia('(prefers-color-scheme: dark)').matches) t = 'dark';
+      if (t) document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
 </head>
 <body>
 <div class="mouse-glow" id="mouseGlow"></div>
@@ -53,7 +61,7 @@
         <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
       </button>
-      <a href="https://fanup.cheez.im" class="btn btn-primary" target="_blank" rel="noopener">
+      <a href="https://fanup.im" class="btn btn-primary" target="_blank" rel="noopener">
         파트너 신청
       </a>
     </div>
@@ -103,14 +111,14 @@
         </p>
 
         <div class="hero-actions fade-up delay-3 for-creator">
-          <a href="https://fanup.cheez.im" class="btn btn-primary btn-lg" target="_blank" rel="noopener">
+          <a href="https://fanup.im" class="btn btn-primary btn-lg" target="_blank" rel="noopener">
             지금 시작하기
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
           </a>
           <a href="#how-it-works" class="btn btn-ghost btn-lg">5분 만에 시작하기</a>
         </div>
         <div class="hero-actions fade-up delay-3 for-fan" style="display:none;">
-          <a href="https://fanup.cheez.im" class="btn btn-primary btn-lg" target="_blank" rel="noopener">
+          <a href="https://fanup.im" class="btn btn-primary btn-lg" target="_blank" rel="noopener">
             팬 활동 시작하기
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
           </a>
@@ -350,7 +358,7 @@
             </div>
           </li>
         </ul>
-        <a href="https://fanup.cheez.im" class="btn btn-primary" target="_blank" rel="noopener" style="margin-top:32px;display:inline-flex;">
+        <a href="https://fanup.im" class="btn btn-primary" target="_blank" rel="noopener" style="margin-top:32px;display:inline-flex;">
           아바타 만들기
           <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
         </a>
@@ -471,7 +479,7 @@
         <p class="section-eyebrow">데이터 인사이트</p>
         <h2>숫자로 증명하는<br><em>나의 영향력.</em></h2>
         <p class="showcase-desc">YouTube API 기반 실시간 TOP 랭킹으로 카테고리 내 위치를 파악하고 성장 전략을 세우세요.</p>
-        <a href="https://fanup.cheez.im" class="btn btn-ghost" target="_blank" rel="noopener" style="margin-top:28px;display:inline-flex;">
+        <a href="https://fanup.im" class="btn btn-ghost" target="_blank" rel="noopener" style="margin-top:28px;display:inline-flex;">
           전체 랭킹 보기
           <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
         </a>
@@ -570,7 +578,7 @@
       <h2>지금, 가장 스마트한<br>팬덤 커머스 FANUP.</h2>
       <p class="cta-sub">Safe · Auto · Profit</p>
       <div class="cta-actions">
-        <a href="https://fanup.cheez.im" class="btn btn-white btn-lg" target="_blank" rel="noopener">
+        <a href="https://fanup.im" class="btn btn-white btn-lg" target="_blank" rel="noopener">
           크리에이터 파트너 신청
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
         </a>
@@ -625,10 +633,10 @@
       <div class="footer-col">
         <h5>크리에이터</h5>
         <ul class="footer-links">
-          <li><a href="https://fanup.cheez.im" target="_blank" rel="noopener">파트너 신청</a></li>
-          <li><a href="https://fanup.cheez.im" target="_blank" rel="noopener">아바타 만들기</a></li>
-          <li><a href="https://fanup.cheez.im" target="_blank" rel="noopener">수익 정산 안내</a></li>
-          <li><a href="https://fanup.cheez.im" target="_blank" rel="noopener">FAQ</a></li>
+          <li><a href="https://fanup.im" target="_blank" rel="noopener">파트너 신청</a></li>
+          <li><a href="https://fanup.im" target="_blank" rel="noopener">아바타 만들기</a></li>
+          <li><a href="https://fanup.im" target="_blank" rel="noopener">수익 정산 안내</a></li>
+          <li><a href="https://fanup.im" target="_blank" rel="noopener">FAQ</a></li>
         </ul>
       </div>
       <div class="footer-col">
