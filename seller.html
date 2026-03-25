@@ -597,42 +597,62 @@
     <div class="page-content" id="page-info" style="display:none;">
       <div class="page-header">
         <h1>업체 정보</h1>
-        <p>등록된 사업자 정보를 확인하세요. 변경이 필요하면 고객센터에 문의해주세요.</p>
+        <p>사업자 정보를 확인하고 수정하세요.</p>
       </div>
       <div class="card" style="max-width:560px;">
-        <div class="card-header"><span class="card-title">사업자 정보</span></div>
+        <div class="card-header">
+          <span class="card-title">사업자 정보</span>
+          <button class="btn btn-ghost btn-sm" id="info-edit-btn" onclick="toggleInfoEdit()">수정</button>
+        </div>
         <div style="padding:0 20px 20px;display:flex;flex-direction:column;gap:16px;">
+
+          <!-- 업체명 -->
           <div>
             <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;">업체명</div>
             <div style="font-size:0.95rem;font-weight:600;" id="info-business-name">—</div>
+            <input class="form-input info-input" id="info-edit-business-name" style="display:none;" placeholder="업체명">
           </div>
+          <!-- 대표자명 -->
           <div>
             <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;">대표자명</div>
             <div style="font-size:0.95rem;" id="info-owner">—</div>
+            <input class="form-input info-input" id="info-edit-owner" style="display:none;" placeholder="대표자명">
           </div>
+          <!-- 사업자등록번호 (수정 불가) -->
           <div>
-            <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;">사업자등록번호</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;">사업자등록번호 <span style="font-size:0.7rem;">(변경 불가)</span></div>
             <div style="font-size:0.95rem;" id="info-biz-number">—</div>
           </div>
+          <!-- 연락처 -->
           <div>
             <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;">연락처</div>
             <div style="font-size:0.95rem;" id="info-phone">—</div>
+            <input class="form-input info-input" id="info-edit-phone" style="display:none;" placeholder="연락처" type="tel">
           </div>
+          <!-- 주소 -->
           <div>
             <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;">주소</div>
             <div style="font-size:0.95rem;" id="info-address">—</div>
+            <input class="form-input info-input" id="info-edit-address" style="display:none;" placeholder="주소">
           </div>
+          <!-- 통신판매업 -->
           <div>
             <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;">통신판매업 신고번호</div>
             <div style="font-size:0.95rem;" id="info-mail-order">—</div>
+            <input class="form-input info-input" id="info-edit-mail-order" style="display:none;" placeholder="통신판매업 신고번호">
           </div>
+          <!-- 이메일 (수정 불가) -->
           <div>
-            <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;">이메일</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;">이메일 <span style="font-size:0.7rem;">(변경 불가)</span></div>
             <div style="font-size:0.95rem;" id="info-email">—</div>
           </div>
-        </div>
-        <div style="padding:16px 20px;border-top:1px solid var(--border);font-size:0.8rem;color:var(--text-muted);">
-          정보 변경 문의: <a href="mailto:seller@cheez.im" style="color:var(--brand);">seller@cheez.im</a>
+
+          <!-- 저장/취소 버튼 (수정 모드에서만 표시) -->
+          <div id="info-save-area" style="display:none;gap:8px;display:none;">
+            <button class="btn btn-primary btn-sm" onclick="saveSellerInfo()">저장</button>
+            <button class="btn btn-ghost btn-sm" onclick="toggleInfoEdit(true)">취소</button>
+            <span id="info-save-msg" style="font-size:0.8rem;color:var(--text-muted);"></span>
+          </div>
         </div>
       </div>
     </div>

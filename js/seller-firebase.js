@@ -513,6 +513,68 @@ window.printInvoiceReal = async function(orderId) {
   w.document.close();
 };
 
+// ─── 업체 정보 수정 ──────────────────────────────────────────
+const INFO_FIELDS = [
+  { view: 'info-business-name', input: 'info-edit-business-name', key: 'businessName' },
+  { view: 'info-owner',         input: 'info-edit-owner',         key: 'ownerName' },
+  { view: 'info-phone',         input: 'info-edit-phone',         key: 'phone' },
+  { view: 'info-address',       input: 'info-edit-address',       key: 'address' },
+  { view: 'info-mail-order',    input: 'info-edit-mail-order',    key: 'mailOrderNumber' },
+];
+
+window.toggleInfoEdit = function(cancel = false) {
+  const editing = document.getElementById('info-edit-btn').textContent === '저장 중...' ? false
+    : document.querySelector('.info-input')?.style.display !== 'none';
+  const toEdit = !editing || cancel === true ? !cancel : false;
+
+  INFO_FIELDS.forEach(f => {
+    const view  = document.getElementById(f.view);
+    const input = document.getElementById(f.input);
+    if (!view || !input) return;
+    if (toEdit) {
+      input.value = view.textContent === '—' ? '' : view.textContent;
+      view.style.display  = 'none';
+      input.style.display = 'block';
+    } else {
+      view.style.display  = '';
+      input.style.display = 'none';
+    }
+  });
+
+  const saveArea = document.getElementById('info-save-area');
+  const editBtn  = document.getElementById('info-edit-btn');
+  if (saveArea) saveArea.style.display = toEdit ? 'flex' : 'none';
+  if (editBtn)  editBtn.style.display  = toEdit ? 'none' : '';
+  document.getElementById('info-save-msg').textContent = '';
+};
+
+window.saveSellerInfo = async function() {
+  if (!currentSeller) return;
+  const btn = document.getElementById('info-edit-btn');
+  const msg = document.getElementById('info-save-msg');
+  msg.textContent = '저장 중...';
+
+  const updates = {};
+  INFO_FIELDS.forEach(f => {
+    const input = document.getElementById(f.input);
+    if (input) updates[f.key] = input.value.trim();
+  });
+
+  try {
+    await updateDoc(doc(db, 'sellers', currentSeller.id), updates);
+    // currentSeller 갱신
+    Object.assign(currentSeller, updates);
+    updateSellerInfo(currentSeller);
+    window.toggleInfoEdit(true);
+    msg.textContent = '✓ 저장됐습니다.';
+    setTimeout(() => { msg.textContent = ''; }, 2000);
+  } catch(e) {
+    console.error('정보 저장 실패:', e);
+    msg.style.color = 'var(--danger)';
+    msg.textContent = '저장에 실패했습니다.';
+  }
+};
+
 // ─── 로그아웃 ────────────────────────────────────────────────
 window.sellerLogout = async function() {
   if (ordersUnsub) { ordersUnsub(); ordersUnsub = null; }
