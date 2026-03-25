@@ -514,6 +514,7 @@ window.sellerLogout = async function() {
   if (ordersUnsub) { ordersUnsub(); ordersUnsub = null; }
   currentSeller = null;
   await signOut(auth);
+  location.href = 'login.html';
 };
 
 // ─── Auth 상태 감시 (핵심) ───────────────────────────────────
