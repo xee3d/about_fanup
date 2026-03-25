@@ -151,20 +151,36 @@ function renderProducts(products) {
     return;
   }
   products.forEach(p => {
-    const stockClass = p.stock <= 3 ? 'stock-low' : 'stock-ok';
-    const statusText = p.status === 'active' ? '판매중' : p.status === 'pending' ? '심사중' : '중지';
-    const statusCls  = p.status === 'active' ? 'status-success' : p.status === 'pending' ? 'status-warning' : 'status-muted';
+    const stock = p.stock ?? p.stockCount ?? '-';
+    const stockClass = typeof stock === 'number' ? (stock <= 3 ? 'stock-low' : 'stock-ok') : '';
+    // 썸네일: 다양한 필드명 처리
+    const thumbUrl = p.thumbnail || p.imageUrl || (Array.isArray(p.images) && p.images[0]) || (Array.isArray(p.imageUrls) && p.imageUrls[0]) || '';
+    // 상태
+    const STATUS = {
+      active:   { text: '판매중', cls: 'status-success', dot: '#22c55e' },
+      pending:  { text: '심사중', cls: 'status-warning', dot: '#f59e0b' },
+      inactive: { text: '중지',   cls: 'status-muted',   dot: '#94a3b8' },
+      rejected: { text: '반려',   cls: 'status-danger',  dot: '#ef4444' },
+    };
+    const s = STATUS[p.status] || STATUS.inactive;
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>
         <div class="product-thumb">
-          ${p.thumbnail ? `<img src="${p.thumbnail}" style="width:100%;height:100%;object-fit:cover;border-radius:6px;">` : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>`}
+          ${thumbUrl
+            ? `<img src="${thumbUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:6px;" loading="lazy">`
+            : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>`}
         </div>
       </td>
       <td class="td-main">${p.name}</td>
       <td>₩${Number(p.price).toLocaleString()}</td>
-      <td class="${stockClass}">${p.stock ?? '-'}</td>
-      <td><span class="status ${statusCls}">${statusText}</span></td>
+      <td class="${stockClass}">${stock}</td>
+      <td>
+        <span class="status ${s.cls}" style="display:inline-flex;align-items:center;gap:5px;">
+          <span style="width:6px;height:6px;border-radius:50%;background:${s.dot};flex-shrink:0;${p.status==='active'?'box-shadow:0 0 0 2px rgba(34,197,94,0.25);':''}"></span>
+          ${s.text}
+        </span>
+      </td>
       <td>
         <button class="btn btn-ghost btn-sm" onclick="editProduct('${p.id}')">수정</button>
         <button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="deleteProduct('${p.id}', '${p.name.replace(/'/g,"\\'")}')">삭제</button>
@@ -443,11 +459,17 @@ window.editProduct = async function(id) {
   if (document.getElementById('prod-form-title'))
     document.getElementById('prod-form-title').textContent = '상품 수정';
 
-  // 기존 이미지 복원
+  // 기존 이미지 복원 (다양한 필드명 처리)
   const preview = document.getElementById('prod-img-preview');
   if (preview) {
     const slots = preview.querySelectorAll('.img-slot');
-    const images = p.images || (p.thumbnail ? [p.thumbnail] : []);
+    const images = (
+      Array.isArray(p.images)     ? p.images     :
+      Array.isArray(p.imageUrls)  ? p.imageUrls  :
+      p.thumbnail  ? [p.thumbnail]  :
+      p.imageUrl   ? [p.imageUrl]   :
+      p.image      ? [p.image]      : []
+    );
     slots.forEach((slot, i) => {
       slot.innerHTML = '';
       if (images[i]) {
@@ -456,7 +478,7 @@ window.editProduct = async function(id) {
         img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:6px;';
         slot.appendChild(img);
       } else {
-        slot.innerHTML = i === 0 ? '<span style="font-size:1.4rem;color:var(--text-muted);">+</span>' : '';
+        slot.innerHTML = i === 0 ? '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' : '';
       }
     });
   }
