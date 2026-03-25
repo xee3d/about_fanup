@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>크리에이터 스튜디오 | FANUP</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" as="style" crossorigin
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <style>
+    /* ── Avatar Card ── */
+    .avatar-card {
+      display: flex; align-items: center; gap: 20px;
+      padding: 20px; background: var(--bg-card);
+      border: 1px solid var(--border); border-radius: var(--radius-lg);
+      margin-bottom: 16px;
+    }
+    .avatar-img {
+      width: 72px; height: 72px; border-radius: 20px;
+      background: var(--brand-light);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--brand); flex-shrink: 0;
+    }
+    .avatar-meta { flex: 1; }
+    .avatar-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+    .avatar-status { font-size: 0.78rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+    .dot-live { width: 7px; height: 7px; background: var(--success); border-radius: 50%; }
+
+    /* ── Gift List ── */
+    .gift-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 0; border-bottom: 1px solid var(--border-light);
+    }
+    .gift-item:last-child { border-bottom: none; }
+    .gift-thumb {
+      width: 48px; height: 48px; border-radius: 12px;
+      background: var(--brand-light); display: flex; align-items: center; justify-content: center;
+      color: var(--brand); flex-shrink: 0;
+    }
+    .gift-info { flex: 1; }
+    .gift-name { font-size: 0.88rem; font-weight: 700; color: var(--text-primary); }
+    .gift-from { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+    .gift-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+    /* ── Cheez Balance ── */
+    .cheez-balance {
+      background: var(--brand);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    .cheez-balance::after {
+      content: '';
+      position: absolute;
+      width: 200px; height: 200px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 50%;
+      right: -60px; top: -60px;
+    }
+    .cheez-balance-label { font-size: 0.8rem; font-weight: 600; opacity: 0.8; margin-bottom: 8px; }
+    .cheez-balance-value { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.04em; line-height: 1; margin-bottom: 16px; }
+    .cheez-balance-sub { font-size: 0.78rem; opacity: 0.7; margin-bottom: 20px; }
+    .btn-white { background: #fff; color: var(--brand); font-weight: 700; }
+    .btn-white:hover { background: #F5F3FF; }
+
+    /* ── Analytics Mini Chart ── */
+    .chart-bars {
+      display: flex; align-items: flex-end; gap: 6px; height: 80px;
+    }
+    .chart-bar {
+      flex: 1; border-radius: 4px 4px 0 0;
+      background: var(--brand-light);
+      transition: background 0.2s;
+      cursor: pointer;
+    }
+    .chart-bar:hover, .chart-bar.active { background: var(--brand); }
+    .chart-labels {
+      display: flex; gap: 6px; margin-top: 6px;
+    }
+    .chart-label { flex: 1; text-align: center; font-size: 0.65rem; color: var(--text-muted); }
+
+    /* ── Persona Tags ── */
+    .persona-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .persona-tag {
+      padding: 5px 12px;
+      background: var(--brand-light); color: var(--brand);
+      border-radius: 100px; font-size: 0.78rem; font-weight: 600;
+      border: 1.5px dashed var(--brand-mid); cursor: pointer;
+      transition: all 0.15s;
+    }
+    .persona-tag:hover { background: var(--brand-mid); }
+    .persona-tag.add {
+      background: transparent; color: var(--text-muted);
+      border: 1.5px dashed var(--border);
+    }
+    .persona-tag.add:hover { border-color: var(--brand-mid); color: var(--brand); }
+  </style>
+</head>
+<body>
+<div class="dash-shell">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="assets/fanup_logo.png" alt="FANUP">
+      <span class="studio-label">Studio</span>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">메인</div>
+      <a class="nav-item active" href="#" data-page="dashboard">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        대시보드
+      </a>
+      <a class="nav-item" href="#" data-page="avatar">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        아바타 설정
+        <span class="nav-badge green">ON</span>
+      </a>
+      <a class="nav-item" href="#" data-page="gifts">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+        선물 보관함
+        <span class="nav-badge">3</span>
+      </a>
+      <a class="nav-item" href="#" data-page="cheez">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        치즈 정산
+      </a>
+      <a class="nav-item" href="#" data-page="analytics">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        통계 분석
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">설정</div>
+      <a class="nav-item" href="#">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        계정 설정
+      </a>
+      <a class="nav-item" href="index.html">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        랜딩 페이지
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="user-avatar">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div>
+          <div class="user-name">키리모코 여우</div>
+          <div class="user-role">파트너 크리에이터</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <div class="dash-main">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="topbar-btn" id="sidebarToggle" style="display:none;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <span class="topbar-title" id="pageTitle">대시보드</span>
+      </div>
+      <div class="topbar-right">
+        <button class="topbar-btn topbar-notif">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <div class="notif-dot"></div>
+        </button>
+        <button class="theme-toggle" id="themeToggle">
+          <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
+        <div class="topbar-avatar">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+      </div>
+    </header>
+
+    <!-- ── PAGE: DASHBOARD ── -->
+    <div class="page-content" id="page-dashboard">
+      <div class="page-header">
+        <h1>대시보드</h1>
+        <p>안녕하세요, 키리모코 여우님. 오늘도 팬들이 기다리고 있어요.</p>
+      </div>
+
+      <!-- Stats -->
+      <div class="stat-grid stat-grid-4 mb-24">
+        <div class="stat-card">
+          <div class="stat-card-label">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            보유 치즈
+          </div>
+          <div class="stat-card-value brand">12,840</div>
+          <div class="stat-card-sub">
+            <span class="stat-delta-up">+2,340</span> 오늘
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            이번 달 예상 수익
+          </div>
+          <div class="stat-card-value">₩248,600</div>
+          <div class="stat-card-sub">
+            <span class="stat-delta-up">+12%</span> 전월 대비
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            오늘 AI 대화 수
+          </div>
+          <div class="stat-card-value">347</div>
+          <div class="stat-card-sub">
+            <span class="stat-delta-up">+48</span> 어제 대비
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/></svg>
+            미수령 선물
+          </div>
+          <div class="stat-card-value">3</div>
+          <div class="stat-card-sub">배송 확인 필요</div>
+        </div>
+      </div>
+
+      <div class="grid-2 mb-24">
+        <!-- 최근 선물 -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">최근 받은 선물</span>
+            <span class="card-action" onclick="switchPage('gifts')">전체 보기</span>
+          </div>
+          <div class="gift-item">
+            <div class="gift-thumb">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+            </div>
+            <div class="gift-info">
+              <div class="gift-name">블루베리 마카롱 세트</div>
+              <div class="gift-from">팬 익명 · 오늘 오전 11:24</div>
+            </div>
+            <span class="status status-warning">배송중</span>
+          </div>
+          <div class="gift-item">
+            <div class="gift-thumb">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+            </div>
+            <div class="gift-info">
+              <div class="gift-name">치즈케이크 홀케이크</div>
+              <div class="gift-from">팬 익명 · 어제</div>
+            </div>
+            <span class="status status-success">수령 완료</span>
+          </div>
+          <div class="gift-item">
+            <div class="gift-thumb">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+            </div>
+            <div class="gift-info">
+              <div class="gift-name">피규어 한정판 (게임 캐릭터)</div>
+              <div class="gift-from">팬 익명 · 2일 전</div>
+            </div>
+            <span class="status status-info">준비중</span>
+          </div>
+        </div>
+
+        <!-- 이번 주 수익 -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">이번 주 수익 추이</span>
+            <span class="card-action" onclick="switchPage('analytics')">상세 보기</span>
+          </div>
+          <div class="chart-bars">
+            <div class="chart-bar" style="height:40%"></div>
+            <div class="chart-bar" style="height:55%"></div>
+            <div class="chart-bar" style="height:35%"></div>
+            <div class="chart-bar" style="height:70%"></div>
+            <div class="chart-bar" style="height:60%"></div>
+            <div class="chart-bar active" style="height:85%"></div>
+            <div class="chart-bar" style="height:50%"></div>
+          </div>
+          <div class="chart-labels">
+            <span class="chart-label">월</span>
+            <span class="chart-label">화</span>
+            <span class="chart-label">수</span>
+            <span class="chart-label">목</span>
+            <span class="chart-label">금</span>
+            <span class="chart-label">토</span>
+            <span class="chart-label">일</span>
+          </div>
+          <div class="divider"></div>
+          <div class="flex-between">
+            <div>
+              <div class="text-xs text-muted mb-4" style="margin-bottom:4px;">이번 주 총 수익</div>
+              <div style="font-size:1.3rem;font-weight:800;color:var(--brand);letter-spacing:-0.03em;">₩62,400</div>
+            </div>
+            <div style="text-align:right;">
+              <div class="text-xs text-muted" style="margin-bottom:4px;">AI 대화 건수</div>
+              <div style="font-size:1.3rem;font-weight:800;color:var(--text-primary);letter-spacing:-0.03em;">2,184</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 아바타 상태 -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">AI 아바타 상태</span>
+          <a class="card-action" onclick="switchPage('avatar')">설정 변경</a>
+        </div>
+        <div class="avatar-card" style="margin-bottom:0;">
+          <div class="avatar-img">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="avatar-meta">
+            <div class="avatar-name">키리모코 AI 아바타</div>
+            <div class="avatar-status">
+              <span class="dot-live"></span>
+              현재 활성화 · 오늘 347회 대화
+            </div>
+          </div>
+          <div class="toggle-wrap">
+            <label class="toggle">
+              <input type="checkbox" checked>
+              <span class="toggle-slider"></span>
+            </label>
+            <span class="toggle-label">활성화</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PAGE: AVATAR ── -->
+    <div class="page-content" id="page-avatar" style="display:none;">
+      <div class="page-header">
+        <h1>아바타 설정</h1>
+        <p>AI 아바타의 성격, 말투, 이미지를 설정하세요.</p>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <!-- 아바타 기본 설정 -->
+          <div class="card mb-16">
+            <div class="card-header"><span class="card-title">기본 정보</span></div>
+            <div class="avatar-card" style="margin-bottom:20px;">
+              <div class="avatar-img" style="cursor:pointer;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
+              <div class="avatar-meta">
+                <div class="avatar-name">키리모코 여우</div>
+                <div class="avatar-status">아바타 이미지 클릭하여 변경</div>
+              </div>
+              <button class="btn btn-outline btn-sm">이미지 변경</button>
+            </div>
+            <div class="form-group">
+              <label class="form-label">아바타 표시 이름</label>
+              <input type="text" class="form-input" value="키리모코 여우">
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">활성화 상태</label>
+              <div class="toggle-wrap">
+                <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+                <span class="toggle-label">팬들이 AI 아바타와 대화할 수 있습니다</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 업로드 -->
+          <div class="card">
+            <div class="card-header"><span class="card-title">모델/이미지 업로드</span></div>
+            <div class="upload-zone">
+              <div class="upload-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+              </div>
+              <div class="upload-text">이미지 또는 Live2D 모델 업로드</div>
+              <div class="upload-sub">PNG, JPG, GIF, Live2D(.moc3) · 최대 50MB</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 페르소나 설정 -->
+        <div>
+          <div class="card mb-16">
+            <div class="card-header"><span class="card-title">페르소나 (Persona)</span></div>
+            <div class="form-group">
+              <label class="form-label">말투 스타일</label>
+              <select class="form-select">
+                <option>밝고 에너지 넘치는 말투</option>
+                <option>차분하고 다정한 말투</option>
+                <option>귀엽고 애교 있는 말투</option>
+                <option>쿨하고 담담한 말투</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">자기소개 (팬들에게 표시)</label>
+              <textarea class="form-textarea">안녕하세요! 저는 키리모코예요. 게임이랑 애니메이션을 좋아하는 버추얼 크리에이터입니다. 팬 여러분과 이야기하는 걸 정말 좋아해요!</textarea>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">성격 태그</label>
+              <div class="persona-tags">
+                <span class="persona-tag">활발함</span>
+                <span class="persona-tag">게임 좋아함</span>
+                <span class="persona-tag">애니 덕후</span>
+                <span class="persona-tag">팬 챙기기 좋아함</span>
+                <span class="persona-tag add">+ 추가</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><span class="card-title">대화 제한 설정</span></div>
+            <div class="form-group">
+              <div class="toggle-wrap" style="margin-bottom:12px;">
+                <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+                <span class="toggle-label">개인 연락처 요청 자동 차단</span>
+              </div>
+              <div class="toggle-wrap" style="margin-bottom:12px;">
+                <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+                <span class="toggle-label">부적절한 대화 자동 필터링</span>
+              </div>
+              <div class="toggle-wrap">
+                <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
+                <span class="toggle-label">하루 대화 횟수 제한 (팬당 50회)</span>
+              </div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;justify-content:center;">저장하기</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PAGE: GIFTS ── -->
+    <div class="page-content" id="page-gifts" style="display:none;">
+      <div class="page-header">
+        <h1>선물 보관함</h1>
+        <p>팬들이 보낸 선물 현황을 확인하고 감사 메시지를 전송하세요.</p>
+      </div>
+
+      <div class="flex-between mb-20">
+        <div class="tabs" style="margin-bottom:0;border-bottom:none;">
+          <button class="tab-btn active">전체 (12)</button>
+          <button class="tab-btn">배송중 (3)</button>
+          <button class="tab-btn">수령 완료 (9)</button>
+        </div>
+        <button class="btn btn-outline btn-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+          필터
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>선물 상품</th>
+                <th>팬 (익명)</th>
+                <th>수령 주소</th>
+                <th>주문일</th>
+                <th>배송 상태</th>
+                <th>액션</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="td-main">블루베리 마카롱 세트</span></td>
+                <td class="td-code">fan_****3821</td>
+                <td><span class="status status-success">보호됨</span></td>
+                <td class="text-sm text-muted">2026.03.25</td>
+                <td><span class="status status-warning">배송중</span></td>
+                <td>
+                  <div style="display:flex;gap:6px;">
+                    <button class="btn btn-ghost btn-sm">감사 메시지</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="td-main">치즈케이크 홀케이크</span></td>
+                <td class="td-code">fan_****7214</td>
+                <td><span class="status status-success">보호됨</span></td>
+                <td class="text-sm text-muted">2026.03.24</td>
+                <td><span class="status status-success">수령 완료</span></td>
+                <td>
+                  <div style="display:flex;gap:6px;">
+                    <button class="btn btn-primary btn-sm">감사 메시지 보내기</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="td-main">피규어 한정판</span></td>
+                <td class="td-code">fan_****5503</td>
+                <td><span class="status status-success">보호됨</span></td>
+                <td class="text-sm text-muted">2026.03.23</td>
+                <td><span class="status status-info">준비중</span></td>
+                <td>
+                  <div style="display:flex;gap:6px;">
+                    <button class="btn btn-ghost btn-sm">감사 메시지</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="td-main">스타벅스 기프티콘 5만원</span></td>
+                <td class="td-code">fan_****9901</td>
+                <td><span class="status status-success">보호됨</span></td>
+                <td class="text-sm text-muted">2026.03.21</td>
+                <td><span class="status status-success">수령 완료</span></td>
+                <td>
+                  <div style="display:flex;gap:6px;">
+                    <button class="btn btn-primary btn-sm">감사 메시지 보내기</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PAGE: CHEEZ ── -->
+    <div class="page-content" id="page-cheez" style="display:none;">
+      <div class="page-header">
+        <h1>치즈 정산</h1>
+        <p>보유 치즈를 현금으로 정산하거나 팬 이벤트에 활용하세요.</p>
+      </div>
+
+      <div class="grid-2 mb-24">
+        <div class="cheez-balance">
+          <div class="cheez-balance-label">현재 보유 치즈</div>
+          <div class="cheez-balance-value">12,840</div>
+          <div class="cheez-balance-sub">≈ ₩128,400 (치즈당 ₩10)</div>
+          <button class="btn btn-white">현금 정산 신청</button>
+        </div>
+        <div>
+          <div class="stat-grid stat-grid-2">
+            <div class="stat-card">
+              <div class="stat-card-label">이번 달 수익</div>
+              <div class="stat-card-value brand">₩248,600</div>
+              <div class="stat-card-sub"><span class="stat-delta-up">+12%</span> 전월 대비</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-label">누적 정산액</div>
+              <div class="stat-card-value">₩1.2M</div>
+              <div class="stat-card-sub">총 8회 정산 완료</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-label">정산 대기</div>
+              <div class="stat-card-value">₩64,200</div>
+              <div class="stat-card-sub">익월 10일 지급</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-label">팬 이벤트 사용</div>
+              <div class="stat-card-value">3,200</div>
+              <div class="stat-card-sub">치즈 역조공</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span class="card-title">정산 내역</span></div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>정산일</th>
+                <th>구분</th>
+                <th>치즈</th>
+                <th>금액</th>
+                <th>상태</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="text-sm">2026.03.10</td>
+                <td class="td-main">월 정산</td>
+                <td>18,240</td>
+                <td style="font-weight:700;color:var(--brand);">₩182,400</td>
+                <td><span class="status status-success">입금 완료</span></td>
+              </tr>
+              <tr>
+                <td class="text-sm">2026.02.10</td>
+                <td class="td-main">월 정산</td>
+                <td>14,600</td>
+                <td style="font-weight:700;color:var(--brand);">₩146,000</td>
+                <td><span class="status status-success">입금 완료</span></td>
+              </tr>
+              <tr>
+                <td class="text-sm">2026.01.10</td>
+                <td class="td-main">월 정산</td>
+                <td>9,800</td>
+                <td style="font-weight:700;color:var(--brand);">₩98,000</td>
+                <td><span class="status status-success">입금 완료</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PAGE: ANALYTICS ── -->
+    <div class="page-content" id="page-analytics" style="display:none;">
+      <div class="page-header">
+        <h1>통계 분석</h1>
+        <p>채널 성과와 팬 활동 데이터를 확인하세요.</p>
+      </div>
+      <div class="stat-grid stat-grid-4 mb-24">
+        <div class="stat-card">
+          <div class="stat-card-label">구독자 수</div>
+          <div class="stat-card-value">124K</div>
+          <div class="stat-card-sub"><span class="stat-delta-up">+1.2K</span> 이번 달</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">월간 AI 대화</div>
+          <div class="stat-card-value">9,840</div>
+          <div class="stat-card-sub"><span class="stat-delta-up">+24%</span> 전월 대비</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">팬 재방문율</div>
+          <div class="stat-card-value">68%</div>
+          <div class="stat-card-sub"><span class="stat-delta-up">+5%p</span> 전월 대비</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">랭킹 순위</div>
+          <div class="stat-card-value brand">#1</div>
+          <div class="stat-card-sub">버추얼 카테고리</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">월별 수익 추이</span></div>
+        <div style="padding:16px 0;">
+          <div class="chart-bars" style="height:120px;">
+            <div class="chart-bar" style="height:50%"></div>
+            <div class="chart-bar" style="height:45%"></div>
+            <div class="chart-bar" style="height:60%"></div>
+            <div class="chart-bar" style="height:55%"></div>
+            <div class="chart-bar" style="height:70%"></div>
+            <div class="chart-bar" style="height:65%"></div>
+            <div class="chart-bar" style="height:80%"></div>
+            <div class="chart-bar" style="height:75%"></div>
+            <div class="chart-bar" style="height:85%"></div>
+            <div class="chart-bar" style="height:78%"></div>
+            <div class="chart-bar" style="height:90%"></div>
+            <div class="chart-bar active" style="height:100%"></div>
+          </div>
+          <div class="chart-labels">
+            <span class="chart-label">4월</span><span class="chart-label">5월</span>
+            <span class="chart-label">6월</span><span class="chart-label">7월</span>
+            <span class="chart-label">8월</span><span class="chart-label">9월</span>
+            <span class="chart-label">10월</span><span class="chart-label">11월</span>
+            <span class="chart-label">12월</span><span class="chart-label">1월</span>
+            <span class="chart-label">2월</span><span class="chart-label">3월</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end dash-main -->
+</div><!-- end dash-shell -->
+
+<script>
+  // Theme
+  const html = document.documentElement;
+  const saved = localStorage.getItem('fanup-theme');
+  if (saved) html.setAttribute('data-theme', saved);
+  else if (window.matchMedia('(prefers-color-scheme: dark)').matches) html.setAttribute('data-theme', 'dark');
+  document.getElementById('themeToggle')?.addEventListener('click', () => {
+    const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('fanup-theme', next);
+  });
+
+  // Sidebar navigation
+  function switchPage(name) {
+    document.querySelectorAll('[id^="page-"]').forEach(p => p.style.display = 'none');
+    document.getElementById('page-' + name).style.display = 'block';
+    document.querySelectorAll('.nav-item').forEach(n => {
+      n.classList.toggle('active', n.dataset.page === name);
+    });
+    const titles = { dashboard:'대시보드', avatar:'아바타 설정', gifts:'선물 보관함', cheez:'치즈 정산', analytics:'통계 분석' };
+    document.getElementById('pageTitle').textContent = titles[name] || name;
+  }
+  document.querySelectorAll('.nav-item[data-page]').forEach(item => {
+    item.addEventListener('click', e => { e.preventDefault(); switchPage(item.dataset.page); });
+  });
+
+  // Mobile sidebar
+  const sidebar = document.getElementById('sidebar');
+  document.getElementById('sidebarToggle')?.addEventListener('click', () => sidebar.classList.toggle('open'));
+  if (window.innerWidth <= 768) document.getElementById('sidebarToggle').style.display = 'flex';
+</script>
+</body>
+</html>

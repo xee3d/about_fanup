@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>판매자 센터 | FANUP</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" as="style" crossorigin
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <style>
+    /* PC 최적화 — 더 넓은 컨텐츠 영역 */
+    :root { --sidebar-width: 220px; }
+
+    .order-row-selected td { background: var(--brand-light) !important; }
+
+    .product-thumb {
+      width: 44px; height: 44px; border-radius: 8px;
+      background: var(--bg); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; color: var(--text-muted);
+    }
+    .invoice-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 10px; border-radius: 6px;
+      font-size: 0.75rem; font-weight: 700;
+      background: var(--brand-light); color: var(--brand);
+      border: none; cursor: pointer; transition: background 0.15s;
+    }
+    .invoice-btn:hover { background: var(--brand-mid); }
+
+    .stock-bar { width: 60px; }
+    .stock-low { color: var(--danger); font-weight: 700; }
+    .stock-ok { color: var(--success); font-weight: 700; }
+
+    /* 개인정보 보호 배너 */
+    .privacy-banner {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 14px 18px;
+      background: #EFF6FF; border: 1px solid #BFDBFE;
+      border-radius: var(--radius); margin-bottom: 16px;
+      font-size: 0.82rem; color: #1E40AF;
+    }
+    [data-theme="dark"] .privacy-banner {
+      background: rgba(30,64,175,0.12); border-color: rgba(96,165,250,0.3); color: #93C5FD;
+    }
+    .privacy-banner-icon { flex-shrink: 0; margin-top: 1px; }
+    .privacy-banner-title { font-weight: 700; margin-bottom: 4px; }
+    .privacy-banner ul { margin: 4px 0 0; padding-left: 16px; line-height: 1.8; }
+
+    /* 마스킹된 주소 */
+    .addr-masked { font-size: 0.82rem; color: var(--text-secondary); }
+    .addr-masked .addr-region { color: var(--text-primary); font-weight: 500; }
+    .addr-masked .addr-hidden {
+      display: inline-flex; align-items: center; gap: 3px;
+      color: var(--text-muted); font-size: 0.78rem;
+    }
+    .addr-lock-icon { opacity: 0.5; }
+
+    /* 안심번호 뱃지 */
+    .safe-num {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 0.78rem; color: var(--success);
+      background: rgba(16,185,129,0.1); padding: 2px 7px;
+      border-radius: 100px; font-weight: 600;
+    }
+    [data-theme="dark"] .safe-num { background: rgba(16,185,129,0.15); }
+
+    /* 수령인 익명 코드 */
+    .recip-code {
+      font-family: monospace; font-size: 0.82rem; font-weight: 700;
+      color: var(--brand); letter-spacing: 0.02em;
+    }
+
+    /* 송장 출력 전용 버튼 */
+    .print-invoice-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 10px; border-radius: 6px;
+      font-size: 0.75rem; font-weight: 700;
+      background: #F0FDF4; color: #15803D;
+      border: 1px solid #BBF7D0; cursor: pointer; transition: background 0.15s;
+    }
+    .print-invoice-btn:hover { background: #DCFCE7; }
+    [data-theme="dark"] .print-invoice-btn {
+      background: rgba(21,128,61,0.15); color: #4ADE80; border-color: rgba(74,222,128,0.25);
+    }
+
+    /* 인쇄 시 — 송장 인쇄용 숨김/표시 */
+    @media print {
+      .sidebar, .topbar, .filter-bar, .bulk-bar, .privacy-banner,
+      .btn, .invoice-btn, .print-invoice-btn, .page-header { display: none !important; }
+      .dash-main { margin-left: 0 !important; }
+      .print-invoice-row { display: table-row !important; }
+      body { background: white; }
+    }
+    .print-invoice-row { display: none; }
+
+    /* 상단 필터 바 */
+    .filter-bar {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      padding: 14px 20px;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); margin-bottom: 16px;
+    }
+    .filter-bar .search-input {
+      flex: 1; min-width: 200px;
+      padding: 8px 12px;
+      border: 1.5px solid var(--border); border-radius: 8px;
+      font-size: 0.875rem; font-family: inherit;
+      background: var(--bg-card); color: var(--text-primary);
+      outline: none;
+    }
+    .filter-bar .search-input:focus { border-color: var(--brand); }
+
+    .bulk-bar {
+      display: none; align-items: center; gap: 10px;
+      padding: 10px 16px;
+      background: var(--brand-light);
+      border: 1px solid var(--brand-mid);
+      border-radius: var(--radius);
+      margin-bottom: 12px;
+    }
+    .bulk-bar.show { display: flex; }
+    .bulk-count { font-size: 0.85rem; font-weight: 700; color: var(--brand); }
+
+    /* 상품 이미지 업로드 */
+    .img-upload-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+    }
+    .img-slot {
+      aspect-ratio: 1;
+      border: 2px dashed var(--border); border-radius: var(--radius);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.15s; color: var(--text-muted);
+    }
+    .img-slot:hover { border-color: var(--brand-mid); background: var(--brand-light); color: var(--brand); }
+
+    /* 배송 처리 모달 */
+    .modal-backdrop {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.4); z-index: 1000;
+      align-items: center; justify-content: center;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      background: var(--bg-card); border-radius: var(--radius-lg);
+      padding: 28px; width: 420px; max-width: 90vw;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+    .modal-title { font-size: 1rem; font-weight: 700; margin-bottom: 20px; color: var(--text-primary); }
+    .modal-footer { display: flex; gap: 8px; margin-top: 20px; justify-content: flex-end; }
+  </style>
+</head>
+<body>
+<div class="dash-shell">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="assets/fanup_logo.png" alt="FANUP">
+      <span class="studio-label">Seller</span>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">운영</div>
+      <a class="nav-item active" href="#" data-page="dashboard">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        대시보드
+      </a>
+      <a class="nav-item" href="#" data-page="orders">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        주문 관리
+        <span class="nav-badge yellow">8</span>
+      </a>
+      <a class="nav-item" href="#" data-page="products">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        상품 관리
+      </a>
+      <a class="nav-item" href="#" data-page="shipping">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        배송 처리
+        <span class="nav-badge">3</span>
+      </a>
+      <a class="nav-item" href="#" data-page="settlement">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        정산 통계
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">설정</div>
+      <a class="nav-item" href="#">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        업체 정보
+      </a>
+      <a class="nav-item" href="index.html">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        랜딩 페이지
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="user-avatar">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        </div>
+        <div>
+          <div class="user-name">달콤선물 상회</div>
+          <div class="user-role">인증 판매자</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <div class="dash-main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="topbar-btn" id="sidebarToggle" style="display:none;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <span class="topbar-title" id="pageTitle">대시보드</span>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-primary btn-sm" onclick="switchPage('products')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          상품 등록
+        </button>
+        <button class="topbar-btn topbar-notif">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <div class="notif-dot"></div>
+        </button>
+        <button class="theme-toggle" id="themeToggle">
+          <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- ── DASHBOARD ── -->
+    <div class="page-content" id="page-dashboard">
+      <div class="page-header">
+        <h1>대시보드</h1>
+        <p>달콤선물 상회 · 오늘 처리할 주문 8건이 있습니다.</p>
+      </div>
+      <div class="stat-grid stat-grid-4 mb-24">
+        <div class="stat-card">
+          <div class="stat-card-label">신규 주문</div>
+          <div class="stat-card-value brand">8</div>
+          <div class="stat-card-sub">처리 대기 중</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">이번 달 판매액</div>
+          <div class="stat-card-value">₩3.84M</div>
+          <div class="stat-card-sub"><span class="stat-delta-up">+8%</span> 전월 대비</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">정산 예정액</div>
+          <div class="stat-card-value">₩3.26M</div>
+          <div class="stat-card-sub">수수료 15% 제외</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">등록 상품</div>
+          <div class="stat-card-value">24</div>
+          <div class="stat-card-sub">판매중 18 · 중지 6</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- 최근 주문 -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">최근 주문</span>
+            <span class="card-action" onclick="switchPage('orders')">전체 보기</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>주문번호</th><th>상품</th><th>크리에이터</th><th>상태</th></tr>
+              </thead>
+              <tbody>
+                <tr><td class="td-code">#FU-20260325-001</td><td class="td-main">마카롱 세트</td><td>키리모코</td><td><span class="status status-warning">대기</span></td></tr>
+                <tr><td class="td-code">#FU-20260325-002</td><td class="td-main">홀케이크</td><td>미나토</td><td><span class="status status-info">준비중</span></td></tr>
+                <tr><td class="td-code">#FU-20260324-018</td><td class="td-main">피규어</td><td>드래곤타에루</td><td><span class="status status-success">배송완료</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 재고 현황 -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">재고 현황</span>
+            <span class="card-action" onclick="switchPage('products')">상품 관리</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>상품명</th><th>재고</th><th>상태</th></tr></thead>
+              <tbody>
+                <tr><td class="td-main">블루베리 마카롱 세트</td><td class="stock-ok">48</td><td><span class="status status-success">판매중</span></td></tr>
+                <tr><td class="td-main">치즈케이크 홀케이크</td><td class="stock-low">3</td><td><span class="status status-danger">재고부족</span></td></tr>
+                <tr><td class="td-main">딸기 타르트 (6개입)</td><td class="stock-ok">22</td><td><span class="status status-success">판매중</span></td></tr>
+                <tr><td class="td-main">초콜릿 퐁당 세트</td><td style="color:var(--text-muted);">0</td><td><span class="status status-default">판매중지</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ORDERS ── -->
+    <div class="page-content" id="page-orders" style="display:none;">
+      <div class="page-header">
+        <h1>주문 관리</h1>
+        <p>주문을 확인하고 송장을 입력하세요. 입력 즉시 크리에이터와 팬에게 자동 알림이 발송됩니다.</p>
+      </div>
+
+      <div class="privacy-banner">
+        <div class="privacy-banner-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div>
+          <div class="privacy-banner-title">크리에이터 개인정보 보호 처리 안내</div>
+          <ul>
+            <li>배송지 상세주소(동·호수)는 이 목록에 표시되지 않으며, <strong>송장 출력 시에만</strong> 프린터로 직접 전달됩니다.</li>
+            <li>수령인 성함은 <strong>팬업-관리번호</strong>로, 연락처는 <strong>안심번호(0507-...)</strong>로 대체됩니다.</li>
+            <li>배송 완료 후 <strong>7일이 지나면</strong> 주소 정보가 시스템에서 자동 마스킹 처리됩니다.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <input class="search-input" type="text" placeholder="주문번호 또는 상품명 검색...">
+        <select class="form-select" style="width:auto;">
+          <option>전체 상태</option>
+          <option>결제 완료</option>
+          <option>준비중</option>
+          <option>배송중</option>
+          <option>배송 완료</option>
+        </select>
+        <select class="form-select" style="width:auto;">
+          <option>최근 30일</option>
+          <option>최근 7일</option>
+          <option>오늘</option>
+        </select>
+        <button class="btn btn-outline btn-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/></svg>
+          엑셀 다운로드
+        </button>
+      </div>
+
+      <div class="bulk-bar" id="bulkBar">
+        <span class="bulk-count" id="bulkCount">0건 선택됨</span>
+        <button class="btn btn-primary btn-sm" onclick="openShipping()">일괄 송장 입력</button>
+        <button class="btn btn-ghost btn-sm">선택 취소</button>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:36px;"><input type="checkbox" id="selectAll" style="cursor:pointer;"></th>
+                <th>주문번호</th>
+                <th>상품명</th>
+                <th>수량</th>
+                <th>크리에이터</th>
+                <th>수령인</th>
+                <th>배송지</th>
+                <th>주문일</th>
+                <th>상태</th>
+                <th>액션</th>
+              </tr>
+            </thead>
+            <tbody id="orderTable">
+              <tr>
+                <td><input type="checkbox" class="order-check" style="cursor:pointer;"></td>
+                <td class="td-code">#FU-20260325-001</td>
+                <td class="td-main">블루베리 마카롱 세트</td>
+                <td>1</td>
+                <td>키리모코 여우</td>
+                <td>
+                  <div class="recip-code">팬업-001234</div>
+                  <div class="safe-num" style="margin-top:3px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    0507-1234-5678
+                  </div>
+                </td>
+                <td>
+                  <div class="addr-masked">
+                    <span class="addr-region">서울시 강남구</span>
+                    <span class="addr-hidden">
+                      <svg class="addr-lock-icon" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                      상세주소 생략
+                    </span>
+                  </div>
+                </td>
+                <td class="text-sm text-muted">2026.03.25 11:24</td>
+                <td><span class="status status-warning">결제완료</span></td>
+                <td>
+                  <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                    <button class="invoice-btn" onclick="openShipping()">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                      송장 입력
+                    </button>
+                    <button class="print-invoice-btn" onclick="printInvoice('FU-20260325-001')">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                      송장 출력
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="order-check" style="cursor:pointer;"></td>
+                <td class="td-code">#FU-20260325-002</td>
+                <td class="td-main">치즈케이크 홀케이크</td>
+                <td>1</td>
+                <td>미나토 하루카</td>
+                <td>
+                  <div class="recip-code">팬업-001235</div>
+                  <div class="safe-num" style="margin-top:3px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    0507-9876-5432
+                  </div>
+                </td>
+                <td>
+                  <div class="addr-masked">
+                    <span class="addr-region">경기도 성남시 분당구</span>
+                    <span class="addr-hidden">
+                      <svg class="addr-lock-icon" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                      상세주소 생략
+                    </span>
+                  </div>
+                </td>
+                <td class="text-sm text-muted">2026.03.25 09:11</td>
+                <td><span class="status status-warning">결제완료</span></td>
+                <td>
+                  <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                    <button class="invoice-btn" onclick="openShipping()">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                      송장 입력
+                    </button>
+                    <button class="print-invoice-btn" onclick="printInvoice('FU-20260325-002')">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                      송장 출력
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="order-check" style="cursor:pointer;"></td>
+                <td class="td-code">#FU-20260324-018</td>
+                <td class="td-main">딸기 타르트 (6개입)</td>
+                <td>2</td>
+                <td>드래곤 타에루</td>
+                <td>
+                  <div class="recip-code">팬업-001198</div>
+                  <div class="safe-num" style="margin-top:3px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    0507-3344-1122
+                  </div>
+                </td>
+                <td>
+                  <div class="addr-masked">
+                    <span class="addr-region">부산시 해운대구</span>
+                    <span class="addr-hidden">
+                      <svg class="addr-lock-icon" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                      상세주소 생략
+                    </span>
+                  </div>
+                </td>
+                <td class="text-sm text-muted">2026.03.24 16:40</td>
+                <td><span class="status status-info">배송중</span></td>
+                <td>
+                  <div style="display:flex;gap:6px;">
+                    <button class="btn btn-ghost btn-sm">송장 확인</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="order-check" style="cursor:pointer;"></td>
+                <td class="td-code">#FU-20260323-041</td>
+                <td class="td-main">블루베리 마카롱 세트</td>
+                <td>1</td>
+                <td>라이트닝 카이</td>
+                <td>
+                  <div class="recip-code" style="color:var(--text-muted);text-decoration:line-through;font-size:0.75rem;">팬업-001102</div>
+                  <div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;">7일 후 마스킹됨</div>
+                </td>
+                <td>
+                  <div class="addr-masked" style="opacity:0.5;">
+                    <span>— — —</span>
+                    <span style="font-size:0.75rem;color:var(--text-muted);display:block;">자동 마스킹 완료</span>
+                  </div>
+                </td>
+                <td class="text-sm text-muted">2026.03.23 13:02</td>
+                <td><span class="status status-success">배송완료</span></td>
+                <td>
+                  <div style="display:flex;gap:6px;">
+                    <button class="btn btn-ghost btn-sm">상세 보기</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PRODUCTS ── -->
+    <div class="page-content" id="page-products" style="display:none;">
+      <div class="page-header">
+        <h1>상품 관리</h1>
+        <p>판매 중인 상품을 관리하고 신규 상품을 등록하세요.</p>
+      </div>
+      <div class="grid-2">
+        <!-- 상품 목록 -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">등록 상품 (24)</span>
+            <div style="display:flex;gap:6px;">
+              <button class="btn btn-outline btn-sm">필터</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>상품명</th><th>가격</th><th>재고</th><th>상태</th><th></th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                      <div class="product-thumb"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+                      <span class="td-main">블루베리 마카롱 세트</span>
+                    </div>
+                  </td>
+                  <td>₩18,900</td>
+                  <td class="stock-ok">48</td>
+                  <td><span class="status status-success">판매중</span></td>
+                  <td><button class="btn btn-ghost btn-sm">수정</button></td>
+                </tr>
+                <tr>
+                  <td>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                      <div class="product-thumb"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+                      <span class="td-main">치즈케이크 홀케이크</span>
+                    </div>
+                  </td>
+                  <td>₩42,000</td>
+                  <td class="stock-low">3</td>
+                  <td><span class="status status-danger">재고부족</span></td>
+                  <td><button class="btn btn-ghost btn-sm">수정</button></td>
+                </tr>
+                <tr>
+                  <td>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                      <div class="product-thumb"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+                      <span class="td-main">초콜릿 퐁당 세트</span>
+                    </div>
+                  </td>
+                  <td>₩24,500</td>
+                  <td style="color:var(--text-muted);">0</td>
+                  <td><span class="status status-default">판매중지</span></td>
+                  <td><button class="btn btn-ghost btn-sm">수정</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 신규 상품 등록 -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">신규 상품 등록</span></div>
+          <div class="form-group">
+            <label class="form-label">상품명</label>
+            <input type="text" class="form-input" placeholder="예: 프리미엄 마카롱 세트 (12개입)">
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label">판매가 (원)</label>
+              <input type="number" class="form-input" placeholder="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">초기 재고 수량</label>
+              <input type="number" class="form-input" placeholder="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">카테고리</label>
+            <select class="form-select">
+              <option>식품 · 음료</option>
+              <option>굿즈 · 피규어</option>
+              <option>꽃다발 · 화환</option>
+              <option>기프티콘</option>
+              <option>기타</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">상품 이미지 (최대 4장)</label>
+            <div class="img-upload-grid">
+              <div class="img-slot">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </div>
+              <div class="img-slot"></div>
+              <div class="img-slot"></div>
+              <div class="img-slot"></div>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:16px;">
+            <label class="form-label">상품 설명</label>
+            <textarea class="form-textarea" placeholder="상품의 구성, 주의사항 등을 입력하세요."></textarea>
+          </div>
+          <button class="btn btn-primary" style="width:100%;justify-content:center;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            상품 등록하기
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SHIPPING ── -->
+    <div class="page-content" id="page-shipping" style="display:none;">
+      <div class="page-header">
+        <h1>배송 처리</h1>
+        <p>송장 번호 입력 후 <strong>송장 출력</strong>을 누르면 전체 주소가 프린터로만 전달됩니다. 화면에는 표시되지 않습니다.</p>
+      </div>
+
+      <div class="privacy-banner">
+        <div class="privacy-banner-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div>
+          <div class="privacy-banner-title">배송지 주소 처리 방식 안내</div>
+          <ul>
+            <li><strong>수령인</strong>: 크리에이터 본명 대신 <strong>팬업-관리번호</strong>로 표시 · 연락처는 <strong>안심번호(0507-...)</strong>로 대체됩니다.</li>
+            <li><strong>배송지 주소</strong>: 시/구까지만 화면에 표시. 상세주소(동·호수)는 [송장 출력] 버튼을 누를 때 프린터로만 전달됩니다.</li>
+            <li><strong>자동 마스킹</strong>: 배송 완료 확인 후 7일이 지나면 주소 정보가 시스템에서 자동으로 삭제됩니다.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>주문번호</th>
+                <th>상품명</th>
+                <th>크리에이터</th>
+                <th>수령인 (익명)</th>
+                <th>배송지</th>
+                <th>택배사</th>
+                <th>송장번호</th>
+                <th>처리</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="td-code">#FU-20260325-001</td>
+                <td class="td-main">블루베리 마카롱 세트</td>
+                <td>키리모코 여우</td>
+                <td>
+                  <div class="recip-code">팬업-001234</div>
+                  <div class="safe-num" style="margin-top:3px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    0507-1234-5678
+                  </div>
+                </td>
+                <td>
+                  <div class="addr-masked">
+                    <span class="addr-region">서울시 강남구</span>
+                    <span class="addr-hidden">
+                      <svg class="addr-lock-icon" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                      상세주소 생략
+                    </span>
+                  </div>
+                </td>
+                <td>
+                  <select class="form-select" style="width:120px;padding:6px 10px;font-size:0.8rem;">
+                    <option>CJ대한통운</option><option>롯데택배</option><option>우체국</option><option>한진택배</option>
+                  </select>
+                </td>
+                <td><input type="text" class="form-input" style="width:150px;padding:6px 10px;font-size:0.8rem;" placeholder="송장번호 입력"></td>
+                <td>
+                  <div style="display:flex;gap:5px;flex-direction:column;">
+                    <button class="btn btn-primary btn-sm">등록 & 알림</button>
+                    <button class="print-invoice-btn" onclick="printInvoice('FU-20260325-001')">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                      송장 출력
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="td-code">#FU-20260325-002</td>
+                <td class="td-main">치즈케이크 홀케이크</td>
+                <td>미나토 하루카</td>
+                <td>
+                  <div class="recip-code">팬업-001235</div>
+                  <div class="safe-num" style="margin-top:3px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    0507-9876-5432
+                  </div>
+                </td>
+                <td>
+                  <div class="addr-masked">
+                    <span class="addr-region">경기도 성남시 분당구</span>
+                    <span class="addr-hidden">
+                      <svg class="addr-lock-icon" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                      상세주소 생략
+                    </span>
+                  </div>
+                </td>
+                <td>
+                  <select class="form-select" style="width:120px;padding:6px 10px;font-size:0.8rem;">
+                    <option>CJ대한통운</option><option>롯데택배</option><option>우체국</option><option>한진택배</option>
+                  </select>
+                </td>
+                <td><input type="text" class="form-input" style="width:150px;padding:6px 10px;font-size:0.8rem;" placeholder="송장번호 입력"></td>
+                <td>
+                  <div style="display:flex;gap:5px;flex-direction:column;">
+                    <button class="btn btn-primary btn-sm">등록 & 알림</button>
+                    <button class="print-invoice-btn" onclick="printInvoice('FU-20260325-002')">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                      송장 출력
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="td-code">#FU-20260324-019</td>
+                <td class="td-main">피규어 한정판</td>
+                <td>라이트닝 카이</td>
+                <td>
+                  <div class="recip-code">팬업-001089</div>
+                  <div class="safe-num" style="margin-top:3px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    0507-5566-7788
+                  </div>
+                </td>
+                <td>
+                  <div class="addr-masked">
+                    <span class="addr-region">인천시 연수구</span>
+                    <span class="addr-hidden">
+                      <svg class="addr-lock-icon" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                      상세주소 생략
+                    </span>
+                  </div>
+                </td>
+                <td>
+                  <select class="form-select" style="width:120px;padding:6px 10px;font-size:0.8rem;">
+                    <option>CJ대한통운</option><option>롯데택배</option><option>우체국</option><option>한진택배</option>
+                  </select>
+                </td>
+                <td><input type="text" class="form-input" style="width:150px;padding:6px 10px;font-size:0.8rem;" placeholder="송장번호 입력"></td>
+                <td>
+                  <div style="display:flex;gap:5px;flex-direction:column;">
+                    <button class="btn btn-primary btn-sm">등록 & 알림</button>
+                    <button class="print-invoice-btn" onclick="printInvoice('FU-20260324-019')">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                      송장 출력
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SETTLEMENT ── -->
+    <div class="page-content" id="page-settlement" style="display:none;">
+      <div class="page-header">
+        <h1>정산 통계</h1>
+        <p>수수료를 제외한 실제 입금 예정 금액을 확인하세요.</p>
+      </div>
+      <div class="stat-grid stat-grid-3 mb-24">
+        <div class="stat-card">
+          <div class="stat-card-label">이번 달 총 판매액</div>
+          <div class="stat-card-value">₩3,840,000</div>
+          <div class="stat-card-sub"><span class="stat-delta-up">+8%</span> 전월 대비</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">플랫폼 수수료 (15%)</div>
+          <div class="stat-card-value" style="color:var(--danger);">- ₩576,000</div>
+          <div class="stat-card-sub">FANUP 서비스 이용료</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">실 입금 예정액</div>
+          <div class="stat-card-value brand">₩3,264,000</div>
+          <div class="stat-card-sub">익월 10일 지급 예정</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">월별 정산 내역</span></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>정산월</th><th>총 판매액</th><th>수수료</th><th>실 입금액</th><th>상태</th></tr></thead>
+            <tbody>
+              <tr><td>2026년 3월</td><td>₩3,840,000</td><td>₩576,000</td><td style="font-weight:700;color:var(--brand);">₩3,264,000</td><td><span class="status status-warning">정산 예정</span></td></tr>
+              <tr><td>2026년 2월</td><td>₩3,560,000</td><td>₩534,000</td><td style="font-weight:700;color:var(--brand);">₩3,026,000</td><td><span class="status status-success">입금 완료</span></td></tr>
+              <tr><td>2026년 1월</td><td>₩2,980,000</td><td>₩447,000</td><td style="font-weight:700;color:var(--brand);">₩2,533,000</td><td><span class="status status-success">입금 완료</span></td></tr>
+              <tr><td>2025년 12월</td><td>₩4,120,000</td><td>₩618,000</td><td style="font-weight:700;color:var(--brand);">₩3,502,000</td><td><span class="status status-success">입금 완료</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 송장 입력 모달 -->
+<div class="modal-backdrop" id="shippingModal">
+  <div class="modal">
+    <div class="modal-title">배송 처리 — 송장 입력</div>
+    <div class="form-group">
+      <label class="form-label">택배사 선택</label>
+      <select class="form-select">
+        <option>CJ대한통운</option><option>롯데택배</option><option>우체국택배</option><option>한진택배</option><option>로젠택배</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin-bottom:0;">
+      <label class="form-label">송장 번호</label>
+      <input type="text" class="form-input" placeholder="예: 631234567890">
+      <div class="form-hint">입력 즉시 크리에이터와 팬에게 배송 알림이 자동 발송됩니다.</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeShipping()">취소</button>
+      <button class="btn btn-primary" onclick="closeShipping()">등록 & 알림 발송</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Theme
+  const html = document.documentElement;
+  const saved = localStorage.getItem('fanup-theme');
+  if (saved) html.setAttribute('data-theme', saved);
+  else if (window.matchMedia('(prefers-color-scheme: dark)').matches) html.setAttribute('data-theme', 'dark');
+  document.getElementById('themeToggle')?.addEventListener('click', () => {
+    const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('fanup-theme', next);
+  });
+
+  // Page switch
+  function switchPage(name) {
+    document.querySelectorAll('[id^="page-"]').forEach(p => p.style.display = 'none');
+    document.getElementById('page-' + name).style.display = 'block';
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.page === name));
+    const titles = { dashboard:'대시보드', orders:'주문 관리', products:'상품 관리', shipping:'배송 처리', settlement:'정산 통계' };
+    document.getElementById('pageTitle').textContent = titles[name] || name;
+  }
+  document.querySelectorAll('.nav-item[data-page]').forEach(item => {
+    item.addEventListener('click', e => { e.preventDefault(); switchPage(item.dataset.page); });
+  });
+
+  // Checkbox 전체 선택
+  document.getElementById('selectAll')?.addEventListener('change', function() {
+    document.querySelectorAll('.order-check').forEach(c => c.checked = this.checked);
+    updateBulkBar();
+  });
+  document.addEventListener('change', e => { if (e.target.classList.contains('order-check')) updateBulkBar(); });
+  function updateBulkBar() {
+    const count = document.querySelectorAll('.order-check:checked').length;
+    const bar = document.getElementById('bulkBar');
+    bar.classList.toggle('show', count > 0);
+    document.getElementById('bulkCount').textContent = count + '건 선택됨';
+  }
+
+  // 배송 처리 모달
+  function openShipping() { document.getElementById('shippingModal').classList.add('open'); }
+  function closeShipping() { document.getElementById('shippingModal').classList.remove('open'); }
+  document.getElementById('shippingModal')?.addEventListener('click', e => { if (e.target === e.currentTarget) closeShipping(); });
+
+  // 송장 출력 — 주소 데이터는 화면에 표시되지 않고 프린터로만 전달
+  // 실제 구현: API에서 전체 주소 수신 후 iframe/print window로만 출력
+  const INVOICE_DATA = {
+    'FU-20260325-001': { recip:'팬업-001234', phone:'0507-1234-5678', addr:'서울시 강남구 테헤란로 ○○○, ○○동 ○○○호', item:'블루베리 마카롱 세트 x1' },
+    'FU-20260325-002': { recip:'팬업-001235', phone:'0507-9876-5432', addr:'경기도 성남시 분당구 판교로 ○○○, ○○동 ○○○호', item:'치즈케이크 홀케이크 x1' },
+    'FU-20260324-019': { recip:'팬업-001089', phone:'0507-5566-7788', addr:'인천시 연수구 컨벤시아대로 ○○○, ○○○동 ○○○호', item:'피규어 한정판 x1' },
+  };
+  function printInvoice(orderId) {
+    const d = INVOICE_DATA[orderId];
+    if (!d) return;
+    const w = window.open('', '_blank', 'width=400,height=300');
+    w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+      <style>
+        body{font-family:'Pretendard',sans-serif;padding:20px;font-size:13px;}
+        .label{font-size:10px;color:#666;margin-bottom:2px;}
+        .value{font-size:14px;font-weight:700;margin-bottom:12px;}
+        .addr{font-size:15px;font-weight:700;}
+        hr{border:none;border-top:1px solid #ddd;margin:12px 0;}
+        .notice{font-size:10px;color:#999;margin-top:16px;}
+      </style>
+      <script>window.onload=()=>{window.print();window.close();}<\/script>
+    </head><body>
+      <div class="label">주문번호</div><div class="value">${orderId}</div>
+      <div class="label">상품</div><div class="value">${d.item}</div>
+      <hr>
+      <div class="label">수령인</div><div class="value">${d.recip}</div>
+      <div class="label">연락처</div><div class="value">${d.phone}</div>
+      <div class="label">배송지</div><div class="addr">${d.addr}</div>
+      <div class="notice">본 출력물의 주소 정보는 배송 목적으로만 사용하며 별도 저장·공유를 금합니다. (FANUP 판매자 계약 제8조)</div>
+    </body></html>`);
+    w.document.close();
+  }
+
+  // Mobile sidebar
+  if (window.innerWidth <= 768) document.getElementById('sidebarToggle').style.display = 'flex';
+  document.getElementById('sidebarToggle')?.addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
+</script>
+</body>
+</html>
