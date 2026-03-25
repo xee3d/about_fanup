@@ -225,7 +225,7 @@
 
     <div class="sidebar-section">
       <div class="sidebar-section-title">설정</div>
-      <a class="nav-item" href="#">
+      <a class="nav-item" href="#" data-page="info">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
         업체 정보
       </a>
@@ -566,17 +566,17 @@
       <div class="stat-grid stat-grid-3 mb-24">
         <div class="stat-card">
           <div class="stat-card-label">이번 달 총 판매액</div>
-          <div class="stat-card-value">₩3,840,000</div>
-          <div class="stat-card-sub"><span class="stat-delta-up">+8%</span> 전월 대비</div>
+          <div class="stat-card-value" id="settle-total-sales">—</div>
+          <div class="stat-card-sub">취소/환불 제외</div>
         </div>
         <div class="stat-card">
-          <div class="stat-card-label">플랫폼 수수료 (15%)</div>
-          <div class="stat-card-value" style="color:var(--danger);">- ₩576,000</div>
+          <div class="stat-card-label">플랫폼 수수료</div>
+          <div class="stat-card-value" style="color:var(--danger);" id="settle-commission">—</div>
           <div class="stat-card-sub">FANUP 서비스 이용료</div>
         </div>
         <div class="stat-card">
           <div class="stat-card-label">실 입금 예정액</div>
-          <div class="stat-card-value brand">₩3,264,000</div>
+          <div class="stat-card-value brand" id="settle-net">—</div>
           <div class="stat-card-sub">익월 10일 지급 예정</div>
         </div>
       </div>
@@ -589,6 +589,50 @@
               <tr><td colspan="5" style="text-align:center;padding:32px;color:var(--text-muted);">로딩 중...</td></tr>
             </tbody>
           </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── INFO ── -->
+    <div class="page-content" id="page-info" style="display:none;">
+      <div class="page-header">
+        <h1>업체 정보</h1>
+        <p>등록된 사업자 정보를 확인하세요. 변경이 필요하면 고객센터에 문의해주세요.</p>
+      </div>
+      <div class="card" style="max-width:560px;">
+        <div class="card-header"><span class="card-title">사업자 정보</span></div>
+        <div style="padding:0 20px 20px;display:flex;flex-direction:column;gap:16px;">
+          <div>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;">업체명</div>
+            <div style="font-size:0.95rem;font-weight:600;" id="info-business-name">—</div>
+          </div>
+          <div>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;">대표자명</div>
+            <div style="font-size:0.95rem;" id="info-owner">—</div>
+          </div>
+          <div>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;">사업자등록번호</div>
+            <div style="font-size:0.95rem;" id="info-biz-number">—</div>
+          </div>
+          <div>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;">연락처</div>
+            <div style="font-size:0.95rem;" id="info-phone">—</div>
+          </div>
+          <div>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;">주소</div>
+            <div style="font-size:0.95rem;" id="info-address">—</div>
+          </div>
+          <div>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;">통신판매업 신고번호</div>
+            <div style="font-size:0.95rem;" id="info-mail-order">—</div>
+          </div>
+          <div>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;">이메일</div>
+            <div style="font-size:0.95rem;" id="info-email">—</div>
+          </div>
+        </div>
+        <div style="padding:16px 20px;border-top:1px solid var(--border);font-size:0.8rem;color:var(--text-muted);">
+          정보 변경 문의: <a href="mailto:seller@cheez.im" style="color:var(--brand);">seller@cheez.im</a>
         </div>
       </div>
     </div>
@@ -639,7 +683,7 @@
     document.querySelectorAll('[id^="page-"]').forEach(p => p.style.display = 'none');
     document.getElementById('page-' + name).style.display = 'block';
     document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.page === name));
-    const titles = { dashboard:'대시보드', orders:'주문 관리', products:'상품 관리', shipping:'배송 처리', settlement:'정산 통계' };
+    const titles = { dashboard:'대시보드', orders:'주문 관리', products:'상품 관리', shipping:'배송 처리', settlement:'정산 통계', info:'업체 정보' };
     document.getElementById('pageTitle').textContent = titles[name] || name;
   }
   document.querySelectorAll('.nav-item[data-page]').forEach(item => {

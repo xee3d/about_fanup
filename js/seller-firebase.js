@@ -331,9 +331,13 @@ function updateDashboardStats(orders) {
   const newOrders  = orders.filter(o => o.status === 'paid').length;
 
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-  set('stat-new-orders',  newOrders);
+  set('stat-new-orders',    newOrders);
   set('stat-monthly-sales', `₩${(totalSales/1000).toFixed(0)}K`);
   set('stat-settlement',    `₩${(settlement/1000).toFixed(0)}K`);
+  // 정산 통계 페이지 카드
+  set('settle-total-sales', `₩${totalSales.toLocaleString()}`);
+  set('settle-commission',  `- ₩${commission.toLocaleString()}`);
+  set('settle-net',         `₩${settlement.toLocaleString()}`);
   renderSettlement(orders);
 }
 
