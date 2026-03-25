@@ -543,13 +543,40 @@ tbody tr:hover td { background: var(--bg); }
   .sidebar { transform: translateX(-232px); width: 232px; }
   .sidebar.open { transform: translateX(0); box-shadow: 4px 0 24px rgba(0,0,0,0.12); }
   .dash-main { margin-left: 0; }
-  .page-content { padding: 20px 16px; }
+  .page-content { padding: 16px 14px; }
   .stat-grid-4, .stat-grid-3 { grid-template-columns: 1fr 1fr; }
   .grid-2, .grid-3 { grid-template-columns: 1fr; }
+
+  /* 테이블 가로 스크롤 */
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { min-width: 480px; }
+
+  /* 페이지 헤더 */
+  .page-header { margin-bottom: 16px; }
+  .page-header h1 { font-size: 1.2rem; }
+  .page-header p { font-size: 0.82rem; }
+
+  /* 카드 패딩 */
+  .card-header { padding: 14px 16px; }
+  form .card-header, form > div { padding-left: 16px; padding-right: 16px; }
+
+  /* 이미지 슬롯 */
+  .img-preview-grid { grid-template-columns: repeat(2, 1fr) !important; }
+
+  /* 상품 폼 그리드 → 1열 */
+  .form-row { grid-template-columns: 1fr !important; }
+
+  /* 탑바 */
+  .topbar-title { font-size: 0.9rem; }
+
+  /* 사이드바 오버레이 */
+  .sidebar-overlay { display: block; }
 }
 
 @media (max-width: 480px) {
   .stat-grid-4, .stat-grid-3, .stat-grid-2 { grid-template-columns: 1fr; }
+  .page-content { padding: 12px 12px; }
+  table { min-width: 400px; }
 }
 
 /* ─── Scrollbar ─── */

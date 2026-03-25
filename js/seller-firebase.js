@@ -432,18 +432,35 @@ window.editProduct = async function(id) {
   const snap = await getDocs(query(collection(db, 'products'), where('__name__', '==', id)));
   if (snap.empty) return;
   const p = snap.docs[0].data();
-  document.getElementById('prod-name').value      = p.name || '';
-  document.getElementById('prod-price').value     = p.price || '';
+  document.getElementById('prod-name').value       = p.name || '';
+  document.getElementById('prod-price').value      = p.price || '';
   document.getElementById('prod-orig-price').value = p.originalPrice || '';
-  document.getElementById('prod-category').value  = p.category || 'all';
-  document.getElementById('prod-stock').value     = p.stock ?? '';
-  document.getElementById('prod-desc').value      = p.description || '';
-  document.getElementById('prod-shipping').value  = p.shippingFee ?? '';
-  document.getElementById('prod-edit-id').value   = id;
-  document.getElementById('prod-form-title')?.replaceChildren
-    ? null : null;
+  document.getElementById('prod-category').value   = p.category || '';
+  document.getElementById('prod-stock').value      = p.stock ?? '';
+  document.getElementById('prod-desc').value       = p.description || '';
+  document.getElementById('prod-shipping').value   = p.shippingFee ?? '';
+  document.getElementById('prod-edit-id').value    = id;
   if (document.getElementById('prod-form-title'))
     document.getElementById('prod-form-title').textContent = '상품 수정';
+
+  // 기존 이미지 복원
+  const preview = document.getElementById('prod-img-preview');
+  if (preview) {
+    const slots = preview.querySelectorAll('.img-slot');
+    const images = p.images || (p.thumbnail ? [p.thumbnail] : []);
+    slots.forEach((slot, i) => {
+      slot.innerHTML = '';
+      if (images[i]) {
+        const img = document.createElement('img');
+        img.src = images[i];
+        img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:6px;';
+        slot.appendChild(img);
+      } else {
+        slot.innerHTML = i === 0 ? '<span style="font-size:1.4rem;color:var(--text-muted);">+</span>' : '';
+      }
+    });
+  }
+
   window.switchPage && window.switchPage('products');
   document.getElementById('prod-name')?.focus();
 };

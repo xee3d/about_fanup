@@ -190,6 +190,9 @@
 <body>
 <div class="dash-shell">
 
+  <!-- 모바일 사이드바 오버레이 -->
+  <div id="sidebarOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:89;" onclick="document.getElementById('sidebar').classList.remove('open');this.style.display='none';"></div>
+
   <!-- ── SIDEBAR ── -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
@@ -480,6 +483,7 @@
             <div class="form-group">
               <label class="form-label">카테고리</label>
               <select id="prod-category" class="form-select">
+                <option value="">카테고리 선택</option>
                 <option value="food">식품 · 음료</option>
                 <option value="goods">굿즈 · 피규어</option>
                 <option value="flower">꽃다발 · 화환</option>
@@ -763,7 +767,22 @@
 
   // Mobile sidebar
   if (window.innerWidth <= 768) document.getElementById('sidebarToggle').style.display = 'flex';
-  document.getElementById('sidebarToggle')?.addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
+  document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+    const sidebar  = document.getElementById('sidebar');
+    const overlay  = document.getElementById('sidebarOverlay');
+    const isOpen   = sidebar.classList.toggle('open');
+    if (overlay) overlay.style.display = isOpen ? 'block' : 'none';
+  });
+  // 페이지 전환 시 사이드바 닫기 (모바일)
+  document.querySelectorAll('.nav-item[data-page]').forEach(item => {
+    item.addEventListener('click', () => {
+      if (window.innerWidth <= 768) {
+        document.getElementById('sidebar').classList.remove('open');
+        const overlay = document.getElementById('sidebarOverlay');
+        if (overlay) overlay.style.display = 'none';
+      }
+    });
+  });
 
   // switchPage를 전역으로 노출 (seller-firebase.js에서 호출)
   window.switchPage = switchPage;
