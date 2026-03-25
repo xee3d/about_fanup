@@ -247,7 +247,7 @@ let unsubSeller = null;
 window.handleLogout = async () => {
   if (unsubSeller) unsubSeller();
   await signOut(auth);
-  location.href = 'apply.html';
+  location.href = 'login.html';
 };
 
 onAuthStateChanged(auth, user => {

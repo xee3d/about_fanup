@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>로그인 | FANUP 판매자 센터</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" as="style" crossorigin
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <!-- Kakao SDK -->
+  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"
+    integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4"
+    crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="css/dashboard.css">
+  <style>
+    body {
+      background: var(--bg); color: var(--text-primary);
+      min-height: 100vh; display: flex; flex-direction: column;
+    }
+
+    /* ─── 레이아웃 ─── */
+    .login-shell {
+      flex: 1; display: grid;
+      grid-template-columns: 1fr 480px;
+      min-height: 100vh;
+    }
+    @media (max-width: 800px) {
+      .login-shell { grid-template-columns: 1fr; }
+      .login-brand { display: none; }
+    }
+
+    /* ─── 브랜드 패널 (좌측) ─── */
+    .login-brand {
+      background: linear-gradient(145deg, #1a0533 0%, #2d0a52 50%, #1a0533 100%);
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 60px 56px; position: relative; overflow: hidden;
+    }
+    .brand-glow {
+      position: absolute; border-radius: 50%;
+      filter: blur(80px); pointer-events: none;
+    }
+    .brand-glow-1 { width: 380px; height: 380px; background: rgba(124,58,237,0.35); top: -60px; left: -80px; }
+    .brand-glow-2 { width: 300px; height: 300px; background: rgba(236,72,153,0.2); bottom: 40px; right: -60px; }
+    .brand-content { position: relative; z-index: 1; }
+    .brand-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 48px; }
+    .brand-logo img { height: 32px; filter: brightness(0) invert(1); }
+    .brand-logo span { font-size: 1.3rem; font-weight: 900; color: #fff; letter-spacing: -0.04em; }
+    .brand-seller-badge {
+      display: inline-block; background: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.7); font-size: 0.75rem; font-weight: 600;
+      padding: 4px 12px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.15);
+      margin-bottom: 24px; letter-spacing: 0.05em; text-transform: uppercase;
+    }
+    .brand-title {
+      font-size: clamp(1.6rem, 2.5vw, 2.2rem); font-weight: 900;
+      color: #fff; line-height: 1.2; letter-spacing: -0.045em;
+      margin-bottom: 16px; word-break: keep-all;
+    }
+    .brand-title em { color: #C084FC; font-style: normal; }
+    .brand-sub { font-size: 0.9rem; color: rgba(255,255,255,0.55); line-height: 1.7; margin-bottom: 40px; word-break: keep-all; }
+    .brand-stats { display: flex; gap: 32px; }
+    .brand-stat-val { font-size: 1.4rem; font-weight: 900; color: #fff; letter-spacing: -0.04em; }
+    .brand-stat-label { font-size: 0.75rem; color: rgba(255,255,255,0.45); margin-top: 2px; }
+
+    /* ─── 로그인 패널 (우측) ─── */
+    .login-panel {
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      padding: 48px 40px; background: var(--bg-card);
+      border-left: 1px solid var(--border);
+    }
+    .login-inner { width: 100%; max-width: 360px; }
+
+    /* 모바일: 브랜드 패널 없을 때 로고 표시 */
+    .login-mobile-logo {
+      display: none; align-items: center; gap: 8px;
+      font-weight: 900; font-size: 1.1rem; letter-spacing: -0.04em;
+      margin-bottom: 32px;
+    }
+    .login-mobile-logo img { height: 26px; filter: var(--logo-filter); }
+    @media (max-width: 800px) {
+      .login-mobile-logo { display: flex; }
+      .login-panel { border-left: none; padding: 40px 24px; }
+    }
+
+    .login-title { font-size: 1.5rem; font-weight: 900; letter-spacing: -0.04em; margin-bottom: 6px; }
+    .login-sub { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 32px; line-height: 1.6; }
+
+    /* ─── 소셜 버튼 ─── */
+    .social-btns { display: flex; flex-direction: column; gap: 10px; }
+
+    .social-btn {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 20px; border-radius: 12px;
+      width: 100%; font-size: 0.92rem; font-weight: 600;
+      font-family: inherit; cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.15s;
+      position: relative;
+    }
+    .social-btn:active { transform: scale(0.98); }
+    .social-btn-icon { width: 22px; height: 22px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .social-btn-label { flex: 1; text-align: left; }
+    .social-btn-arrow { font-size: 0.8rem; opacity: 0.5; }
+
+    /* Google */
+    .btn-google {
+      background: #fff; color: #1F1F1F;
+      border: 1.5px solid #E5E7EB;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    .btn-google:hover { box-shadow: 0 3px 12px rgba(0,0,0,0.10); border-color: #D1D5DB; }
+    [data-theme="dark"] .btn-google { background: #1E1E2A; color: #F0F0F8; border-color: #2A2A38; }
+
+    /* Kakao */
+    .btn-kakao {
+      background: #FEE500; color: #191919;
+      border: none;
+      box-shadow: 0 1px 4px rgba(254,229,0,0.25);
+    }
+    .btn-kakao:hover { background: #F5DC00; box-shadow: 0 3px 12px rgba(254,229,0,0.4); }
+
+    /* 구분선 */
+    .divider {
+      display: flex; align-items: center; gap: 12px;
+      margin: 20px 0; color: var(--text-muted); font-size: 0.78rem;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+
+    /* 하단 링크 */
+    .login-footer-links {
+      margin-top: 28px; text-align: center;
+      font-size: 0.8rem; color: var(--text-muted);
+    }
+    .login-footer-links a { color: var(--brand); font-weight: 600; }
+    .login-footer-links .sep { margin: 0 8px; }
+
+    /* ─── 상태 메시지 ─── */
+    .status-msg {
+      display: none; align-items: center; gap: 8px;
+      padding: 12px 14px; border-radius: 10px;
+      font-size: 0.82rem; margin-bottom: 16px;
+    }
+    .status-msg.loading { background: var(--brand-light); color: var(--brand); display: flex; }
+    .status-msg.error   { background: var(--danger-light); color: var(--danger); display: flex; }
+    .spin {
+      width: 16px; height: 16px; border: 2px solid currentColor;
+      border-top-color: transparent; border-radius: 50%;
+      animation: spin 0.7s linear infinite; flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─── 거절 상태 ─── */
+    .rejected-card {
+      display: none; padding: 16px;
+      background: var(--danger-light); border: 1px solid var(--danger);
+      border-radius: 12px; margin-bottom: 16px;
+    }
+    .rejected-card .title { font-size: 0.88rem; font-weight: 700; color: var(--danger); }
+    .rejected-card .reason { font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px; }
+    .rejected-card .reapply { font-size: 0.82rem; color: var(--brand); font-weight: 600; display: block; margin-top: 10px; }
+
+    /* ─── Theme ─── */
+    .theme-toggle {
+      position: fixed; top: 20px; right: 20px;
+      width: 34px; height: 34px; border-radius: 50%;
+      border: 1px solid var(--border); background: var(--bg-card);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--text-secondary); z-index: 10;
+    }
+    [data-theme="light"] .icon-moon { display: block; }
+    [data-theme="light"] .icon-sun  { display: none; }
+    [data-theme="dark"]  .icon-moon { display: none; }
+    [data-theme="dark"]  .icon-sun  { display: block; }
+
+    /* ─── 로딩 오버레이 ─── */
+    #loadingOverlay {
+      display: none; position: fixed; inset: 0; z-index: 100;
+      background: var(--bg); align-items: center; justify-content: center; flex-direction: column; gap: 16px;
+    }
+    #loadingOverlay.show { display: flex; }
+    .loading-spinner { width: 40px; height: 40px; border: 3px solid var(--brand-light); border-top-color: var(--brand); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    .loading-text { font-size: 0.88rem; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle" aria-label="테마 전환">
+  <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+</button>
+
+<!-- 전체 로딩 오버레이 -->
+<div id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <p class="loading-text" id="loadingText">로그인 중...</p>
+</div>
+
+<div class="login-shell">
+
+  <!-- ── 브랜드 패널 ── -->
+  <div class="login-brand">
+    <div class="brand-glow brand-glow-1"></div>
+    <div class="brand-glow brand-glow-2"></div>
+    <div class="brand-content">
+      <div class="brand-logo">
+        <img src="assets/fanup_logo.png" alt="FANUP" onerror="this.style.display='none'">
+        <span>FANUP</span>
+      </div>
+      <div class="brand-seller-badge">Seller Center</div>
+      <h1 class="brand-title">팬과 크리에이터를<br>연결하는 <em>판매자 파트너</em></h1>
+      <p class="brand-sub">
+        FANUP 파트너가 되면 크리에이터의 팬 베이스에<br>
+        직접 상품을 선보이고, 안전하게 정산받을 수 있습니다.
+      </p>
+      <div class="brand-stats">
+        <div>
+          <div class="brand-stat-val">0%</div>
+          <div class="brand-stat-label">주소 노출률</div>
+        </div>
+        <div>
+          <div class="brand-stat-val">24/7</div>
+          <div class="brand-stat-label">실시간 주문</div>
+        </div>
+        <div>
+          <div class="brand-stat-val">FREE</div>
+          <div class="brand-stat-label">초기 입점비</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 로그인 패널 ── -->
+  <div class="login-panel">
+    <div class="login-inner">
+
+      <!-- 모바일 로고 -->
+      <div class="login-mobile-logo">
+        <img src="assets/fanup_logo.png" alt="FANUP" onerror="this.style.display='none'">
+        FANUP
+      </div>
+
+      <h2 class="login-title">판매자 센터 로그인</h2>
+      <p class="login-sub">승인된 파트너 계정으로 로그인하세요.<br>처음이시라면 아래에서 입점 신청을 해주세요.</p>
+
+      <!-- 상태 메시지 -->
+      <div class="status-msg" id="statusMsg">
+        <div class="spin"></div>
+        <span id="statusText">로그인 처리 중...</span>
+      </div>
+
+      <!-- 거절 카드 -->
+      <div class="rejected-card" id="rejectedCard">
+        <div class="title">❌ 입점 거절 안내</div>
+        <div class="reason" id="rejectedReason"></div>
+        <a href="apply.html" class="reapply">재신청하기 →</a>
+      </div>
+
+      <!-- 소셜 로그인 버튼 -->
+      <div class="social-btns" id="socialBtns">
+        <!-- Google -->
+        <button class="social-btn btn-google" id="googleBtn">
+          <span class="social-btn-icon">
+            <svg width="20" height="20" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+              <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+              <path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/>
+              <path d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.55 0 9s.348 2.825.957 4.039l3.007-2.332z" fill="#FBBC05"/>
+              <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+            </svg>
+          </span>
+          <span class="social-btn-label">Google로 계속하기</span>
+          <span class="social-btn-arrow">›</span>
+        </button>
+
+        <!-- Kakao -->
+        <button class="social-btn btn-kakao" id="kakaoBtn">
+          <span class="social-btn-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 3C6.477 3 2 6.477 2 10.5c0 2.574 1.574 4.842 3.969 6.196l-.98 3.615c-.082.303.265.545.518.36L9.86 18.28C10.56 18.424 11.27 18.5 12 18.5c5.523 0 10-3.477 10-7.5S17.523 3 12 3z" fill="#191919"/>
+            </svg>
+          </span>
+          <span class="social-btn-label">카카오로 계속하기</span>
+          <span class="social-btn-arrow">›</span>
+        </button>
+      </div>
+
+      <div class="divider">또는</div>
+
+      <div class="login-footer-links">
+        처음이신가요?
+        <a href="apply.html">입점 신청하기</a>
+        <span class="sep">·</span>
+        <a href="pending.html">심사 현황 확인</a>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Theme
+  const html = document.documentElement;
+  const saved = localStorage.getItem('fanup-theme');
+  if (saved) html.setAttribute('data-theme', saved);
+  else if (window.matchMedia('(prefers-color-scheme: dark)').matches) html.setAttribute('data-theme', 'dark');
+  document.getElementById('themeToggle')?.addEventListener('click', () => {
+    const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next); localStorage.setItem('fanup-theme', next);
+  });
+
+  // Kakao SDK 초기화
+  Kakao.init('75b210982867b05e2e4e7cbda7354714');
+</script>
+
+<script type="module">
+import { initializeApp }       from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js';
+import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithCustomToken, onAuthStateChanged }
+  from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js';
+import { getFirestore, collection, query, where, getDocs }
+  from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js';
+import { getFunctions, httpsCallable }
+  from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-functions.js';
+
+const app  = initializeApp({ apiKey:'AIzaSyAsQZo491B1W3s_s2WcqrTMdgH810Putao', authDomain:'fanup-app.firebaseapp.com', projectId:'fanup-app', storageBucket:'fanup-app-storage', messagingSenderId:'542708276250', appId:'1:542708276250:web:a2f01ca6b84ed1d50845a3' });
+const auth = getAuth(app);
+const db   = getFirestore(app);
+const fns  = getFunctions(app, 'asia-northeast3');
+
+// ─── 헬퍼 ──────────────────────────────────────────────────
+function showLoading(text = '로그인 중...') {
+  document.getElementById('loadingText').textContent = text;
+  document.getElementById('loadingOverlay').classList.add('show');
+}
+function hideLoading() {
+  document.getElementById('loadingOverlay').classList.remove('show');
+}
+function showStatus(text, type = 'loading') {
+  const el = document.getElementById('statusMsg');
+  el.className = `status-msg ${type}`;
+  document.getElementById('statusText').textContent = text;
+}
+function hideStatus() {
+  document.getElementById('statusMsg').className = 'status-msg';
+}
+function setBtnsDisabled(d) {
+  document.getElementById('googleBtn').disabled = d;
+  document.getElementById('kakaoBtn').disabled  = d;
+}
+
+async function fetchSeller(uid) {
+  const snap = await getDocs(query(collection(db, 'sellers'), where('uid', '==', uid)));
+  if (snap.empty) return null;
+  return { id: snap.docs[0].id, ...snap.docs[0].data() };
+}
+
+async function routeAfterLogin(uid) {
+  showLoading('계정 확인 중...');
+  try {
+    const seller = await fetchSeller(uid);
+    if (!seller)                       { location.href = 'apply.html';   return; }
+    if (seller.status === 'pending')   { location.href = 'pending.html'; return; }
+    if (seller.status === 'approved')  { location.href = 'seller.html';  return; }
+    if (seller.status === 'rejected') {
+      hideLoading();
+      document.getElementById('rejectedCard').style.display = 'block';
+      document.getElementById('rejectedReason').textContent = seller.rejectionReason ? '사유: ' + seller.rejectionReason : '담당자에게 문의해주세요.';
+      setBtnsDisabled(false);
+    }
+  } catch(e) {
+    hideLoading();
+    showStatus('오류가 발생했습니다. 다시 시도해주세요.', 'error');
+    setBtnsDisabled(false);
+  }
+}
+
+// ─── 이미 로그인된 경우 자동 라우팅 ──────────────────────
+onAuthStateChanged(auth, user => {
+  if (user) routeAfterLogin(user.uid);
+});
+
+// ─── Google 로그인 ─────────────────────────────────────────
+document.getElementById('googleBtn').addEventListener('click', async () => {
+  setBtnsDisabled(true);
+  showStatus('Google 계정 연결 중...');
+  try {
+    const result = await signInWithPopup(auth, new GoogleAuthProvider());
+    await routeAfterLogin(result.user.uid);
+  } catch(e) {
+    if (e.code !== 'auth/popup-closed-by-user') {
+      showStatus('로그인에 실패했습니다.', 'error');
+    } else {
+      hideStatus();
+    }
+    setBtnsDisabled(false);
+  }
+});
+
+// ─── 카카오 로그인 ─────────────────────────────────────────
+document.getElementById('kakaoBtn').addEventListener('click', () => {
+  setBtnsDisabled(true);
+  showStatus('카카오 계정 연결 중...');
+
+  Kakao.Auth.login({
+    success: async (authObj) => {
+      try {
+        showLoading('카카오 인증 중...');
+        const socialLoginAuth = httpsCallable(fns, 'socialLoginAuth');
+        const result = await socialLoginAuth({ provider: 'kakao', accessToken: authObj.access_token });
+        if (!result.data.success) throw new Error('Custom token 발급 실패');
+        await signInWithCustomToken(auth, result.data.customToken);
+        await routeAfterLogin(result.data.user.uid);
+      } catch(e) {
+        console.error('카카오 로그인 오류:', e);
+        hideLoading();
+        showStatus('카카오 로그인 중 오류가 발생했습니다.', 'error');
+        setBtnsDisabled(false);
+      }
+    },
+    fail: (err) => {
+      console.error('카카오 Auth 실패:', err);
+      hideStatus();
+      setBtnsDisabled(false);
+    },
+  });
+});
+</script>
+</body>
+</html>
