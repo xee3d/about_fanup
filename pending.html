@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>입점 심사 중 | FANUP</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" as="style" crossorigin
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <style>
+    body {
+      background: var(--bg); color: var(--text-primary);
+      min-height: 100vh; display: flex; flex-direction: column;
+    }
+
+    /* ─── Header ─── */
+    .pending-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 40px; border-bottom: 1px solid var(--border);
+      background: var(--bg-card);
+    }
+    .pending-logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.05rem; letter-spacing: -0.03em; }
+    .pending-logo img { height: 26px; filter: var(--logo-filter); }
+
+    /* ─── Main ─── */
+    .pending-main {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      padding: 40px 24px;
+    }
+    .pending-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 24px; padding: 48px 40px;
+      width: 100%; max-width: 460px;
+      box-shadow: var(--shadow-md); text-align: center;
+    }
+    @media (max-width: 500px) { .pending-card { padding: 36px 24px; } }
+
+    .pending-logo-sm {
+      width: 56px; height: 56px; border-radius: 16px;
+      background: var(--brand-light); display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px; font-size: 1.6rem;
+    }
+    .pending-title { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.04em; margin-bottom: 8px; }
+    .pending-sub { font-size: 0.88rem; color: var(--text-muted); line-height: 1.65; margin-bottom: 32px; word-break: keep-all; }
+
+    /* ─── 스텝 타임라인 ─── */
+    .steps { display: flex; flex-direction: column; gap: 0; margin-bottom: 32px; text-align: left; }
+    .step {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 14px 0; position: relative;
+    }
+    .step:not(:last-child)::after {
+      content: ''; position: absolute;
+      left: 15px; top: 42px; bottom: -14px; width: 2px;
+      background: var(--border);
+    }
+    .step-dot {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 0.9rem; font-weight: 700;
+      border: 2px solid var(--border); background: var(--bg-card);
+      position: relative; z-index: 1;
+    }
+    .step.done   .step-dot { background: var(--success); border-color: var(--success); color: #fff; }
+    .step.active .step-dot { background: var(--brand); border-color: var(--brand); color: #fff; }
+    .step.active .step-dot::after {
+      content: ''; position: absolute; inset: -5px;
+      border-radius: 50%; border: 2px solid var(--brand);
+      opacity: 0.3; animation: ping 1.5s ease-in-out infinite;
+    }
+    @keyframes ping {
+      0%, 100% { transform: scale(1); opacity: 0.3; }
+      50% { transform: scale(1.3); opacity: 0; }
+    }
+    .step-text {}
+    .step-label { font-size: 0.88rem; font-weight: 700; }
+    .step-desc { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+    .step.done   .step-label { color: var(--success); }
+    .step.active .step-label { color: var(--brand); }
+    .step.wait   .step-label { color: var(--text-muted); }
+
+    /* ─── 업체 정보 ─── */
+    .seller-info-box {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px 18px;
+      text-align: left; margin-bottom: 24px;
+    }
+    .seller-info-label { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px; }
+    .seller-info-name { font-size: 0.95rem; font-weight: 700; }
+    .seller-info-email { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+    .seller-info-date { font-size: 0.75rem; color: var(--text-muted); margin-top: 6px; }
+
+    /* ─── 상태 배지 ─── */
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 14px; border-radius: 50px; font-size: 0.8rem; font-weight: 700;
+      background: var(--warning-light); color: var(--warning);
+      margin-bottom: 24px;
+    }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; animation: blink 1.4s ease-in-out infinite; }
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    /* ─── 거절 상태 ─── */
+    .rejected-box {
+      background: var(--danger-light); border: 1px solid var(--danger);
+      border-radius: 12px; padding: 16px 18px;
+      text-align: left; margin-bottom: 24px; display: none;
+    }
+    .rejected-box .rej-title { font-size: 0.88rem; font-weight: 700; color: var(--danger); margin-bottom: 4px; }
+    .rejected-box .rej-reason { font-size: 0.82rem; color: var(--text-secondary); }
+
+    /* ─── Actions ─── */
+    .pending-actions { display: flex; flex-direction: column; gap: 10px; }
+    .btn-outline {
+      padding: 11px; border-radius: 50px;
+      border: 1.5px solid var(--border); background: transparent;
+      font-size: 0.88rem; font-weight: 600; color: var(--text-secondary);
+      font-family: inherit; cursor: pointer; transition: border-color 0.15s;
+    }
+    .btn-outline:hover { border-color: var(--text-muted); }
+    .btn-primary {
+      padding: 12px; border-radius: 50px;
+      background: var(--brand); color: #fff;
+      border: none; font-size: 0.9rem; font-weight: 700;
+      font-family: inherit; cursor: pointer;
+    }
+    .reapply-hint { font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; }
+
+    /* ─── Theme Toggle ─── */
+    .theme-toggle {
+      width: 34px; height: 34px; border-radius: 50%;
+      border: 1px solid var(--border); background: var(--bg-card);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--text-secondary);
+    }
+    [data-theme="light"] .icon-moon { display: block; }
+    [data-theme="light"] .icon-sun  { display: none; }
+    [data-theme="dark"]  .icon-moon { display: none; }
+    [data-theme="dark"]  .icon-sun  { display: block; }
+
+    /* ─── Footer ─── */
+    .pending-footer {
+      border-top: 1px solid var(--border); padding: 20px 40px;
+      text-align: center; font-size: 0.78rem; color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+<header class="pending-header">
+  <a href="index.html" class="pending-logo">
+    <img src="assets/fanup_logo.png" alt="FANUP" onerror="this.style.display='none'">
+    FANUP
+  </a>
+  <button class="theme-toggle" id="themeToggle" aria-label="테마 전환">
+    <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</header>
+
+<main class="pending-main">
+  <div class="pending-card">
+    <div class="pending-logo-sm">📋</div>
+    <h1 class="pending-title" id="pageTitle">입점 심사 중</h1>
+    <p class="pending-sub" id="pageSub">신청해 주셔서 감사합니다. 서류 검토 후<br>1–3 영업일 내에 결과를 안내해 드립니다.</p>
+
+    <!-- 상태 배지 -->
+    <div class="status-badge" id="statusBadge">
+      <span class="status-dot"></span>
+      심사 진행 중
+    </div>
+
+    <!-- 거절 사유 -->
+    <div class="rejected-box" id="rejectedBox">
+      <div class="rej-title">입점이 거절되었습니다.</div>
+      <div class="rej-reason" id="rejectedReason"></div>
+    </div>
+
+    <!-- 업체 정보 -->
+    <div class="seller-info-box" id="sellerInfoBox">
+      <div class="seller-info-label">신청 업체</div>
+      <div class="seller-info-name" id="sellerName">—</div>
+      <div class="seller-info-email" id="sellerEmail">—</div>
+      <div class="seller-info-date" id="sellerDate">신청일: —</div>
+    </div>
+
+    <!-- 스텝 타임라인 -->
+    <div class="steps" id="stepsEl">
+      <div class="step done" id="step1">
+        <div class="step-dot">✓</div>
+        <div class="step-text">
+          <div class="step-label">신청 완료</div>
+          <div class="step-desc">입점 신청서가 접수됐습니다.</div>
+        </div>
+      </div>
+      <div class="step active" id="step2">
+        <div class="step-dot">2</div>
+        <div class="step-text">
+          <div class="step-label">서류 검토 중</div>
+          <div class="step-desc">사업자 정보 및 상품 카테고리 적합성 검토</div>
+        </div>
+      </div>
+      <div class="step wait" id="step3">
+        <div class="step-dot">3</div>
+        <div class="step-text">
+          <div class="step-label">최종 승인</div>
+          <div class="step-desc">승인 완료 시 판매자 센터 이용 가능</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 액션 -->
+    <div class="pending-actions" id="pendingActions">
+      <button class="btn-outline" onclick="handleLogout()">다른 계정으로 로그인</button>
+      <p style="font-size:0.78rem;color:var(--text-muted);">문의: <a href="mailto:seller@cheez.im" style="color:var(--brand);">seller@cheez.im</a></p>
+    </div>
+  </div>
+</main>
+
+<footer class="pending-footer">
+  © 2026 FANUP Inc. All rights reserved.
+</footer>
+
+<script>
+  const html = document.documentElement;
+  const saved = localStorage.getItem('fanup-theme');
+  if (saved) html.setAttribute('data-theme', saved);
+  else if (window.matchMedia('(prefers-color-scheme: dark)').matches) html.setAttribute('data-theme', 'dark');
+  document.getElementById('themeToggle')?.addEventListener('click', () => {
+    const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next); localStorage.setItem('fanup-theme', next);
+  });
+</script>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js';
+import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js';
+import { getFirestore, collection, query, where, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js';
+
+const app  = initializeApp({ apiKey:'AIzaSyAsQZo491B1W3s_s2WcqrTMdgH810Putao', authDomain:'fanup-app.firebaseapp.com', projectId:'fanup-app', storageBucket:'fanup-app-storage', messagingSenderId:'542708276250', appId:'1:542708276250:web:a2f01ca6b84ed1d50845a3' });
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+let unsubSeller = null;
+
+window.handleLogout = async () => {
+  if (unsubSeller) unsubSeller();
+  await signOut(auth);
+  location.href = 'apply.html';
+};
+
+onAuthStateChanged(auth, user => {
+  if (!user) { location.href = 'apply.html'; return; }
+
+  // onSnapshot으로 seller 문서 실시간 감시
+  const q = query(collection(db, 'sellers'), where('uid', '==', user.uid));
+  unsubSeller = onSnapshot(q, snap => {
+    if (snap.empty) { location.href = 'apply.html'; return; }
+
+    const seller = { id: snap.docs[0].id, ...snap.docs[0].data() };
+
+    // 승인 완료 → seller.html 이동
+    if (seller.status === 'approved') { location.href = 'seller.html'; return; }
+
+    // 업체 정보 표시
+    document.getElementById('sellerName').textContent  = seller.businessName || '—';
+    document.getElementById('sellerEmail').textContent = seller.email || user.email || '—';
+    if (seller.createdAt?.toDate) {
+      document.getElementById('sellerDate').textContent = '신청일: ' + seller.createdAt.toDate().toLocaleDateString('ko-KR');
+    }
+
+    // 거절 처리
+    if (seller.status === 'rejected') {
+      document.getElementById('pageTitle').textContent = '입점 거절 안내';
+      document.getElementById('pageSub').textContent   = '아래 사유를 확인하시고 수정 후 재신청해 주세요.';
+      document.getElementById('statusBadge').style.display = 'none';
+      document.getElementById('stepsEl').style.display     = 'none';
+      const rb = document.getElementById('rejectedBox');
+      rb.style.display = 'block';
+      document.getElementById('rejectedReason').textContent = seller.rejectionReason
+        ? '사유: ' + seller.rejectionReason
+        : '담당자에게 문의해 주세요.';
+      document.getElementById('pendingActions').innerHTML = `
+        <button class="btn-primary" onclick="location.href='apply.html'">재신청하기</button>
+        <button class="btn-outline" onclick="handleLogout()">로그아웃</button>
+        <p class="reapply-hint">문의: <a href="mailto:seller@cheez.im" style="color:var(--brand);">seller@cheez.im</a></p>
+      `;
+    }
+  });
+});
+</script>
+</body>
+</html>

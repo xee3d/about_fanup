@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>입점 신청 | FANUP 파트너</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" as="style" crossorigin
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <style>
+    body { background: var(--bg); color: var(--text-primary); min-height: 100vh; }
+
+    /* ─── Header ─── */
+    .apply-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 40px; border-bottom: 1px solid var(--border);
+      background: var(--bg-card);
+      position: sticky; top: 0; z-index: 10;
+    }
+    .apply-logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.1rem; letter-spacing: -0.03em; }
+    .apply-logo img { height: 28px; filter: var(--logo-filter); }
+    .apply-header-right { display: flex; align-items: center; gap: 12px; }
+    .apply-login-hint { font-size: 0.85rem; color: var(--text-muted); }
+    .apply-login-hint a { color: var(--brand); font-weight: 600; }
+
+    /* ─── Layout ─── */
+    .apply-wrap {
+      max-width: 1080px; margin: 0 auto; padding: 60px 24px 80px;
+      display: grid; grid-template-columns: 1fr 420px; gap: 60px; align-items: start;
+    }
+    @media (max-width: 860px) {
+      .apply-wrap { grid-template-columns: 1fr; gap: 40px; }
+      .apply-header { padding: 16px 20px; }
+    }
+
+    /* ─── Left: 소개 ─── */
+    .apply-intro {}
+    .apply-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--brand-light); color: var(--brand);
+      font-size: 0.8rem; font-weight: 700; padding: 5px 12px;
+      border-radius: 50px; margin-bottom: 20px;
+    }
+    .apply-title {
+      font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 900;
+      letter-spacing: -0.045em; line-height: 1.15; margin-bottom: 16px;
+      word-break: keep-all;
+    }
+    .apply-title em { color: var(--brand); font-style: normal; }
+    .apply-sub {
+      font-size: 1rem; color: var(--text-secondary); line-height: 1.7;
+      margin-bottom: 40px; word-break: keep-all;
+    }
+
+    .benefit-list { display: flex; flex-direction: column; gap: 16px; }
+    .benefit-item {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 16px 18px; background: var(--bg-card);
+      border: 1px solid var(--border); border-radius: var(--radius-lg);
+    }
+    .benefit-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: var(--brand-light); display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 1.2rem;
+    }
+    .benefit-text {}
+    .benefit-text strong { font-size: 0.9rem; font-weight: 700; display: block; margin-bottom: 2px; }
+    .benefit-text span { font-size: 0.82rem; color: var(--text-muted); }
+
+    .apply-testimonial {
+      margin-top: 28px; padding: 18px 20px;
+      background: var(--brand-light); border-radius: var(--radius-lg);
+      border-left: 3px solid var(--brand);
+    }
+    .apply-testimonial p { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.65; }
+    .apply-testimonial cite { font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; display: block; }
+
+    /* ─── Right: 신청 카드 ─── */
+    .apply-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 20px; padding: 32px 28px;
+      box-shadow: var(--shadow-md); position: sticky; top: 90px;
+    }
+    .apply-card-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 4px; letter-spacing: -0.03em; }
+    .apply-card-sub { font-size: 0.83rem; color: var(--text-muted); margin-bottom: 24px; }
+
+    /* ─── Google 로그인 영역 ─── */
+    #loginSection { display: flex; flex-direction: column; gap: 12px; }
+    .google-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 13px 20px; border-radius: 50px;
+      border: 1.5px solid var(--border);
+      background: var(--bg-card); cursor: pointer;
+      font-size: 0.92rem; font-weight: 600; color: var(--text-primary);
+      transition: box-shadow 0.2s, border-color 0.2s; width: 100%;
+    }
+    .google-btn:hover { box-shadow: 0 2px 14px rgba(0,0,0,0.09); border-color: #D1D5DB; }
+    .login-hint { font-size: 0.78rem; color: var(--text-muted); text-align: center; }
+
+    /* ─── 신청 폼 ─── */
+    #formSection { display: none; }
+    .logged-in-bar {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 20px;
+      padding: 10px 14px; background: var(--brand-light);
+      border-radius: 10px; font-size: 0.82rem;
+    }
+    .logged-in-bar .avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--brand); display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .logged-in-bar .email { flex: 1; color: var(--text-secondary); font-weight: 500; }
+    .logged-in-bar button {
+      background: none; border: none; color: var(--text-muted);
+      font-size: 0.78rem; cursor: pointer; text-decoration: underline;
+    }
+
+    .form-group { margin-bottom: 14px; }
+    .form-label { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 5px; display: block; }
+    .form-input, .form-select {
+      width: 100%; padding: 10px 13px;
+      border: 1.5px solid var(--border); border-radius: 8px;
+      font-size: 0.875rem; font-family: inherit;
+      background: var(--bg-card); color: var(--text-primary);
+      transition: border-color 0.15s; outline: none;
+    }
+    .form-input:focus, .form-select:focus { border-color: var(--brand); }
+    .form-input:disabled { background: var(--bg); color: var(--text-muted); }
+    .form-input.optional { background: var(--bg); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .form-hint { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
+
+    .submit-btn {
+      width: 100%; padding: 13px; border-radius: 50px;
+      background: var(--brand); color: #fff;
+      border: none; font-size: 0.95rem; font-weight: 700;
+      font-family: inherit; cursor: pointer; margin-top: 6px;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .submit-btn:hover { background: var(--brand-hover); }
+    .submit-btn:active { transform: scale(0.98); }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .agree-text { font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: 10px; }
+    .agree-text a { color: var(--brand); }
+
+    /* ─── 심사 완료 안내 ─── */
+    #doneSection {
+      display: none; flex-direction: column; align-items: center;
+      gap: 12px; text-align: center; padding: 16px 0;
+    }
+    .done-icon { font-size: 2.8rem; }
+    .done-title { font-size: 1.05rem; font-weight: 800; letter-spacing: -0.03em; }
+    .done-sub { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; word-break: keep-all; }
+    .done-btn {
+      padding: 11px 28px; border-radius: 50px;
+      background: var(--brand); color: #fff;
+      border: none; font-size: 0.88rem; font-weight: 700;
+      font-family: inherit; cursor: pointer; margin-top: 4px;
+    }
+
+    /* ─── Theme Toggle ─── */
+    .theme-toggle {
+      width: 34px; height: 34px; border-radius: 50%;
+      border: 1px solid var(--border); background: var(--bg-card);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--text-secondary);
+    }
+    [data-theme="light"] .icon-moon { display: block; }
+    [data-theme="light"] .icon-sun  { display: none; }
+    [data-theme="dark"]  .icon-moon { display: none; }
+    [data-theme="dark"]  .icon-sun  { display: block; }
+
+    /* ─── Footer ─── */
+    .apply-footer {
+      border-top: 1px solid var(--border); padding: 24px 40px;
+      text-align: center; font-size: 0.78rem; color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+<header class="apply-header">
+  <a href="index.html" class="apply-logo">
+    <img src="assets/fanup_logo.png" alt="FANUP" onerror="this.style.display='none'">
+    FANUP
+  </a>
+  <div class="apply-header-right">
+    <span class="apply-login-hint">이미 파트너이신가요? <a href="seller.html">로그인 →</a></span>
+    <button class="theme-toggle" id="themeToggle" aria-label="테마 전환">
+      <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+  </div>
+</header>
+
+<main class="apply-wrap">
+
+  <!-- ── 좌측: 소개 ── -->
+  <div class="apply-intro">
+    <div class="apply-badge">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      FANUP 파트너 프로그램
+    </div>
+    <h1 class="apply-title">팬이 좋아하는 선물,<br><em>크리에이터와 함께</em> 판매하세요.</h1>
+    <p class="apply-sub">
+      FANUP 파트너가 되면 수백만 팬과 연결된 크리에이터 채널에서<br>
+      내 상품을 직접 선보일 수 있습니다. 입점 비용 없이, 수익만.
+    </p>
+
+    <div class="benefit-list">
+      <div class="benefit-item">
+        <div class="benefit-icon">🆓</div>
+        <div class="benefit-text">
+          <strong>초기 비용 없는 입점</strong>
+          <span>별도 입점비 없이 시작. 판매가 발생한 이후 수수료만 정산됩니다.</span>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon">🛡️</div>
+        <div class="benefit-text">
+          <strong>크리에이터 주소 완전 보호</strong>
+          <span>팬의 배송지는 익명 코드 + 안심번호로만 제공. 상세주소는 송장 출력 시에만 전달됩니다.</span>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon">📦</div>
+        <div class="benefit-text">
+          <strong>실시간 주문 대시보드</strong>
+          <span>주문 접수부터 배송 완료까지 웹에서 실시간으로 관리하세요.</span>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon">🤝</div>
+        <div class="benefit-text">
+          <strong>크리에이터 직접 연동</strong>
+          <span>파트너 크리에이터의 팬 베이스에 상품이 직접 노출됩니다.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="apply-testimonial">
+      <p>"FANUP 입점 후 팬들의 반응이 완전히 달랐어요. 크리에이터 이름을 달고 나가는 상품이라 팬들이 먼저 찾아봐요."</p>
+      <cite>— 치즈마트 대표</cite>
+    </div>
+  </div>
+
+  <!-- ── 우측: 신청 카드 ── -->
+  <div class="apply-card">
+    <p class="apply-card-title">파트너 신청하기</p>
+    <p class="apply-card-sub">심사 완료까지 보통 1–3 영업일이 소요됩니다.</p>
+
+    <!-- Google 로그인 -->
+    <div id="loginSection">
+      <button class="google-btn" id="googleLoginBtn">
+        <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+          <path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/>
+          <path d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.55 0 9s.348 2.825.957 4.039l3.007-2.332z" fill="#FBBC05"/>
+          <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+        </svg>
+        Google 계정으로 시작하기
+      </button>
+      <p class="login-hint">로그인 후 신청 양식이 표시됩니다.</p>
+    </div>
+
+    <!-- 신청 폼 -->
+    <div id="formSection">
+      <div class="logged-in-bar" id="loggedInBar">
+        <div class="avatar" id="userAvatar">?</div>
+        <span class="email" id="userEmail">—</span>
+        <button onclick="handleLogout()">로그아웃</button>
+      </div>
+
+      <form id="applyForm">
+        <input type="hidden" id="reg-uid">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">업체명 *</label>
+            <input type="text" id="reg-businessName" class="form-input" placeholder="예: 달콤선물 상회" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">대표자 성함 *</label>
+            <input type="text" id="reg-ownerName" class="form-input" placeholder="홍길동" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">사업자 등록번호 *</label>
+          <input type="text" id="reg-businessNumber" class="form-input" placeholder="000-00-00000" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">연락처 *</label>
+            <input type="tel" id="reg-phone" class="form-input" placeholder="010-0000-0000" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">카테고리 *</label>
+            <select id="reg-category" class="form-select" required>
+              <option value="" disabled selected>선택</option>
+              <option value="food">식품 · 음료</option>
+              <option value="goods">굿즈 · 피규어</option>
+              <option value="flower">꽃다발 · 화환</option>
+              <option value="gifticon">기프티콘</option>
+              <option value="other">기타</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">통신판매업 신고번호 <span style="color:var(--text-muted);font-weight:400;">(선택)</span></label>
+          <input type="text" id="reg-mailOrder" class="form-input optional" placeholder="제0000-서울강남-00000호">
+        </div>
+        <div class="form-group">
+          <label class="form-label">업체 주소 <span style="color:var(--text-muted);font-weight:400;">(선택)</span></label>
+          <input type="text" id="reg-address" class="form-input optional" placeholder="서울시 강남구 …">
+        </div>
+        <div class="form-group">
+          <label class="form-label">이메일</label>
+          <input type="email" id="reg-email" class="form-input" readonly disabled>
+          <p class="form-hint">Google 계정 이메일이 자동 입력됩니다.</p>
+        </div>
+        <button type="submit" class="submit-btn" id="submitBtn">입점 신청하기</button>
+        <p class="agree-text">신청 시 FANUP <a href="#">이용약관</a> 및 <a href="#">개인정보처리방침</a>에 동의하는 것으로 간주됩니다.</p>
+      </form>
+    </div>
+
+    <!-- 제출 완료 -->
+    <div id="doneSection">
+      <div class="done-icon">✅</div>
+      <p class="done-title">신청이 완료됐습니다!</p>
+      <p class="done-sub">서류 검토 후 1–3 영업일 내에 결과를 안내해 드립니다.<br>승인 완료 시 이메일로 알림을 보내드립니다.</p>
+      <button class="done-btn" onclick="location.href='pending.html'">심사 현황 확인 →</button>
+    </div>
+  </div>
+
+</main>
+
+<footer class="apply-footer">
+  © 2026 FANUP Inc. All rights reserved. · <a href="mailto:seller@cheez.im" style="color:var(--brand);">seller@cheez.im</a>
+</footer>
+
+<script>
+  // Theme
+  const html = document.documentElement;
+  const saved = localStorage.getItem('fanup-theme');
+  if (saved) html.setAttribute('data-theme', saved);
+  else if (window.matchMedia('(prefers-color-scheme: dark)').matches) html.setAttribute('data-theme', 'dark');
+  document.getElementById('themeToggle')?.addEventListener('click', () => {
+    const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next); localStorage.setItem('fanup-theme', next);
+  });
+</script>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js';
+import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js';
+import { getFirestore, collection, query, where, getDocs, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js';
+
+const app  = initializeApp({ apiKey:'AIzaSyAsQZo491B1W3s_s2WcqrTMdgH810Putao', authDomain:'fanup-app.firebaseapp.com', projectId:'fanup-app', storageBucket:'fanup-app-storage', messagingSenderId:'542708276250', appId:'1:542708276250:web:a2f01ca6b84ed1d50845a3' });
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+async function fetchSeller(uid) {
+  const snap = await getDocs(query(collection(db, 'sellers'), where('uid', '==', uid)));
+  if (snap.empty) return null;
+  return { id: snap.docs[0].id, ...snap.docs[0].data() };
+}
+
+function showLogin()  { document.getElementById('loginSection').style.display = ''; document.getElementById('formSection').style.display = 'none'; document.getElementById('doneSection').style.display = 'none'; }
+function showForm()   { document.getElementById('loginSection').style.display = 'none'; document.getElementById('formSection').style.display = ''; document.getElementById('doneSection').style.display = 'none'; }
+function showDone()   { document.getElementById('loginSection').style.display = 'none'; document.getElementById('formSection').style.display = 'none'; document.getElementById('doneSection').style.display = 'flex'; }
+
+document.getElementById('googleLoginBtn').addEventListener('click', async () => {
+  try { await signInWithPopup(auth, new GoogleAuthProvider()); }
+  catch(e) { console.error(e); }
+});
+
+window.handleLogout = () => signOut(auth);
+
+onAuthStateChanged(auth, async user => {
+  if (!user) { showLogin(); return; }
+  const seller = await fetchSeller(user.uid);
+  if (seller?.status === 'approved') { location.href = 'seller.html'; return; }
+  if (seller?.status === 'pending')  { location.href = 'pending.html'; return; }
+
+  // 미등록 or 재신청 → 폼 표시
+  showForm();
+  document.getElementById('userAvatar').textContent = (user.displayName || user.email || '?')[0].toUpperCase();
+  document.getElementById('userEmail').textContent = user.email || '';
+  document.getElementById('reg-email').value = user.email || '';
+  document.getElementById('reg-uid').value = user.uid;
+});
+
+document.getElementById('applyForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.textContent = '신청 중...';
+  try {
+    await addDoc(collection(db, 'sellers'), {
+      uid:             document.getElementById('reg-uid').value,
+      email:           document.getElementById('reg-email').value,
+      businessName:    document.getElementById('reg-businessName').value.trim(),
+      ownerName:       document.getElementById('reg-ownerName').value.trim(),
+      businessNumber:  document.getElementById('reg-businessNumber').value.trim(),
+      phone:           document.getElementById('reg-phone').value.trim(),
+      category:        document.getElementById('reg-category').value,
+      mailOrderNumber: document.getElementById('reg-mailOrder').value.trim() || null,
+      address:         document.getElementById('reg-address').value.trim() || null,
+      status:          'pending',
+      createdAt:       serverTimestamp(),
+    });
+    showDone();
+  } catch(err) {
+    console.error(err);
+    alert('신청 중 오류가 발생했습니다. 다시 시도해주세요.');
+    btn.disabled = false; btn.textContent = '입점 신청하기';
+  }
+});
+</script>
+</body>
+</html>
