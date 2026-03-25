@@ -22,6 +22,9 @@ import {
   getDocs, addDoc, updateDoc, deleteDoc,
   doc, onSnapshot, serverTimestamp,
 } from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js';
+import {
+  getStorage, ref, uploadBytes, getDownloadURL,
+} from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js';
 
 // ─── Firebase 초기화 ────────────────────────────────────────
 const firebaseConfig = {
@@ -33,9 +36,10 @@ const firebaseConfig = {
   appId:             '1:542708276250:web:a2f01ca6b84ed1d50845a3',
 };
 
-const app  = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db   = getFirestore(app);
+const app     = initializeApp(firebaseConfig);
+const auth    = getAuth(app);
+const db      = getFirestore(app);
+const storage = getStorage(app);
 
 // ─── 상태 ───────────────────────────────────────────────────
 let currentSeller = null;   // { id, businessName, ... }
@@ -59,6 +63,38 @@ function injectLoginOverlay() {
         </svg>
         Google로 계속하기
       </button>
+
+      <!-- 판매자 신청 폼 (미등록 사용자가 Google 로그인 후 표시) -->
+      <div id="authRegisterForm" style="display:none;width:100%;">
+        <div style="border-top:1px solid var(--border,#E5E7EB);margin:8px 0 16px;"></div>
+        <p style="font-size:0.8rem;color:#6B7280;margin:0 0 12px;text-align:center;">아래 정보를 입력하여 판매자로 신청하세요.</p>
+        <form id="registerFormEl" style="display:flex;flex-direction:column;gap:10px;">
+          <input type="text" id="reg-businessName" placeholder="업체명 *" required
+            style="padding:9px 12px;border:1.5px solid var(--border,#E5E7EB);border-radius:8px;font-size:0.875rem;font-family:inherit;outline:none;">
+          <input type="text" id="reg-ownerName" placeholder="대표자 성함 *" required
+            style="padding:9px 12px;border:1.5px solid var(--border,#E5E7EB);border-radius:8px;font-size:0.875rem;font-family:inherit;outline:none;">
+          <input type="text" id="reg-businessNumber" placeholder="사업자 등록번호 *" required
+            style="padding:9px 12px;border:1.5px solid var(--border,#E5E7EB);border-radius:8px;font-size:0.875rem;font-family:inherit;outline:none;">
+          <input type="tel" id="reg-phone" placeholder="연락처 *" required
+            style="padding:9px 12px;border:1.5px solid var(--border,#E5E7EB);border-radius:8px;font-size:0.875rem;font-family:inherit;outline:none;">
+          <select id="reg-category" required
+            style="padding:9px 12px;border:1.5px solid var(--border,#E5E7EB);border-radius:8px;font-size:0.875rem;font-family:inherit;outline:none;background:var(--bg-card,#fff);color:var(--text-primary,#111);">
+            <option value="" disabled selected>카테고리 선택 *</option>
+            <option value="food">식품 · 음료</option>
+            <option value="goods">굿즈 · 피규어</option>
+            <option value="flower">꽃다발 · 화환</option>
+            <option value="gifticon">기프티콘</option>
+            <option value="other">기타</option>
+          </select>
+          <input type="email" id="reg-email" placeholder="이메일 (Google 계정)" readonly
+            style="padding:9px 12px;border:1.5px solid var(--border,#E5E7EB);border-radius:8px;font-size:0.875rem;font-family:inherit;outline:none;background:var(--bg,#F9FAFB);color:#6B7280;">
+          <button type="submit"
+            style="padding:11px;border-radius:50px;border:none;background:#7C3AED;color:#fff;font-size:0.9rem;font-weight:700;font-family:inherit;cursor:pointer;margin-top:4px;">
+            입점 신청하기
+          </button>
+        </form>
+      </div>
+
       <div class="auth-pending" id="authPending" style="display:none;">
         <div class="auth-pending-icon">⏳</div>
         <p>판매자 심사 중입니다.<br>승인 후 이용 가능합니다.</p>
@@ -73,6 +109,7 @@ function injectLoginOverlay() {
   el.style.cssText = `
     position:fixed; inset:0; z-index:9000;
     background:var(--bg); display:flex; align-items:center; justify-content:center;
+    overflow-y:auto;
   `;
   document.body.appendChild(el);
 
@@ -84,21 +121,68 @@ function injectLoginOverlay() {
       console.error('로그인 실패:', e);
     }
   });
+
+  document.getElementById('registerFormEl').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const businessName   = document.getElementById('reg-businessName').value.trim();
+    const ownerName      = document.getElementById('reg-ownerName').value.trim();
+    const businessNumber = document.getElementById('reg-businessNumber').value.trim();
+    const phone          = document.getElementById('reg-phone').value.trim();
+    const category       = document.getElementById('reg-category').value;
+
+    if (!businessName || !ownerName || !businessNumber || !phone || !category) {
+      alert('모든 필드를 입력해주세요.');
+      return;
+    }
+
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = '신청 중...';
+
+    try {
+      await addDoc(collection(db, 'sellers'), {
+        uid:            user.uid,
+        email:          user.email,
+        status:         'pending',
+        createdAt:      serverTimestamp(),
+        businessName,
+        ownerName,
+        businessNumber,
+        phone,
+        category,
+      });
+      showOverlay('pending');
+    } catch (err) {
+      console.error('신청 실패:', err);
+      alert('신청 중 오류가 발생했습니다. 다시 시도해주세요.');
+      submitBtn.disabled = false;
+      submitBtn.textContent = '입점 신청하기';
+    }
+  });
 }
 
 // ─── 오버레이 제어 ───────────────────────────────────────────
 function showOverlay(state, msg = '') {
-  const overlay  = document.getElementById('auth-overlay');
-  const btn      = document.getElementById('googleLoginBtn');
-  const pending  = document.getElementById('authPending');
-  const rejected = document.getElementById('authRejected');
-  const authMsg  = document.getElementById('authMsg');
+  const overlay      = document.getElementById('auth-overlay');
+  const btn          = document.getElementById('googleLoginBtn');
+  const pending      = document.getElementById('authPending');
+  const rejected     = document.getElementById('authRejected');
+  const authMsg      = document.getElementById('authMsg');
+  const registerForm = document.getElementById('authRegisterForm');
   if (!overlay) return;
   overlay.style.display = 'flex';
-  btn.style.display      = state === 'login'    ? '' : 'none';
-  pending.style.display  = state === 'pending'  ? 'block' : 'none';
-  rejected.style.display = state === 'rejected' ? 'block' : 'none';
+
+  // 각 섹션 초기화 후 해당 state만 표시
+  btn.style.display          = state === 'login'    ? '' : 'none';
+  pending.style.display      = state === 'pending'  ? 'block' : 'none';
+  rejected.style.display     = state === 'rejected' ? 'block' : 'none';
+  registerForm.style.display = state === 'register' ? 'block' : 'none';
+
   if (state === 'login') authMsg.textContent = msg || 'Google 계정으로 로그인하세요.';
+  if (state === 'register') authMsg.textContent = '판매자 신청을 완료해주세요.';
   if (state === 'rejected' && msg) {
     document.getElementById('authRejectedReason').textContent = '사유: ' + msg;
   }
@@ -396,6 +480,20 @@ window.submitProduct = async function(e) {
 
   if (!name || !price) { alert('상품명과 가격을 입력하세요.'); return; }
 
+  // ─── 이미지 업로드 ────────────────────────────────────────
+  const imageInput = document.getElementById('prod-images-input');
+  const imageUrls  = [];
+  if (imageInput && imageInput.files.length > 0) {
+    const files = Array.from(imageInput.files).slice(0, 4);
+    for (const file of files) {
+      const path     = `products/${currentSeller.id}/${Date.now()}_${file.name}`;
+      const storageRef = ref(storage, path);
+      const snapshot = await uploadBytes(storageRef, file);
+      const url      = await getDownloadURL(snapshot.ref);
+      imageUrls.push(url);
+    }
+  }
+
   const editId = document.getElementById('prod-edit-id')?.value;
   const data = {
     vendorId:    currentSeller.id,
@@ -406,6 +504,11 @@ window.submitProduct = async function(e) {
     status: 'pending',
     updatedAt: serverTimestamp(),
   };
+
+  if (imageUrls.length > 0) {
+    data.images    = imageUrls;
+    data.thumbnail = imageUrls[0];
+  }
 
   if (editId) {
     await updateDoc(doc(db, 'products', editId), data);
@@ -524,8 +627,10 @@ onAuthStateChanged(auth, async user => {
   const seller = await fetchSeller(user.uid);
 
   if (!seller) {
-    // 미등록 → 온보딩 안내
-    showOverlay('login', '판매자 등록이 필요합니다. 아래 버튼으로 신청하세요.');
+    // 미등록 → 신청 폼 표시
+    const emailEl = document.getElementById('reg-email');
+    if (emailEl) emailEl.value = user.email || '';
+    showOverlay('register');
     return;
   }
 
@@ -555,4 +660,25 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   // 배송 모달 확인 버튼
   document.getElementById('confirmShippingBtn')?.addEventListener('click', window.confirmShipping);
+
+  // ─── 이미지 미리보기 ─────────────────────────────────────
+  document.getElementById('prod-images-input')?.addEventListener('change', function() {
+    const preview = document.getElementById('prod-img-preview');
+    if (!preview) return;
+    const slots = preview.querySelectorAll('.img-slot');
+    const files  = Array.from(this.files).slice(0, 4);
+
+    slots.forEach((slot, i) => {
+      slot.innerHTML = '';
+      if (files[i]) {
+        const img = document.createElement('img');
+        img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:calc(var(--radius,8px) - 2px);';
+        img.src = URL.createObjectURL(files[i]);
+        slot.appendChild(img);
+      } else if (i === 0) {
+        // 첫 번째 슬롯은 + 아이콘 표시
+        slot.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+      }
+    });
+  });
 });
