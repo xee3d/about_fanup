@@ -159,17 +159,180 @@
     .bulk-bar.show { display: flex; }
     .bulk-count { font-size: 0.85rem; font-weight: 700; color: var(--brand); }
 
-    /* 상품 이미지 업로드 */
-    .img-upload-grid {
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+    /* 이미지 업로드 영역 — 대표 + 상세 나란히 */
+    .img-section-row {
+      display: flex; gap: 16px; margin-bottom: 12px;
+    }
+    .img-section {
+      flex: 1; min-width: 0;
+    }
+    .img-section-label {
+      font-size: 0.82rem; font-weight: 700; margin-bottom: 6px; color: var(--text-primary);
+    }
+    .img-section-hint {
+      font-size: 0.72rem; color: var(--text-muted); margin-bottom: 8px;
     }
     .img-slot {
-      aspect-ratio: 1;
+      width: 80px; height: 80px;
       border: 2px dashed var(--border); border-radius: var(--radius);
       display: flex; align-items: center; justify-content: center;
       cursor: pointer; transition: all 0.15s; color: var(--text-muted);
+      flex-shrink: 0; overflow: hidden;
     }
     .img-slot:hover { border-color: var(--brand-mid); background: var(--brand-light); color: var(--brand); }
+    .img-slot.has-image { border-style: solid; cursor: pointer; }
+    .img-slot.active { border-color: var(--brand); box-shadow: 0 0 0 2px var(--brand-light); }
+
+    /* 상세이미지 썸네일 */
+    .detail-thumb-grid { display: flex; gap: 6px; flex-wrap: wrap; }
+    .detail-thumb {
+      width: 80px; height: 80px; border-radius: var(--radius); overflow: visible;
+      border: 2px solid var(--border); cursor: pointer; transition: all 0.15s;
+      flex-shrink: 0; position: relative;
+    }
+    .detail-thumb:hover, .detail-thumb.active { border-color: var(--brand); box-shadow: 0 0 0 2px var(--brand-light); }
+    .detail-thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: calc(var(--radius) - 2px); }
+    .detail-thumb .detail-thumb-remove {
+      position: absolute; top: -8px; right: -8px; width: 20px; height: 20px;
+      border-radius: 50%; background: var(--danger); color: #fff; border: 2px solid var(--bg-card);
+      font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.15s; z-index: 2;
+    }
+    .detail-thumb:hover .detail-thumb-remove { opacity: 1; }
+
+    /* 공용 이미지 프리뷰 */
+    .img-preview-area {
+      border-radius: var(--radius); overflow: hidden;
+      border: 1px solid var(--border); max-height: 280px; overflow-y: hidden;
+      position: relative; transition: max-height 0.3s ease;
+    }
+    .img-preview-area img { width: 100%; display: block; }
+    .img-preview-area.expanded { max-height: 80vh; overflow-y: auto; }
+    .img-preview-toggle {
+      position: sticky; bottom: 0; left: 0; right: 0;
+      background: linear-gradient(transparent, var(--bg-card) 70%);
+      text-align: center; padding: 24px 0 8px; cursor: pointer;
+      font-size: 0.78rem; font-weight: 600; color: var(--brand);
+    }
+    .img-preview-area.expanded .img-preview-toggle {
+      background: var(--bg-card); padding: 8px 0;
+    }
+
+    /* ─── 모바일 최적화 ─── */
+    @media (max-width: 768px) {
+      .auth-card { width: 90vw; padding: 32px 24px; }
+
+      /* 이미지 영역 */
+      .img-section-row { flex-direction: column; gap: 12px; }
+      .img-slot { width: 72px; height: 72px; }
+      .detail-thumb { width: 64px; height: 64px; }
+      .img-preview-area { max-height: 200px; }
+      .detail-thumb .detail-thumb-remove { opacity: 1; }
+
+      /* 프라이버시 배너 — 텍스트 래핑 */
+      .privacy-banner {
+        padding: 10px 12px; font-size: 0.75rem;
+        flex-direction: column; gap: 6px;
+      }
+      .privacy-banner ul { padding-left: 14px; line-height: 1.6; }
+
+      /* 필터바 — 세로 배치 */
+      .filter-bar {
+        flex-direction: column; padding: 10px 12px; gap: 8px;
+      }
+      .filter-bar .search-input { width: 100%; min-width: 0; }
+      .filter-bar .form-select { width: 100% !important; }
+      .filter-bar .btn { width: 100%; justify-content: center; }
+
+      /* 주문 테이블 → 모바일 카드형 */
+      #page-orders .table-wrap { overflow-x: visible; }
+      #page-orders table { min-width: 0; }
+      #page-orders thead { display: none; }
+      #page-orders tbody tr {
+        display: flex; flex-wrap: wrap; gap: 4px 12px;
+        padding: 12px 14px; border-bottom: 1px solid var(--border);
+        align-items: center; position: relative;
+      }
+      #page-orders tbody td {
+        display: inline-flex; align-items: center; padding: 2px 0;
+        border: none; font-size: 0.82rem;
+      }
+      #page-orders tbody td::before {
+        content: attr(data-label);
+        font-size: 0.7rem; font-weight: 600; color: var(--text-muted);
+        margin-right: 4px; white-space: nowrap;
+      }
+      /* 체크박스 셀 */
+      #page-orders tbody td:first-child { order: -1; margin-right: auto; }
+      #page-orders tbody td:first-child::before { display: none; }
+
+      /* 상품 테이블 → 모바일 카드형 */
+      #page-products .table-wrap { overflow-x: visible; }
+      #page-products table { min-width: 0; width: 100%; }
+      #page-products thead { display: none; }
+      #page-products tbody tr {
+        display: grid;
+        grid-template-columns: 44px 1fr auto;
+        grid-template-rows: auto auto auto;
+        column-gap: 10px; row-gap: 4px;
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--border);
+        align-items: center;
+      }
+      #page-products tbody td { border: none; padding: 0; }
+      /* 이미지: col1, 3행 span */
+      #page-products tbody td:nth-child(1) {
+        grid-column: 1; grid-row: 1 / 4; align-self: start; padding-top: 2px;
+      }
+      /* 상품명: col2, 1행 — 말줄임 */
+      #page-products tbody td:nth-child(2) {
+        grid-column: 2; grid-row: 1;
+        font-size: 0.85rem; font-weight: 600;
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      }
+      /* 상태: col3, 1행 */
+      #page-products tbody td:nth-child(5) {
+        grid-column: 3; grid-row: 1; justify-self: end;
+      }
+      /* 가격: col2, 2행 */
+      #page-products tbody td:nth-child(3) {
+        grid-column: 2; grid-row: 2;
+        font-size: 0.78rem; color: var(--text-secondary);
+      }
+      /* 재고: col3, 2행 */
+      #page-products tbody td:nth-child(4) {
+        grid-column: 3; grid-row: 2;
+        font-size: 0.78rem; justify-self: end;
+      }
+      #page-products tbody td:nth-child(4)::before {
+        content: "재고 "; font-size: 0.7rem; color: var(--text-muted);
+      }
+      /* 버튼: col2~3, 3행 */
+      #page-products tbody td:nth-child(6) {
+        grid-column: 2 / 4; grid-row: 3; display: flex; gap: 6px;
+      }
+      .product-thumb { width: 40px; height: 40px; }
+      .btn-sm { font-size: 0.72rem; padding: 4px 8px; white-space: nowrap; }
+
+      /* 벌크바 */
+      .bulk-bar { flex-wrap: wrap; }
+
+      /* 모달 */
+      .modal { padding: 20px 16px; }
+
+      /* 탑바 */
+      .topbar-right .btn { font-size: 0.75rem; padding: 5px 10px; }
+    }
+
+    @media (max-width: 480px) {
+      .img-slot { width: 64px; height: 64px; }
+      .detail-thumb { width: 56px; height: 56px; }
+      .img-section-label { font-size: 0.78rem; }
+      .img-section-hint { font-size: 0.68rem; }
+      .form-label { font-size: 0.82rem; }
+      .form-input, .form-select, .form-textarea { font-size: 16px; padding: 8px 10px; }
+      #page-orders tbody td { font-size: 0.78rem; }
+    }
 
     /* 배송 처리 모달 */
     .modal-backdrop {
@@ -267,7 +430,7 @@
   <div class="dash-main">
     <header class="topbar">
       <div class="topbar-left">
-        <button class="topbar-btn" id="sidebarToggle" style="display:none;">
+        <button class="topbar-btn" id="sidebarToggle" style="display:none;" aria-label="메뉴">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
         <span class="topbar-title" id="pageTitle">대시보드</span>
@@ -409,11 +572,9 @@
                 <th style="width:36px;"><input type="checkbox" id="selectAll" style="cursor:pointer;"></th>
                 <th>주문번호</th>
                 <th>상품명</th>
-                <th>수량</th>
                 <th>크리에이터</th>
                 <th>수령인</th>
-                <th>배송지</th>
-                <th>주문일</th>
+                <th>금액</th>
                 <th>상태</th>
                 <th>액션</th>
               </tr>
@@ -484,29 +645,41 @@
               <label class="form-label">카테고리</label>
               <select id="prod-category" class="form-select">
                 <option value="">카테고리 선택</option>
-                <option value="food">식품 · 음료</option>
-                <option value="goods">굿즈 · 피규어</option>
-                <option value="flower">꽃다발 · 화환</option>
-                <option value="gifticon">기프티콘</option>
-                <option value="other">기타</option>
+                <option value="equipment">방송장비</option>
+                <option value="game">게임/엔터</option>
+                <option value="digital">디지털/가전</option>
+                <option value="food">음식/간식</option>
+                <option value="health">건강</option>
               </select>
             </div>
             <div class="form-group" style="margin-bottom:16px;">
               <label class="form-label">상품 설명</label>
               <textarea id="prod-desc" class="form-textarea" placeholder="상품의 구성, 주의사항 등을 입력하세요."></textarea>
             </div>
-            <div class="form-group">
-              <label class="form-label">상품 이미지 (최대 4장)</label>
-              <input type="file" id="prod-images-input" multiple accept="image/*" style="display:none;">
-              <div class="img-upload-grid" id="prod-img-preview" onclick="document.getElementById('prod-images-input').click()">
-                <div class="img-slot">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <input type="file" id="prod-images-input" accept="image/*" style="display:none;">
+            <input type="file" id="prod-detail-images-input" multiple accept="image/*" style="display:none;">
+            <div class="img-section-row">
+              <div class="img-section">
+                <div class="img-section-label">대표 이미지</div>
+                <div class="img-section-hint">1:1 비율 · 최대 5MB</div>
+                <div class="img-slot" id="prod-img-slot">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 </div>
-                <div class="img-slot"></div>
-                <div class="img-slot"></div>
-                <div class="img-slot"></div>
               </div>
-              <p style="font-size:0.78rem;color:var(--text-muted);margin-top:6px;">클릭하여 이미지 선택 (JPG, PNG, 최대 5MB)</p>
+              <div class="img-section">
+                <div class="img-section-label">상세 이미지 <span style="font-weight:400;color:var(--text-muted);font-size:0.72rem;">최대 3장</span></div>
+                <div class="img-section-hint">세로 긴 이미지 · 클릭하면 아래에서 미리보기</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                  <div class="detail-thumb-grid" id="prod-detail-thumbs"></div>
+                  <div class="detail-thumb" id="prod-detail-add-btn" onclick="document.getElementById('prod-detail-images-input').click()" style="display:flex;align-items:center;justify-content:center;color:var(--text-muted);">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="img-preview-area" id="img-preview-area" style="display:none;">
+              <img id="img-preview-img" src="" alt="미리보기" onclick="togglePreviewExpand()" style="cursor:pointer;">
+              <div class="img-preview-toggle" id="img-preview-toggle" onclick="togglePreviewExpand()">펼쳐보기 ▼</div>
             </div>
             <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>

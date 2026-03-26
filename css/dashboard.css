@@ -578,8 +578,12 @@ tbody tr:hover td { background: var(--bg); }
   /* 탑바 */
   .topbar-title { font-size: 0.9rem; }
 
-  /* 사이드바 오버레이 */
+  /* 사이드바 오버레이 & 토글 */
   .sidebar-overlay { display: block; }
+  #sidebarToggle { display: flex !important; }
+
+  /* 카드 그리드 */
+  .card-grid { grid-template-columns: 1fr !important; }
 }
 
 @media (max-width: 480px) {

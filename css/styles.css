@@ -367,9 +367,9 @@ body.theme-ready .topnav{transition:box-shadow 0.25s}
 @media(max-width:768px){
   .nav-menu{display:none}.nav-menu.open{display:flex}.nav-hamburger{display:flex}
   .nav-right .btn-primary{display:none}
-  .hero{padding:calc(var(--nav-offset)+48px) 0 56px}
+  .hero{padding:calc(var(--nav-offset) + 48px) 0 56px}
   .hero-grid{grid-template-columns:1fr;gap:48px}
-  .hero-visual{height:320px;order:- 1}
+  .hero-visual{height:320px;order:-1}
   .glass-card--gift{width:240px;top:0;left:5%}
   .glass-card--chat{width:260px;bottom:0;right:5%}
   .section{padding:80px 0}

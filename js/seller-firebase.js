@@ -164,6 +164,11 @@ function renderProducts(products) {
     };
     const s = STATUS[p.status] || STATUS.inactive;
     const tr = document.createElement('tr');
+    tr.style.cursor = 'pointer';
+    tr.addEventListener('click', (e) => {
+      if (e.target.closest('button')) return;
+      editProduct(p.id);
+    });
     tr.innerHTML = `
       <td>
         <div class="product-thumb">
@@ -262,13 +267,13 @@ function renderOrders(orders) {
     const tr    = document.createElement('tr');
     tr.innerHTML = `
       <td><input type="checkbox" class="order-check"></td>
-      <td class="td-code">#FU-${o.id.slice(-8).toUpperCase()}</td>
-      <td class="td-main">${o.productName || '-'}</td>
-      <td>${o.creatorNames?.[0] || '-'}</td>
-      <td><span class="recip-code">팬업-${o.id.slice(0,6).toUpperCase()}</span></td>
-      <td>₩${Number(o.totalAmount).toLocaleString()}</td>
-      <td><span class="status ${cls}">${label}</span></td>
-      <td>
+      <td data-label="주문" class="td-code">#FU-${o.id.slice(-8).toUpperCase()}</td>
+      <td data-label="상품" class="td-main">${o.productName || '-'}</td>
+      <td data-label="크리에이터">${o.creatorNames?.[0] || '-'}</td>
+      <td data-label="수령인"><span class="recip-code">팬업-${o.id.slice(0,6).toUpperCase()}</span></td>
+      <td data-label="금액">₩${Number(o.totalAmount).toLocaleString()}</td>
+      <td data-label=""><span class="status ${cls}">${label}</span></td>
+      <td data-label="" style="display:flex;gap:4px;flex-wrap:wrap;">
         ${o.status === 'paid' ? `<button class="btn btn-ghost btn-sm" onclick="updateOrderStatus('${o.id}','preparing')">준비 시작</button>` : ''}
         ${o.status === 'preparing' ? `<button class="btn btn-primary btn-sm" onclick="openShippingModal('${o.id}')">송장 입력</button>` : ''}
         ${o.status === 'shipping' ? `<span style="color:var(--text-muted);font-size:0.8rem;">배송중</span>` : ''}
@@ -401,17 +406,29 @@ window.submitProduct = async function(e) {
 
   if (!name || !price) { alert('상품명과 가격을 입력하세요.'); return; }
 
-  // ─── 이미지 업로드 ────────────────────────────────────────
+  // ─── 대표 이미지 업로드 (1장) ─────────────────────────────
   const imageInput = document.getElementById('prod-images-input');
   const imageUrls  = [];
   if (imageInput && imageInput.files.length > 0) {
-    const files = Array.from(imageInput.files).slice(0, 4);
+    const file = imageInput.files[0];
+    const path = `products/${currentSeller.id}/${Date.now()}_${file.name}`;
+    const storageRef = ref(storage, path);
+    const snapshot = await uploadBytes(storageRef, file);
+    const url = await getDownloadURL(snapshot.ref);
+    imageUrls.push(url);
+  }
+
+  // ─── 상세 이미지 업로드 (최대 3장) ───────────────────────
+  const detailInput = document.getElementById('prod-detail-images-input');
+  const detailImageUrls = [...(window._existingDetailImages || [])];
+  if (detailInput && detailInput.files.length > 0) {
+    const files = Array.from(detailInput.files).slice(0, 3 - detailImageUrls.length);
     for (const file of files) {
-      const path     = `products/${currentSeller.id}/${Date.now()}_${file.name}`;
+      const path = `products/${currentSeller.id}/detail_${Date.now()}_${file.name}`;
       const storageRef = ref(storage, path);
       const snapshot = await uploadBytes(storageRef, file);
-      const url      = await getDownloadURL(snapshot.ref);
-      imageUrls.push(url);
+      const url = await getDownloadURL(snapshot.ref);
+      detailImageUrls.push(url);
     }
   }
 
@@ -429,6 +446,9 @@ window.submitProduct = async function(e) {
   if (imageUrls.length > 0) {
     data.images    = imageUrls;
     data.thumbnail = imageUrls[0];
+  }
+  if (detailImageUrls.length > 0) {
+    data.detailImages = detailImageUrls;
   }
 
   if (editId) {
@@ -459,29 +479,25 @@ window.editProduct = async function(id) {
   if (document.getElementById('prod-form-title'))
     document.getElementById('prod-form-title').textContent = '상품 수정';
 
-  // 기존 이미지 복원 (다양한 필드명 처리)
-  const preview = document.getElementById('prod-img-preview');
-  if (preview) {
-    const slots = preview.querySelectorAll('.img-slot');
-    const images = (
-      Array.isArray(p.images)     ? p.images     :
-      Array.isArray(p.imageUrls)  ? p.imageUrls  :
-      p.thumbnail  ? [p.thumbnail]  :
-      p.imageUrl   ? [p.imageUrl]   :
-      p.image      ? [p.image]      : []
-    );
-    slots.forEach((slot, i) => {
-      slot.innerHTML = '';
-      if (images[i]) {
-        const img = document.createElement('img');
-        img.src = images[i];
-        img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:6px;';
-        slot.appendChild(img);
-      } else {
-        slot.innerHTML = i === 0 ? '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' : '';
-      }
-    });
+  // 기존 대표 이미지 복원
+  const slot = document.getElementById('prod-img-slot');
+  const thumbUrl = p.thumbnail || p.imageUrl || (Array.isArray(p.images) && p.images[0]) || '';
+  if (slot) {
+    if (thumbUrl) {
+      slot.innerHTML = `<img src="${thumbUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:calc(var(--radius) - 2px);">`;
+      slot.classList.add('has-image');
+      window._mainImageUrl = thumbUrl;
+    } else {
+      slot.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+      slot.classList.remove('has-image');
+      window._mainImageUrl = null;
+    }
   }
+
+  // 기존 상세이미지 복원
+  const existingDetails = Array.isArray(p.detailImages) ? p.detailImages : [];
+  window._existingDetailImages = [...existingDetails];
+  renderDetailThumbs();
 
   window.switchPage && window.switchPage('products');
   document.getElementById('prod-name')?.focus();
@@ -499,9 +515,102 @@ function resetProductForm() {
   });
   const editId = document.getElementById('prod-edit-id');
   if (editId) editId.value = '';
+  const catEl = document.getElementById('prod-category');
+  if (catEl) catEl.value = '';
   if (document.getElementById('prod-form-title'))
     document.getElementById('prod-form-title').textContent = '신규 상품 등록';
+  // 대표 이미지 초기화
+  const slot = document.getElementById('prod-img-slot');
+  if (slot) {
+    slot.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+    slot.classList.remove('has-image');
+  }
+  window._mainImageUrl = null;
+  const imgInput = document.getElementById('prod-images-input');
+  if (imgInput) imgInput.value = '';
+  // 상세이미지 초기화
+  window._existingDetailImages = [];
+  const detailInput = document.getElementById('prod-detail-images-input');
+  if (detailInput) detailInput.value = '';
+  renderDetailThumbs();
+  hidePreview();
 }
+
+// ─── 공용 이미지 프리뷰 ──────────────────────────────────
+function showPreview(url, isDetail) {
+  const area = document.getElementById('img-preview-area');
+  const img = document.getElementById('img-preview-img');
+  const toggle = document.getElementById('img-preview-toggle');
+  if (!area || !img) return;
+
+  if (isDetail) {
+    // 같은 이미지 재클릭 → 펼치기/접기 토글
+    if (area.style.display !== 'none' && area.dataset.currentUrl === url) {
+      area.classList.toggle('expanded');
+      if (toggle) toggle.textContent = area.classList.contains('expanded') ? '접기 ▲' : '펼쳐보기 ▼';
+      return;
+    }
+    // 다른 이미지 또는 첫 클릭 → 접힌 상태로 열기
+    img.src = url;
+    area.style.display = 'block';
+    area.classList.remove('expanded');
+    if (toggle) { toggle.style.display = ''; toggle.textContent = '펼쳐보기 ▼'; }
+  } else {
+    // 대표이미지: 항상 펼침, 토글 버튼 숨김
+    img.src = url;
+    area.style.display = 'block';
+    area.classList.add('expanded');
+    if (toggle) toggle.style.display = 'none';
+  }
+  area.dataset.currentUrl = url;
+}
+
+function hidePreview() {
+  const area = document.getElementById('img-preview-area');
+  if (area) { area.style.display = 'none'; area.classList.remove('expanded'); }
+}
+
+window.togglePreviewExpand = function() {
+  const area = document.getElementById('img-preview-area');
+  const btn = document.getElementById('img-preview-toggle');
+  if (!area || !btn) return;
+  area.classList.toggle('expanded');
+  btn.textContent = area.classList.contains('expanded') ? '접기 ▲' : '펼쳐보기 ▼';
+};
+
+// ─── 상세이미지 썸네일 렌더 ───────────────────────────────
+function renderDetailThumbs() {
+  const grid = document.getElementById('prod-detail-thumbs');
+  if (!grid) return;
+  grid.innerHTML = '';
+  const imgs = window._existingDetailImages || [];
+  imgs.forEach((url, i) => {
+    const thumb = document.createElement('div');
+    thumb.className = 'detail-thumb';
+    thumb.innerHTML = `
+      <img src="${url}" loading="lazy">
+      <button type="button" class="detail-thumb-remove" onclick="event.stopPropagation();removeDetailImage(${i})">✕</button>
+    `;
+    thumb.addEventListener('click', () => {
+      showPreview(url, true);
+      document.querySelectorAll('#prod-detail-thumbs .detail-thumb').forEach((el, j) => {
+        el.classList.toggle('active', j === i);
+      });
+      // 대표이미지 slot active 해제
+      document.getElementById('prod-img-slot')?.classList.remove('active');
+    });
+    grid.appendChild(thumb);
+  });
+  const addBtn = document.getElementById('prod-detail-add-btn');
+  if (addBtn) addBtn.style.display = imgs.length >= 3 ? 'none' : '';
+}
+
+window.removeDetailImage = function(index) {
+  if (!window._existingDetailImages) return;
+  window._existingDetailImages.splice(index, 1);
+  renderDetailThumbs();
+  hidePreview();
+};
 
 // ─── 주문 상태 변경 ──────────────────────────────────────────
 window.updateOrderStatus = async function(orderId, status) {
@@ -667,24 +776,56 @@ document.addEventListener('DOMContentLoaded', () => {
   // 배송 모달 확인 버튼
   document.getElementById('confirmShippingBtn')?.addEventListener('click', window.confirmShipping);
 
-  // ─── 이미지 미리보기 ─────────────────────────────────────
+  // ─── 대표 이미지 미리보기 (1장) ──────────────────────────
+  const mainSlot = document.getElementById('prod-img-slot');
   document.getElementById('prod-images-input')?.addEventListener('change', function() {
-    const preview = document.getElementById('prod-img-preview');
-    if (!preview) return;
-    const slots = preview.querySelectorAll('.img-slot');
-    const files  = Array.from(this.files).slice(0, 4);
+    if (!mainSlot) return;
+    mainSlot.innerHTML = '';
+    if (this.files[0]) {
+      const url = URL.createObjectURL(this.files[0]);
+      const img = document.createElement('img');
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:calc(var(--radius,8px) - 2px);';
+      img.src = url;
+      mainSlot.appendChild(img);
+      mainSlot.classList.add('has-image');
+      window._mainImageUrl = url;
+      showPreview(url, false);
+      mainSlot.classList.add('active');
+      document.querySelectorAll('#prod-detail-thumbs .detail-thumb').forEach(el => el.classList.remove('active'));
+    } else {
+      mainSlot.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+      mainSlot.classList.remove('has-image');
+      window._mainImageUrl = null;
+    }
+  });
+  // 대표 이미지 슬롯 클릭: 이미지 없으면 파일선택, 있으면 프리뷰
+  mainSlot?.addEventListener('click', () => {
+    if (window._mainImageUrl && mainSlot.classList.contains('has-image')) {
+      showPreview(window._mainImageUrl, false);
+      mainSlot.classList.add('active');
+      document.querySelectorAll('#prod-detail-thumbs .detail-thumb').forEach(el => el.classList.remove('active'));
+    } else {
+      document.getElementById('prod-images-input')?.click();
+    }
+  });
 
-    slots.forEach((slot, i) => {
-      slot.innerHTML = '';
-      if (files[i]) {
-        const img = document.createElement('img');
-        img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:calc(var(--radius,8px) - 2px);';
-        img.src = URL.createObjectURL(files[i]);
-        slot.appendChild(img);
-      } else if (i === 0) {
-        // 첫 번째 슬롯은 + 아이콘 표시
-        slot.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
-      }
+  // ─── 상세 이미지 선택 → 로컬 미리보기 썸네일 ─────────────
+  document.getElementById('prod-detail-images-input')?.addEventListener('change', function() {
+    if (!window._existingDetailImages) window._existingDetailImages = [];
+    const remaining = 3 - window._existingDetailImages.length;
+    const files = Array.from(this.files).slice(0, remaining);
+    files.forEach(file => {
+      const url = URL.createObjectURL(file);
+      window._existingDetailImages.push(url);
     });
+    renderDetailThumbs();
+    if (window._existingDetailImages.length > 0) {
+      const lastIdx = window._existingDetailImages.length - 1;
+      showPreview(window._existingDetailImages[lastIdx], true);
+      document.querySelectorAll('#prod-detail-thumbs .detail-thumb').forEach((el, j) => {
+        el.classList.toggle('active', j === lastIdx);
+      });
+      document.getElementById('prod-img-slot')?.classList.remove('active');
+    }
   });
 });
