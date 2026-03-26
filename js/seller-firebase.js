@@ -640,8 +640,8 @@ onAuthStateChanged(auth, async user => {
   }
 
   if (seller.status === 'pending') {
-    // 심사 대기 → 전용 페이지로
-    location.href = 'pending.html';
+    // 심사 대기 → 신청/현황 통합 페이지로
+    location.href = 'apply.html';
     return;
   }
 

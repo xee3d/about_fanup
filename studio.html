@@ -2,12 +2,17 @@
 <html lang="ko" data-theme="light">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>크리에이터 스튜디오 | FANUP</title>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="stylesheet" as="style" crossorigin
     href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <link rel="stylesheet" href="css/dashboard.css">
+  <style>
+    /* 접근 가드 확인 전 깜빡임 방지 */
+    body { opacity: 0; }
+    body.ui-ready { opacity: 1; transition: opacity 0.12s ease; }
+  </style>
   <style>
     /* ── Avatar Card ── */
     .avatar-card {
@@ -697,6 +702,34 @@
   const sidebar = document.getElementById('sidebar');
   document.getElementById('sidebarToggle')?.addEventListener('click', () => sidebar.classList.toggle('open'));
   if (window.innerWidth <= 768) document.getElementById('sidebarToggle').style.display = 'flex';
+</script>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js';
+import { getFirestore, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js';
+
+const app  = initializeApp({ apiKey:'AIzaSyAsQZo491B1W3s_s2WcqrTMdgH810Putao', authDomain:'fanup-app.firebaseapp.com', projectId:'fanup-app', storageBucket:'fanup-app-storage', messagingSenderId:'542708276250', appId:'1:542708276250:web:a2f01ca6b84ed1d50845a3' });
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+async function fetchCreator(uid) {
+  const snap = await getDocs(query(collection(db, 'creators'), where('uid', '==', uid)));
+  if (snap.empty) return null;
+  return snap.docs[0].data();
+}
+
+onAuthStateChanged(auth, async user => {
+  if (!user) { location.replace('studio-login.html'); return; }
+  try {
+    const creator = await fetchCreator(user.uid);
+    if (!creator) { location.replace('studio-login.html'); return; }
+    if (creator.status !== 'approved') { location.replace('studio-login.html'); return; }
+    document.body.classList.add('ui-ready');
+  } catch {
+    location.replace('studio-login.html');
+  }
+});
 </script>
 </body>
 </html>

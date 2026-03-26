@@ -51,6 +51,8 @@ img { display: block; max-width: 100%; }
 
   --sidebar-width: 232px;
   --topbar-height: 60px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --topbar-offset: calc(var(--topbar-height) + var(--safe-top));
 
   --logo-filter: brightness(0);
 }
@@ -94,6 +96,8 @@ img { display: block; max-width: 100%; }
   z-index: 200;
   overflow-y: auto;
   transition: transform 0.25s ease;
+  box-sizing: border-box;
+  padding-top: var(--safe-top);
 }
 .sidebar-logo {
   height: var(--topbar-height);
@@ -197,13 +201,15 @@ img { display: block; max-width: 100%; }
 
 /* ─── Topbar ─── */
 .topbar {
-  height: var(--topbar-height);
+  box-sizing: border-box;
+  padding: 0 24px;
+  padding-top: var(--safe-top);
+  height: var(--topbar-offset);
   background: var(--bg-topbar);
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -249,7 +255,10 @@ img { display: block; max-width: 100%; }
 }
 
 /* ─── Page Content ─── */
-.page-content { padding: 28px 24px; }
+.page-content {
+  padding: 28px 24px;
+  padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+}
 
 .page-header { margin-bottom: 24px; }
 .page-header h1 { font-size: 1.3rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.02em; }

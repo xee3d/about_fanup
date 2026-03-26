@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>크리에이터 등록 | FANUP Studio</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" as="style" crossorigin
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <style>
+    body { background: var(--bg); color: var(--text-primary); min-height: 100vh; }
+
+    /* ─── Header ─── */
+    .apply-header {
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      height: calc(64px + env(safe-area-inset-top, 0px));
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-card);
+      position: sticky; top: 0; z-index: 10;
+    }
+    .apply-header-inner{
+      max-width: var(--container-max, 1160px);
+      margin: 0 auto;
+      height: 64px;
+      padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px;
+    }
+    .apply-logo {
+      display: inline-flex; align-items: center;
+      height: 28px;
+      text-decoration: none;
+      color: var(--text-primary);
+    }
+    .apply-logo img {
+      display: block;
+      height: 28px;
+      width: auto;
+      filter: var(--logo-filter);
+    }
+    .apply-header-right { display: flex; align-items: center; gap: 12px; }
+    .apply-login-hint { font-size: 0.85rem; color: var(--text-muted); }
+    .apply-login-hint a { color: var(--brand); font-weight: 600; }
+
+    /* ─── Layout ─── */
+    .apply-wrap {
+      max-width: 1080px; margin: 0 auto; padding: 60px 24px 80px;
+      display: grid; grid-template-columns: 1fr 420px; gap: 60px; align-items: start;
+    }
+    @media (max-width: 860px) {
+      .apply-wrap { grid-template-columns: 1fr; gap: 40px; }
+      .apply-header-inner { padding: 0 20px; }
+      .apply-logo { height: 26px; }
+      .apply-logo img { height: 26px; }
+    }
+
+    /* ─── Left: 소개 ─── */
+    .apply-intro {}
+    .apply-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--brand-light); color: var(--brand);
+      font-size: 0.8rem; font-weight: 700; padding: 5px 12px;
+      border-radius: 50px; margin-bottom: 20px;
+    }
+    .apply-title {
+      font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 900;
+      letter-spacing: -0.045em; line-height: 1.15; margin-bottom: 16px;
+      word-break: keep-all;
+    }
+    .apply-title em { color: var(--brand); font-style: normal; }
+    .apply-sub {
+      font-size: 1rem; color: var(--text-secondary); line-height: 1.7;
+      margin-bottom: 40px; word-break: keep-all;
+    }
+
+    .benefit-list { display: flex; flex-direction: column; gap: 16px; }
+    .benefit-item {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 16px 18px; background: var(--bg-card);
+      border: 1px solid var(--border); border-radius: var(--radius-lg);
+    }
+    .benefit-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: var(--brand-light); display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 1.2rem;
+    }
+    .benefit-text {}
+    .benefit-text strong { font-size: 0.9rem; font-weight: 700; display: block; margin-bottom: 2px; }
+    .benefit-text span { font-size: 0.82rem; color: var(--text-muted); }
+
+    .apply-testimonial {
+      margin-top: 28px; padding: 18px 20px;
+      background: var(--brand-light); border-radius: var(--radius-lg);
+      border-left: 3px solid var(--brand);
+    }
+    .apply-testimonial p { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.65; }
+    .apply-testimonial cite { font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; display: block; }
+
+    /* ─── Right: 신청 카드 ─── */
+    .apply-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 20px; padding: 32px 28px;
+      box-shadow: var(--shadow-md); position: sticky; top: calc(90px + env(safe-area-inset-top, 0px));
+    }
+    .apply-card-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 4px; letter-spacing: -0.03em; }
+    .apply-card-sub { font-size: 0.83rem; color: var(--text-muted); margin-bottom: 24px; }
+
+    /* ─── Google 로그인 영역 ─── */
+    #loginSection { display: flex; flex-direction: column; gap: 12px; }
+    .google-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 13px 20px; border-radius: 50px;
+      border: 1.5px solid var(--border);
+      background: var(--bg-card); cursor: pointer;
+      font-size: 0.92rem; font-weight: 600; color: var(--text-primary);
+      transition: box-shadow 0.2s, border-color 0.2s; width: 100%;
+    }
+    .google-btn:hover { box-shadow: 0 2px 14px rgba(0,0,0,0.09); border-color: #D1D5DB; }
+    .login-hint { font-size: 0.78rem; color: var(--text-muted); text-align: center; }
+
+    /* ─── 신청 폼 ─── */
+    #formSection { display: none; }
+    .logged-in-bar {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 20px;
+      padding: 10px 14px; background: var(--brand-light);
+      border-radius: 10px; font-size: 0.82rem;
+    }
+    .logged-in-bar .avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--brand); display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .logged-in-bar .email { flex: 1; color: var(--text-secondary); font-weight: 500; }
+    .logged-in-bar button {
+      background: none; border: none; color: var(--text-muted);
+      font-size: 0.78rem; cursor: pointer; text-decoration: underline;
+    }
+
+    .form-group { margin-bottom: 14px; }
+    .form-label { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 5px; display: block; }
+    .form-input, .form-select, .form-textarea {
+      width: 100%; padding: 10px 13px;
+      border: 1.5px solid var(--border); border-radius: 8px;
+      font-size: 0.875rem; font-family: inherit;
+      background: var(--bg-card); color: var(--text-primary);
+      transition: border-color 0.15s; outline: none;
+    }
+    .form-textarea { min-height: 60px; resize: vertical; line-height: 1.5; }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--brand); }
+    .form-input:disabled { background: var(--bg); color: var(--text-muted); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .form-hint { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
+
+    /* ─── 플랫폼 선택 ─── */
+    .platform-list { display: flex; gap: 8px; margin-bottom: 14px; }
+    .platform-item {
+      flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;
+      padding: 14px 8px; border: 1.5px solid var(--border);
+      border-radius: 12px; cursor: pointer; transition: all 0.15s;
+    }
+    .platform-item:hover { border-color: var(--brand-mid); }
+    .platform-item.selected { border-color: var(--brand); background: var(--brand-light); }
+    .platform-item input[type="radio"] { display: none; }
+    .platform-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 0.85rem; flex-shrink: 0;
+    }
+    .platform-icon.youtube { background: #FEE2E2; color: #DC2626; }
+    .platform-icon.chzzk { background: #DBEAFE; color: #2563EB; }
+    .platform-icon.soop { background: #D1FAE5; color: #059669; }
+    .platform-name { font-size: 0.75rem; font-weight: 600; }
+
+    .channel-field { display: none; }
+    .channel-field.visible { display: block; }
+
+    .submit-btn {
+      width: 100%; padding: 13px; border-radius: 50px;
+      background: var(--brand); color: #fff;
+      border: none; font-size: 0.95rem; font-weight: 700;
+      font-family: inherit; cursor: pointer; margin-top: 6px;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .submit-btn:hover { background: var(--brand-hover); }
+    .submit-btn:active { transform: scale(0.98); }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .agree-text { font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: 10px; }
+    .agree-text a { color: var(--brand); }
+
+    /* ─── 심사 완료 안내 ─── */
+    #doneSection {
+      display: none; flex-direction: column; align-items: center;
+      gap: 12px; text-align: center; padding: 16px 0;
+    }
+    .done-icon { font-size: 2.8rem; }
+    .done-title { font-size: 1.05rem; font-weight: 800; letter-spacing: -0.03em; }
+    .done-sub { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; word-break: keep-all; }
+    .done-btn {
+      padding: 11px 28px; border-radius: 50px;
+      background: var(--brand); color: #fff;
+      border: none; font-size: 0.88rem; font-weight: 700;
+      font-family: inherit; cursor: pointer; margin-top: 4px;
+    }
+
+    /* ─── Theme Toggle ─── */
+    .theme-toggle {
+      width: 34px; height: 34px; border-radius: 50%;
+      border: 1px solid var(--border); background: var(--bg-card);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--text-secondary);
+    }
+    [data-theme="light"] .icon-moon { display: block; }
+    [data-theme="light"] .icon-sun  { display: none; }
+    [data-theme="dark"]  .icon-moon { display: none; }
+    [data-theme="dark"]  .icon-sun  { display: block; }
+
+    /* ─── Footer ─── */
+    .apply-footer {
+      border-top: 1px solid var(--border); padding: 24px 40px;
+      text-align: center; font-size: 0.78rem; color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+<header class="apply-header">
+  <div class="apply-header-inner">
+    <a href="index.html" class="apply-logo">
+      <img src="assets/fanup_logo.png" alt="FANUP">
+    </a>
+    <div class="apply-header-right">
+      <span class="apply-login-hint">이미 등록된 크리에이터인가요? <a href="studio-login.html">스튜디오 →</a></span>
+      <button class="theme-toggle" id="themeToggle" aria-label="테마 전환">
+        <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="apply-wrap">
+
+  <!-- ── 좌측: 소개 ── -->
+  <div class="apply-intro">
+    <div class="apply-badge">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      FANUP 크리에이터
+    </div>
+    <h1 class="apply-title">팬이 보내는 마음,<br><em>AI 아바타</em>로 받아보세요.</h1>
+    <p class="apply-sub">
+      FANUP 크리에이터로 등록하면 나만의 AI 아바타가 팬과 대화하고,<br>
+      팬들이 보낸 선물을 안전하게 수령할 수 있습니다.
+    </p>
+
+    <div class="benefit-list">
+      <div class="benefit-item">
+        <div class="benefit-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="8" width="16" height="12" rx="3"/><path d="M9 12h.01"/><path d="M15 12h.01"/><path d="M9 16h6"/><path d="M12 4v4"/>
+          </svg>
+        </div>
+        <div class="benefit-text">
+          <strong>AI 아바타 대화</strong>
+          <span>나만의 AI 아바타가 팬과 24시간 소통합니다. 말투, 성격 모두 커스텀 가능.</span>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13"/><path d="M3 12h18"/><path d="M12 8c-1.8 0-3-1.2-3-2.5S10 3 12 4.2C14 3 15 4.2 15 5.5S13.8 8 12 8z"/>
+          </svg>
+        </div>
+        <div class="benefit-text">
+          <strong>안전한 선물 수령</strong>
+          <span>실제 주소 노출 없이 팬의 선물을 안전하게 받을 수 있습니다.</span>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v20"/><path d="M17 6H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
+        <div class="benefit-text">
+          <strong>치즈 수익 정산</strong>
+          <span>팬 활동에서 발생하는 치즈 수익을 매월 정산받으세요.</span>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3 4 7v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V7z"/><path d="m9 12 2 2 4-4"/>
+          </svg>
+        </div>
+        <div class="benefit-text">
+          <strong>개인정보 완전 보호</strong>
+          <span>실명, 주소, 연락처 모두 비공개. 안심번호 시스템으로 보호됩니다.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="apply-testimonial">
+      <p>"FANUP 등록하고 나서 팬들이 직접 선물을 보내주기 시작했어요. 주소 걱정 없이 받을 수 있어서 너무 좋아요."</p>
+      <cite>— 파트너 크리에이터</cite>
+    </div>
+  </div>
+
+  <!-- ── 우측: 신청 카드 ── -->
+  <div class="apply-card">
+    <p class="apply-card-title">크리에이터 등록 신청</p>
+    <p class="apply-card-sub">투명한 심사를 위해 <strong>채널 소유 확인</strong>과 <strong>정산/신원 정보</strong>가 필요합니다. 제출된 정보는 검증 목적 외 사용되지 않습니다.</p>
+
+    <style>
+      .stepper{display:flex;gap:8px;margin:18px 0 18px}
+      .step{flex:1;display:flex;flex-direction:column;gap:6px}
+      .step-bar{height:6px;border-radius:999px;background:var(--gray-100);overflow:hidden;border:1px solid var(--border)}
+      .step-bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,#8B5CF6,#7C3AED,#EC4899);border-radius:999px;transition:width 0.25s ease}
+      .step-label{font-size:0.72rem;color:var(--text-muted);font-weight:700;letter-spacing:-0.01em}
+      .step.active .step-label{color:var(--text-primary)}
+
+      .card-note{
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: var(--bg);
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        margin-bottom: 14px;
+      }
+      .card-note strong{color:var(--text-primary)}
+      .pill{
+        display:inline-flex;align-items:center;gap:6px;
+        padding:4px 10px;border-radius:999px;
+        background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.18);
+        color:var(--brand);font-size:0.72rem;font-weight:800;letter-spacing:0.02em;
+      }
+      [data-theme="dark"] .pill{background:rgba(124,58,237,0.14);border-color:rgba(124,58,237,0.35)}
+
+      .section-title{font-size:0.92rem;font-weight:900;letter-spacing:-0.03em;margin:14px 0 8px}
+      .section-sub{font-size:0.78rem;color:var(--text-muted);line-height:1.6;margin-bottom:10px}
+
+      .form-actions{display:flex;gap:10px;margin-top:14px}
+      .btn-inline{
+        flex:1;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+        padding: 12px 14px;border-radius: 12px;font-weight:800;font-size:0.9rem;
+        border:1.5px solid var(--border);background:var(--bg-card);color:var(--text-primary);
+      }
+      .btn-inline.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+      .btn-inline.primary:hover{background:var(--brand-hover)}
+      .btn-inline:disabled{opacity:0.55;cursor:not-allowed}
+
+      .mini{font-size:0.75rem;color:var(--text-muted);line-height:1.6;margin-top:10px}
+      .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,'Liberation Mono','Courier New',monospace}
+
+      .check-row{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:var(--bg);margin-top:10px}
+      .check-row input{margin-top:3px}
+      .check-row label{font-size:0.82rem;color:var(--text-secondary);line-height:1.55}
+      .check-row label strong{color:var(--text-primary)}
+
+      .status-box{
+        display:none;
+        padding:14px 14px;border-radius:14px;border:1px solid var(--border);
+        background:var(--bg);
+        margin:14px 0;
+      }
+      .status-box .t{font-size:0.9rem;font-weight:900;margin-bottom:6px}
+      .status-box .d{font-size:0.82rem;color:var(--text-secondary);line-height:1.6}
+      .status-box.pending{border-color:rgba(124,58,237,0.28);background:rgba(124,58,237,0.06)}
+      .status-box.pending .t{color:var(--brand)}
+      .status-box.rejected{border-color:rgba(239,68,68,0.35);background:rgba(239,68,68,0.06)}
+      .status-box.rejected .t{color:var(--danger)}
+      .status-box.approved{border-color:rgba(16,185,129,0.30);background:rgba(16,185,129,0.06)}
+      .status-box.approved .t{color:var(--success)}
+
+      /* 로그인 전에도 '신청서' 형태로 보이기 */
+      #formSection{display:block !important;}
+      .locked-shell{position:relative;}
+      .locked-shell.is-locked{
+        border-radius: 16px;
+      }
+      .locked-shell.is-locked .apply-step,
+      .locked-shell.is-locked .status-box,
+      .locked-shell.is-locked .stepper{
+        filter: blur(1.5px);
+        opacity: 0.55;
+        pointer-events: none;
+        user-select: none;
+      }
+      .lock-banner{
+        display:none;
+        position: sticky;
+        top: calc(64px + env(safe-area-inset-top, 0px));
+        z-index: 5;
+        margin: 14px 0 10px;
+        padding: 12px 12px;
+        border-radius: 14px;
+        border: 1px solid rgba(124,58,237,0.28);
+        background: linear-gradient(145deg, rgba(124,58,237,0.10), rgba(236,72,153,0.06));
+        box-shadow: var(--shadow-sm);
+      }
+      .lock-banner.show{display:flex;align-items:center;gap:10px;}
+      .lock-badge{
+        width:32px;height:32px;border-radius:12px;
+        background: rgba(124,58,237,0.16);
+        border: 1px solid rgba(124,58,237,0.26);
+        display:flex;align-items:center;justify-content:center;flex-shrink:0;
+        color: var(--brand);
+      }
+      .lock-title{font-size:0.86rem;font-weight:900;letter-spacing:-0.03em;color:var(--text-primary);margin-bottom:2px}
+      .lock-desc{font-size:0.78rem;color:var(--text-secondary);line-height:1.55}
+      .lock-cta{margin-left:auto;flex-shrink:0}
+    </style>
+
+    <!-- Google 로그인 -->
+    <div id="loginSection">
+      <button class="google-btn" id="googleLoginBtn">
+        <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+          <path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/>
+          <path d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.55 0 9s.348 2.825.957 4.039l3.007-2.332z" fill="#FBBC05"/>
+          <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+        </svg>
+        Google 계정으로 로그인
+      </button>
+      <p class="login-hint">로그인 후 신청 정보를 입력할 수 있습니다.</p>
+    </div>
+
+    <!-- 상태/폼 -->
+    <div id="formSection">
+      <div class="logged-in-bar" id="loggedInBar">
+        <div class="avatar" id="userAvatar">?</div>
+        <span class="email" id="userEmail">—</span>
+        <button type="button" onclick="handleLogout()">로그아웃</button>
+      </div>
+
+      <div class="lock-banner" id="lockBanner">
+        <div class="lock-badge">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+        </div>
+        <div>
+          <div class="lock-title">신청서 작성은 로그인 후 가능합니다</div>
+          <div class="lock-desc">Google로 로그인하면 토큰 생성/채널 소유 확인부터 바로 시작할 수 있어요.</div>
+        </div>
+        <div class="lock-cta">
+          <button class="btn-inline primary" type="button" onclick="document.getElementById('googleLoginBtn').click()">Google 로그인</button>
+        </div>
+      </div>
+
+      <div class="status-box pending" id="statusPending">
+        <div class="t">심사 진행 중</div>
+        <div class="d">이미 신청이 접수되어 검토 중입니다. 정보 수정이 필요하면 아래에서 내용을 업데이트한 뒤 다시 제출할 수 있어요.</div>
+      </div>
+      <div class="status-box rejected" id="statusRejected">
+        <div class="t">보완 요청/거절</div>
+        <div class="d" id="statusRejectedReason">사유: —</div>
+      </div>
+      <div class="status-box approved" id="statusApproved">
+        <div class="t">승인 완료</div>
+        <div class="d">스튜디오 사용이 가능합니다. 아래 버튼으로 이동하세요.</div>
+        <div class="form-actions">
+          <a class="btn-inline primary" href="studio.html">스튜디오로</a>
+          <a class="btn-inline" href="index.html">랜딩으로</a>
+        </div>
+      </div>
+
+      <div class="locked-shell" id="lockedShell">
+      <div class="stepper" aria-label="신청 단계">
+        <div class="step active" id="step1">
+          <div class="step-bar"><i id="bar1"></i></div>
+          <div class="step-label">1) 채널 소유 확인</div>
+        </div>
+        <div class="step" id="step2">
+          <div class="step-bar"><i id="bar2"></i></div>
+          <div class="step-label">2) 신원/정산 정보</div>
+        </div>
+        <div class="step" id="step3">
+          <div class="step-bar"><i id="bar3"></i></div>
+          <div class="step-label">3) 약관 동의/제출</div>
+        </div>
+      </div>
+
+      <form id="creatorForm">
+        <input type="hidden" id="reg-uid">
+        <input type="hidden" id="reg-email">
+
+        <!-- STEP 1 -->
+        <div class="apply-step" id="panel1">
+          <div class="card-note">
+            <span class="pill">검증 1</span>
+            <div style="margin-top:8px;">
+              <strong>채널 소유 확인</strong>을 위해, 아래 토큰을 채널 소개(또는 공지/고정 글)에 5분 이상 공개해 주세요.
+              <div class="mini" style="margin-top:8px;">
+                토큰: <span class="mono" id="verifyToken">—</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">활동명 (채널명/닉네임) *</label>
+            <input type="text" id="reg-displayName" class="form-input" placeholder="예: 키리모코 여우" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">활동 플랫폼 *</label>
+            <div class="platform-list">
+              <label class="platform-item" data-platform="youtube">
+                <input type="radio" name="platform" value="youtube" required>
+                <div class="platform-icon youtube">YT</div>
+                <span class="platform-name">YouTube</span>
+              </label>
+              <label class="platform-item" data-platform="chzzk">
+                <input type="radio" name="platform" value="chzzk">
+                <div class="platform-icon chzzk">CZ</div>
+                <span class="platform-name">치지직</span>
+              </label>
+              <label class="platform-item" data-platform="soop">
+                <input type="radio" name="platform" value="soop">
+                <div class="platform-icon soop">SP</div>
+                <span class="platform-name">숲</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group channel-field" id="channelField">
+            <label class="form-label">채널 URL *</label>
+            <input type="url" id="reg-channelUrl" class="form-input" placeholder="" required>
+            <p class="form-hint" id="channelHint"></p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">소유 확인 위치 *</label>
+            <select id="reg-verifyMethod" class="form-select" required>
+              <option value="">선택</option>
+              <option value="description">채널 소개(설명)에 토큰 입력</option>
+              <option value="pinned">고정 글/공지에 토큰 입력</option>
+              <option value="community">커뮤니티 글에 토큰 포함</option>
+            </select>
+            <p class="form-hint">운영진이 채널에서 토큰을 직접 확인합니다.</p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">토큰이 보이는 링크(확인 URL) *</label>
+            <input type="url" id="reg-verifyUrl" class="form-input" placeholder="예: 채널 소개가 보이는 페이지 URL" required>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-inline" onclick="location.href='studio-login.html'">스튜디오로</button>
+            <button type="button" class="btn-inline primary" id="next1">다음</button>
+          </div>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="apply-step" id="panel2" style="display:none;">
+          <div class="section-title">신원 정보</div>
+          <div class="section-sub">정산/계약을 위한 최소 정보입니다. 주민등록번호 전체 입력은 받지 않습니다.</div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">실명(정산/계약용) *</label>
+              <input type="text" id="reg-legalName" class="form-input" placeholder="예: 홍길동" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">생년월일 *</label>
+              <input type="date" id="reg-birthdate" class="form-input" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">연락처(본인확인용) *</label>
+              <input type="tel" id="reg-phone" class="form-input" placeholder="010-0000-0000" required>
+              <p class="form-hint">승인/보완 요청 안내에 사용됩니다.</p>
+            </div>
+            <div class="form-group">
+              <label class="form-label">거주 국가 *</label>
+              <select id="reg-country" class="form-select" required>
+                <option value="">선택</option>
+                <option value="KR">대한민국</option>
+                <option value="JP">일본</option>
+                <option value="US">미국</option>
+                <option value="OTHER">기타</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="section-title" style="margin-top:18px;">정산 계좌 정보</div>
+          <div class="section-sub">정산을 받을 계좌 정보를 입력해 주세요.</div>
+
+          <div class="form-group">
+            <label class="form-label">은행 *</label>
+            <input type="text" id="reg-bankName" class="form-input" placeholder="예: 국민은행" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">예금주 *</label>
+              <input type="text" id="reg-accountHolder" class="form-input" placeholder="예: 홍길동" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">계좌번호 *</label>
+              <input type="text" id="reg-accountNumber" class="form-input" placeholder="숫자만 입력" inputmode="numeric" required>
+            </div>
+          </div>
+          <p class="form-hint">보안을 위해 제출 후 화면에는 마스킹 처리될 수 있습니다.</p>
+
+          <div class="form-actions">
+            <button type="button" class="btn-inline" id="prev2">이전</button>
+            <button type="button" class="btn-inline primary" id="next2">다음</button>
+          </div>
+        </div>
+
+        <!-- STEP 3 -->
+        <div class="apply-step" id="panel3" style="display:none;">
+          <div class="section-title">약관 및 동의</div>
+          <div class="section-sub">검증/정산을 위해 필요한 항목입니다.</div>
+
+          <div class="check-row">
+            <input type="checkbox" id="agreeTerms" required>
+            <label for="agreeTerms"><strong>이용약관</strong>에 동의합니다. (필수)</label>
+          </div>
+          <div class="check-row">
+            <input type="checkbox" id="agreePrivacy" required>
+            <label for="agreePrivacy"><strong>개인정보 처리</strong> 및 심사 목적의 정보 이용에 동의합니다. (필수)</label>
+          </div>
+          <div class="check-row">
+            <input type="checkbox" id="agreePayout" required>
+            <label for="agreePayout"><strong>정산 규정</strong>(수수료/지급일/환불 정책)을 확인했고 동의합니다. (필수)</label>
+          </div>
+          <div class="check-row">
+            <input type="checkbox" id="agreeTruth" required>
+            <label for="agreeTruth">제출한 정보가 사실이며, 허위 시 승인이 취소될 수 있음을 이해합니다. (필수)</label>
+          </div>
+
+          <p class="mini">※ 실제 서비스에서는 휴대폰 본인인증/서류 제출 등 추가 절차가 붙을 수 있습니다. 현재는 운영진의 수동 검증 플로우로 동작합니다.</p>
+
+          <button type="submit" class="submit-btn" id="submitBtn">신청서 제출</button>
+          <p class="agree-text">문의: <a href="mailto:creator@fanup.im">creator@fanup.im</a></p>
+
+          <div class="form-actions">
+            <button type="button" class="btn-inline" id="prev3">이전</button>
+            <button type="button" class="btn-inline" id="saveDraft">임시 저장</button>
+          </div>
+        </div>
+      </form>
+      </div><!-- locked-shell -->
+
+      <!-- 제출 완료 -->
+      <div id="doneSection" style="display:none;">
+        <div class="done-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>
+          </svg>
+        </div>
+        <p class="done-title">신청이 접수됐습니다</p>
+        <p class="done-sub">운영진이 채널 소유 및 신원/정산 정보를 검증합니다.<br>보완이 필요하면 이메일/연락처로 안내드릴게요.</p>
+        <button class="done-btn" onclick="location.href='studio-login.html'">스튜디오로 돌아가기 →</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="apply-footer">
+  © 2026 FANUP Inc. All rights reserved. · <a href="mailto:creator@fanup.im" style="color:var(--brand);">creator@fanup.im</a>
+</footer>
+
+<script>
+  // Theme
+  const html = document.documentElement;
+  const saved = localStorage.getItem('fanup-theme');
+  if (saved) html.setAttribute('data-theme', saved);
+  else if (window.matchMedia('(prefers-color-scheme: dark)').matches) html.setAttribute('data-theme', 'dark');
+  document.getElementById('themeToggle')?.addEventListener('click', () => {
+    const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next); localStorage.setItem('fanup-theme', next);
+  });
+</script>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js';
+import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js';
+import { getFirestore, collection, query, where, getDocs, addDoc, serverTimestamp, updateDoc, doc } from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js';
+
+const app  = initializeApp({ apiKey:'AIzaSyAsQZo491B1W3s_s2WcqrTMdgH810Putao', authDomain:'fanup-app.firebaseapp.com', projectId:'fanup-app', storageBucket:'fanup-app-storage', messagingSenderId:'542708276250', appId:'1:542708276250:web:a2f01ca6b84ed1d50845a3' });
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+const platformInfo = {
+  youtube: { placeholder: 'https://www.youtube.com/@채널명', hint: 'YouTube 스튜디오 > 맞춤설정 > 기본 정보에서 채널 URL을 확인하세요.' },
+  chzzk:   { placeholder: 'https://chzzk.naver.com/채널ID', hint: '치지직 프로필 > 내 채널에서 채널 URL을 복사해주세요.' },
+  soop:    { placeholder: 'https://www.sooplive.co.kr/채널ID', hint: '숲 내 채널 페이지의 URL을 복사해주세요.' }
+};
+
+// 플랫폼 선택
+document.querySelectorAll('.platform-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.platform-item').forEach(i => i.classList.remove('selected'));
+    item.classList.add('selected');
+
+    const p = item.dataset.platform;
+    const info = platformInfo[p];
+    const field = document.getElementById('channelField');
+    const input = document.getElementById('reg-channelUrl');
+    const hint = document.getElementById('channelHint');
+
+    field.classList.add('visible');
+    input.placeholder = info.placeholder;
+    hint.textContent = info.hint;
+    input.value = '';
+    input.focus();
+  });
+});
+
+async function fetchCreator(uid) {
+  const snap = await getDocs(query(collection(db, 'creators'), where('uid', '==', uid)));
+  if (snap.empty) return null;
+  return { id: snap.docs[0].id, ...snap.docs[0].data() };
+}
+
+function showLogin()  {
+  document.getElementById('loginSection').style.display = '';
+  document.getElementById('formSection').style.display = '';
+  document.getElementById('doneSection').style.display = 'none';
+  document.getElementById('loggedInBar').style.display = 'none';
+  document.getElementById('lockBanner')?.classList.add('show');
+  document.getElementById('lockedShell')?.classList.add('is-locked');
+  setStep(1);
+}
+function showForm()   {
+  document.getElementById('loginSection').style.display = 'none';
+  document.getElementById('formSection').style.display = '';
+  document.getElementById('doneSection').style.display = 'none';
+  document.getElementById('loggedInBar').style.display = '';
+  document.getElementById('lockBanner')?.classList.remove('show');
+  document.getElementById('lockedShell')?.classList.remove('is-locked');
+}
+function showDone()   { document.getElementById('loginSection').style.display = 'none'; document.getElementById('formSection').style.display = 'none'; document.getElementById('doneSection').style.display = 'flex'; }
+
+function setStep(n) {
+  const panels = [null, 'panel1', 'panel2', 'panel3'];
+  panels.slice(1).forEach((id, idx) => {
+    document.getElementById(id).style.display = (idx + 1 === n) ? '' : 'none';
+  });
+  ['step1','step2','step3'].forEach((id, idx) => {
+    document.getElementById(id).classList.toggle('active', idx + 1 === n);
+  });
+  document.getElementById('bar1').style.width = n >= 1 ? '100%' : '0%';
+  document.getElementById('bar2').style.width = n >= 2 ? '100%' : '0%';
+  document.getElementById('bar3').style.width = n >= 3 ? '100%' : '0%';
+  window.__applyStep = n;
+}
+
+function makeToken(uid) {
+  const base = (uid || '').replace(/[^a-zA-Z0-9]/g, '').slice(-10).toUpperCase();
+  const salt = Math.random().toString(36).slice(2, 6).toUpperCase();
+  return `FANUP-${base || 'CREATOR'}-${salt}`;
+}
+
+function readDraft() {
+  try { return JSON.parse(localStorage.getItem('fanup-creator-apply-draft') || 'null'); }
+  catch { return null; }
+}
+function writeDraft(data) {
+  localStorage.setItem('fanup-creator-apply-draft', JSON.stringify({ ...data, savedAt: Date.now() }));
+}
+function pick(v) { return (v ?? '').toString(); }
+function collectForm() {
+  const platform = document.querySelector('input[name="platform"]:checked')?.value || '';
+  return {
+    uid: pick(document.getElementById('reg-uid').value),
+    email: pick(document.getElementById('reg-email').value),
+    displayName: pick(document.getElementById('reg-displayName').value).trim(),
+    platform,
+    channelUrl: pick(document.getElementById('reg-channelUrl').value).trim(),
+    verification: {
+      token: pick(document.getElementById('verifyToken').textContent).trim(),
+      method: pick(document.getElementById('reg-verifyMethod').value),
+      url: pick(document.getElementById('reg-verifyUrl').value).trim(),
+    },
+    identity: {
+      legalName: pick(document.getElementById('reg-legalName').value).trim(),
+      birthdate: pick(document.getElementById('reg-birthdate').value),
+      phone: pick(document.getElementById('reg-phone').value).trim(),
+      country: pick(document.getElementById('reg-country').value),
+    },
+    payout: {
+      bankName: pick(document.getElementById('reg-bankName').value).trim(),
+      accountHolder: pick(document.getElementById('reg-accountHolder').value).trim(),
+      accountNumber: pick(document.getElementById('reg-accountNumber').value).trim(),
+    },
+    agreements: {
+      terms: !!document.getElementById('agreeTerms')?.checked,
+      privacy: !!document.getElementById('agreePrivacy')?.checked,
+      payout: !!document.getElementById('agreePayout')?.checked,
+      truth: !!document.getElementById('agreeTruth')?.checked,
+    },
+  };
+}
+function hydrateForm(data) {
+  if (!data) return;
+  if (data.displayName) document.getElementById('reg-displayName').value = data.displayName;
+  if (data.platform) {
+    const radio = document.querySelector(`input[name="platform"][value="${data.platform}"]`);
+    if (radio) radio.checked = true;
+    document.querySelectorAll('.platform-item').forEach(i => i.classList.toggle('selected', i.dataset.platform === data.platform));
+    const info = platformInfo[data.platform];
+    if (info) {
+      document.getElementById('channelField').classList.add('visible');
+      document.getElementById('reg-channelUrl').placeholder = info.placeholder;
+      document.getElementById('channelHint').textContent = info.hint;
+    }
+  }
+  if (data.channelUrl) document.getElementById('reg-channelUrl').value = data.channelUrl;
+  if (data.verification?.method) document.getElementById('reg-verifyMethod').value = data.verification.method;
+  if (data.verification?.url) document.getElementById('reg-verifyUrl').value = data.verification.url;
+
+  if (data.identity?.legalName) document.getElementById('reg-legalName').value = data.identity.legalName;
+  if (data.identity?.birthdate) document.getElementById('reg-birthdate').value = data.identity.birthdate;
+  if (data.identity?.phone) document.getElementById('reg-phone').value = data.identity.phone;
+  if (data.identity?.country) document.getElementById('reg-country').value = data.identity.country;
+
+  if (data.payout?.bankName) document.getElementById('reg-bankName').value = data.payout.bankName;
+  if (data.payout?.accountHolder) document.getElementById('reg-accountHolder').value = data.payout.accountHolder;
+  if (data.payout?.accountNumber) document.getElementById('reg-accountNumber').value = data.payout.accountNumber;
+}
+
+function showStatusBoxes(creator) {
+  const pending = document.getElementById('statusPending');
+  const rejected = document.getElementById('statusRejected');
+  const approved = document.getElementById('statusApproved');
+  pending.style.display = 'none';
+  rejected.style.display = 'none';
+  approved.style.display = 'none';
+  if (!creator) return;
+  if (creator.status === 'pending') pending.style.display = 'block';
+  if (creator.status === 'rejected') {
+    rejected.style.display = 'block';
+    document.getElementById('statusRejectedReason').textContent = creator.rejectionReason ? ('사유: ' + creator.rejectionReason) : '사유: 담당자에게 문의해주세요.';
+  }
+  if (creator.status === 'approved') approved.style.display = 'block';
+}
+
+document.getElementById('googleLoginBtn').addEventListener('click', async () => {
+  try { await signInWithPopup(auth, new GoogleAuthProvider()); }
+  catch(e) { console.error(e); }
+});
+
+window.handleLogout = () => signOut(auth);
+
+onAuthStateChanged(auth, async user => {
+  if (!user) { showLogin(); return; }
+  const creator = await fetchCreator(user.uid);
+  if (creator?.status === 'approved') { showForm(); showStatusBoxes(creator); return; }
+  showForm();
+  showStatusBoxes(creator);
+
+  document.getElementById('userAvatar').textContent = (user.displayName || user.email || '?')[0].toUpperCase();
+  document.getElementById('userEmail').textContent = user.email || '';
+  document.getElementById('reg-email').value = user.email || '';
+  document.getElementById('reg-uid').value = user.uid;
+  if (user.displayName) document.getElementById('reg-displayName').value = user.displayName;
+
+  // token
+  const token = makeToken(user.uid);
+  document.getElementById('verifyToken').textContent = token;
+
+  // hydrate from existing creator doc or draft
+  if (creator) {
+    hydrateForm({
+      displayName: creator.displayName,
+      platform: creator.platform,
+      channelUrl: creator.channelUrl,
+      verification: creator.verification,
+      identity: creator.identity,
+      payout: creator.payout,
+    });
+    // Keep token stable per session; store in draft too
+    writeDraft({ ...(readDraft() || {}), verification: { ...(creator.verification || {}), token } });
+  } else {
+    const draft = readDraft();
+    hydrateForm(draft);
+  }
+
+  setStep(1);
+});
+
+document.getElementById('next1')?.addEventListener('click', () => {
+  const f = collectForm();
+  if (!f.displayName || !f.platform || !f.channelUrl || !f.verification.method || !f.verification.url) {
+    alert('STEP 1의 필수 항목을 모두 입력해주세요.');
+    return;
+  }
+  writeDraft(f);
+  setStep(2);
+});
+document.getElementById('prev2')?.addEventListener('click', () => setStep(1));
+document.getElementById('next2')?.addEventListener('click', () => {
+  const f = collectForm();
+  if (!f.identity.legalName || !f.identity.birthdate || !f.identity.phone || !f.identity.country || !f.payout.bankName || !f.payout.accountHolder || !f.payout.accountNumber) {
+    alert('STEP 2의 필수 항목을 모두 입력해주세요.');
+    return;
+  }
+  writeDraft(f);
+  setStep(3);
+});
+document.getElementById('prev3')?.addEventListener('click', () => setStep(2));
+document.getElementById('saveDraft')?.addEventListener('click', () => {
+  writeDraft(collectForm());
+  alert('임시 저장되었습니다.');
+});
+
+document.getElementById('creatorForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  const payload = collectForm();
+  if (!payload.platform) { alert('활동 플랫폼을 선택해주세요.'); return; }
+  if (!payload.agreements.terms || !payload.agreements.privacy || !payload.agreements.payout || !payload.agreements.truth) {
+    alert('약관 동의(필수)를 모두 체크해주세요.');
+    return;
+  }
+
+  btn.disabled = true; btn.textContent = '신청 중...';
+  try {
+    const existing = await fetchCreator(payload.uid);
+    const data = {
+      uid: payload.uid,
+      email: payload.email,
+      displayName: payload.displayName,
+      platform: payload.platform,
+      channelUrl: payload.channelUrl,
+      verification: payload.verification,
+      identity: payload.identity,
+      payout: payload.payout,
+      agreements: payload.agreements,
+      status: 'pending',
+      updatedAt: serverTimestamp(),
+      submittedAt: serverTimestamp(),
+    };
+    if (!existing) {
+      await addDoc(collection(db, 'creators'), { ...data, createdAt: serverTimestamp() });
+    } else {
+      await updateDoc(doc(db, 'creators', existing.id), data);
+    }
+    localStorage.removeItem('fanup-creator-apply-draft');
+    showDone();
+  } catch(err) {
+    console.error(err);
+    alert('신청 중 오류가 발생했습니다. 다시 시도해주세요.');
+    btn.disabled = false; btn.textContent = '크리에이터 등록 신청';
+  }
+});
+</script>
+</body>
+</html>
