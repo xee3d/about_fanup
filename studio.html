@@ -102,6 +102,76 @@
       border: 1.5px dashed var(--border);
     }
     .persona-tag.add:hover { border-color: var(--brand-mid); color: var(--brand); }
+
+    /* ── Avatar Wizard ── */
+    .wizard-layout { display:grid; grid-template-columns:1fr 320px; gap:24px; align-items:start; }
+    @media (max-width:900px) { .wizard-layout { grid-template-columns:1fr; } }
+
+    .wizard-progress-wrap { margin-bottom:20px; }
+    .wizard-progress-label { display:flex; justify-content:space-between; font-size:0.78rem; color:var(--text-muted); margin-bottom:8px; font-weight:500; }
+    .wizard-progress-bar-bg { height:4px; background:var(--border); border-radius:4px; }
+    .wizard-progress-bar-fill { height:4px; background:var(--brand); border-radius:4px; transition:width 0.4s ease; }
+
+    .wizard-chat { display:flex; flex-direction:column; gap:14px; margin-bottom:20px; }
+    .chat-msg { display:flex; gap:10px; align-items:flex-start; }
+    .chat-msg.user { flex-direction:row-reverse; }
+    .chat-avatar-icon { width:34px; height:34px; border-radius:10px; background:var(--brand-light); color:var(--brand); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:16px; }
+    .chat-bubble { max-width:82%; padding:11px 15px; border-radius:16px; font-size:0.88rem; line-height:1.55; }
+    .chat-msg.bot .chat-bubble { background:var(--bg-card); border:1px solid var(--border); border-top-left-radius:4px; color:var(--text-primary); }
+    .chat-msg.user .chat-bubble { background:var(--brand); color:#fff; border-top-right-radius:4px; }
+
+    .wizard-step { margin-bottom:0; }
+    .tag-options { display:flex; flex-wrap:wrap; gap:7px; }
+    .tag-option { padding:5px 13px; background:var(--bg); border:1.5px solid var(--border); border-radius:100px; font-size:0.8rem; cursor:pointer; color:var(--text-secondary); transition:all 0.15s; user-select:none; }
+    .tag-option.selected { background:var(--brand-light); border-color:var(--brand); color:var(--brand); font-weight:600; }
+    .tag-option:hover:not(.selected) { border-color:var(--brand-mid); }
+
+    .speech-style-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .speech-style-opt { padding:10px 13px; background:var(--bg); border:1.5px solid var(--border); border-radius:var(--radius-md); cursor:pointer; transition:all 0.15s; }
+    .speech-style-opt.selected { background:var(--brand-light); border-color:var(--brand); }
+    .speech-style-opt .opt-emoji { font-size:17px; margin-bottom:3px; }
+    .speech-style-opt .opt-name { font-size:0.82rem; font-weight:600; color:var(--text-primary); }
+    .speech-style-opt .opt-desc { font-size:0.72rem; color:var(--text-muted); margin-top:1px; }
+    .speech-style-opt.selected .opt-name { color:var(--brand); }
+
+    .wizard-nav { display:flex; justify-content:space-between; align-items:center; margin-top:16px; }
+
+    .examples-list { display:flex; flex-direction:column; gap:8px; }
+    .example-row { display:flex; gap:7px; align-items:center; }
+    .example-row .form-input { flex:1; }
+    .btn-remove { background:transparent; border:1px solid var(--border); border-radius:7px; padding:5px 9px; cursor:pointer; color:var(--text-muted); font-size:0.75rem; line-height:1; transition:all 0.15s; }
+    .btn-remove:hover { border-color:#ef4444; color:#ef4444; }
+
+    .safety-opts { display:flex; flex-direction:column; gap:8px; }
+    .safety-opt { display:flex; gap:12px; align-items:center; padding:10px 14px; border:1.5px solid var(--border); border-radius:var(--radius-md); cursor:pointer; transition:all 0.15s; }
+    .safety-opt.selected { border-color:var(--brand); background:var(--brand-light); }
+    .safety-opt .s-icon { font-size:20px; flex-shrink:0; }
+    .safety-opt .s-name { font-size:0.85rem; font-weight:600; color:var(--text-primary); }
+    .safety-opt .s-desc { font-size:0.74rem; color:var(--text-muted); }
+    .safety-opt.selected .s-name { color:var(--brand); }
+
+    .upload-zone-sm { border:2px dashed var(--border); border-radius:var(--radius-md); padding:22px; text-align:center; cursor:pointer; transition:border-color 0.2s; position:relative; overflow:hidden; }
+    .upload-zone-sm:hover { border-color:var(--brand); }
+    .upload-zone-sm.has-img { border-style:solid; border-color:var(--brand); min-height:100px; background-size:cover; background-position:center; background-repeat:no-repeat; }
+    .upload-zone-sm.has-img .upload-overlay { position:absolute;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;color:#fff;font-size:0.85rem;font-weight:600; }
+
+    .avatar-preview-card { text-align:center; padding:8px 0; }
+    .avatar-preview-img { width:88px; height:88px; border-radius:22px; background:var(--brand-light); display:flex; align-items:center; justify-content:center; margin:0 auto 14px; overflow:hidden; }
+    .avatar-preview-img img { width:100%; height:100%; object-fit:cover; }
+    .avatar-preview-name { font-size:1rem; font-weight:700; color:var(--text-primary); margin-bottom:4px; }
+    .avatar-preview-persona { font-size:0.78rem; color:var(--text-muted); margin-bottom:10px; line-height:1.4; padding:0 8px; }
+    .avatar-preview-tags { display:flex; flex-wrap:wrap; gap:5px; justify-content:center; margin-bottom:12px; }
+    .avatar-preview-tag { padding:3px 10px; background:var(--brand-light); color:var(--brand); border-radius:100px; font-size:0.72rem; font-weight:600; }
+
+    .wizard-radio-group { display:flex; gap:8px; flex-wrap:wrap; }
+    .wizard-radio { display:flex; align-items:center; gap:6px; padding:7px 14px; border:1.5px solid var(--border); border-radius:100px; cursor:pointer; font-size:0.83rem; color:var(--text-secondary); transition:all 0.15s; }
+    .wizard-radio input { display:none; }
+    .wizard-radio.selected { border-color:var(--brand); background:var(--brand-light); color:var(--brand); font-weight:600; }
+
+    .spinner { width:24px; height:24px; border:3px solid var(--border); border-top-color:var(--brand); border-radius:50%; animation:spin 0.65s linear infinite; display:inline-block; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    @keyframes fadeInUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    .chat-msg { animation:fadeInUp 0.25s ease both; }
   </style>
 </head>
 <body>
@@ -349,96 +419,80 @@
     <div class="page-content" id="page-avatar" style="display:none;">
       <div class="page-header">
         <h1>아바타 설정</h1>
-        <p>AI 아바타의 성격, 말투, 이미지를 설정하세요.</p>
+        <p>Cheez AI를 활용해 팬들과 대화할 나만의 아바타를 만들어보세요.</p>
       </div>
 
-      <div class="grid-2">
-        <div>
-          <!-- 아바타 기본 설정 -->
-          <div class="card mb-16">
-            <div class="card-header"><span class="card-title">기본 정보</span></div>
-            <div class="avatar-card" style="margin-bottom:20px;">
-              <div class="avatar-img" style="cursor:pointer;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              </div>
-              <div class="avatar-meta">
-                <div class="avatar-name">키리모코 여우</div>
-                <div class="avatar-status">아바타 이미지 클릭하여 변경</div>
-              </div>
-              <button class="btn btn-outline btn-sm">이미지 변경</button>
-            </div>
-            <div class="form-group">
-              <label class="form-label">아바타 표시 이름</label>
-              <input type="text" class="form-input" value="키리모코 여우">
-            </div>
-            <div class="form-group" style="margin-bottom:0;">
-              <label class="form-label">활성화 상태</label>
-              <div class="toggle-wrap">
-                <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
-                <span class="toggle-label">팬들이 AI 아바타와 대화할 수 있습니다</span>
-              </div>
+      <!-- 로딩 -->
+      <div id="avatar-loading" style="text-align:center;padding:80px 0;">
+        <div class="spinner"></div>
+        <p style="color:var(--text-muted);margin-top:14px;font-size:0.9rem;">아바타 정보를 불러오는 중...</p>
+      </div>
+
+      <!-- 기존 아바타 보기 -->
+      <div id="avatar-existing" style="display:none;">
+        <div class="grid-2">
+          <div>
+            <div class="card" id="avatar-existing-card" style="margin-bottom:14px;"></div>
+            <div style="display:flex;gap:10px;">
+              <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="startWizard(true)">✏️ 아바타 수정</button>
+              <button class="btn btn-outline" onclick="startWizard(false)">새로 만들기</button>
             </div>
           </div>
-
-          <!-- 업로드 -->
-          <div class="card">
-            <div class="card-header"><span class="card-title">모델/이미지 업로드</span></div>
-            <div class="upload-zone">
-              <div class="upload-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
-              </div>
-              <div class="upload-text">이미지 또는 Live2D 모델 업로드</div>
-              <div class="upload-sub">PNG, JPG, GIF, Live2D(.moc3) · 최대 50MB</div>
+          <div>
+            <div class="card">
+              <div class="card-header"><span class="card-title">아바타 미리보기</span></div>
+              <div id="existing-preview-content"></div>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- 페르소나 설정 -->
-        <div>
-          <div class="card mb-16">
-            <div class="card-header"><span class="card-title">페르소나 (Persona)</span></div>
-            <div class="form-group">
-              <label class="form-label">말투 스타일</label>
-              <select class="form-select">
-                <option>밝고 에너지 넘치는 말투</option>
-                <option>차분하고 다정한 말투</option>
-                <option>귀엽고 애교 있는 말투</option>
-                <option>쿨하고 담담한 말투</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">자기소개 (팬들에게 표시)</label>
-              <textarea class="form-textarea">안녕하세요! 저는 키리모코예요. 게임이랑 애니메이션을 좋아하는 버추얼 크리에이터입니다. 팬 여러분과 이야기하는 걸 정말 좋아해요!</textarea>
-            </div>
-            <div class="form-group" style="margin-bottom:0;">
-              <label class="form-label">성격 태그</label>
-              <div class="persona-tags">
-                <span class="persona-tag">활발함</span>
-                <span class="persona-tag">게임 좋아함</span>
-                <span class="persona-tag">애니 덕후</span>
-                <span class="persona-tag">팬 챙기기 좋아함</span>
-                <span class="persona-tag add">+ 추가</span>
+      <!-- 아바타 없음 -->
+      <div id="avatar-empty" style="display:none;text-align:center;padding:80px 20px;">
+        <div style="font-size:56px;margin-bottom:16px;">🤖</div>
+        <h3 style="margin-bottom:8px;color:var(--text-primary);">아직 아바타가 없어요</h3>
+        <p style="color:var(--text-muted);margin-bottom:28px;">Cheez AI를 활용해 팬들과 대화할 아바타를 만들어보세요!</p>
+        <button class="btn btn-primary" style="padding:13px 30px;font-size:0.95rem;" onclick="startWizard(false)">✨ 아바타 만들기</button>
+      </div>
+
+      <!-- 위자드 -->
+      <div id="avatar-wizard" style="display:none;">
+        <div class="wizard-layout">
+          <!-- 왼쪽: 채팅형 입력 -->
+          <div class="wizard-chat-col">
+            <div class="wizard-progress-wrap">
+              <div class="wizard-progress-label">
+                <span id="wizardStepLabel">단계 1 / 5</span>
+                <span id="wizardStepName">이름 &amp; 성별</span>
               </div>
+              <div class="wizard-progress-bar-bg">
+                <div class="wizard-progress-bar-fill" id="wizardProgressFill" style="width:20%"></div>
+              </div>
+            </div>
+            <div class="wizard-chat" id="wizardChat"></div>
+            <div class="card wizard-step" id="wizardInputArea"></div>
+            <div class="wizard-nav">
+              <button class="btn btn-outline" id="wizardBackBtn" onclick="wizardBack()" disabled>← 이전</button>
+              <button class="btn btn-primary" id="wizardNextBtn" onclick="wizardNext()">다음 →</button>
             </div>
           </div>
-
-          <div class="card">
-            <div class="card-header"><span class="card-title">대화 제한 설정</span></div>
-            <div class="form-group">
-              <div class="toggle-wrap" style="margin-bottom:12px;">
-                <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
-                <span class="toggle-label">개인 연락처 요청 자동 차단</span>
-              </div>
-              <div class="toggle-wrap" style="margin-bottom:12px;">
-                <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
-                <span class="toggle-label">부적절한 대화 자동 필터링</span>
-              </div>
-              <div class="toggle-wrap">
-                <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
-                <span class="toggle-label">하루 대화 횟수 제한 (팬당 50회)</span>
+          <!-- 오른쪽: 라이브 프리뷰 -->
+          <div class="wizard-preview-col">
+            <div class="card" style="position:sticky;top:80px;">
+              <div class="card-header"><span class="card-title">실시간 미리보기</span></div>
+              <div class="avatar-preview-card">
+                <div class="avatar-preview-img" id="previewImg">
+                  <span style="font-size:36px;">🤖</span>
+                </div>
+                <div class="avatar-preview-name" id="previewName">이름 미정</div>
+                <div class="avatar-preview-persona" id="previewPersona">성격 설명이 여기에 표시됩니다</div>
+                <div class="avatar-preview-tags" id="previewTags"></div>
+                <div style="padding:10px 12px;background:var(--bg);border-radius:var(--radius-md);text-align:left;">
+                  <div style="font-size:0.71rem;color:var(--text-muted);margin-bottom:3px;">첫 인사 메시지</div>
+                  <div style="font-size:0.82rem;color:var(--text-secondary);font-style:italic;line-height:1.5;" id="previewIntro">아직 입력되지 않았어요...</div>
+                </div>
               </div>
             </div>
-            <button class="btn btn-primary" style="width:100%;justify-content:center;">저장하기</button>
           </div>
         </div>
       </div>
@@ -693,6 +747,10 @@
     });
     const titles = { dashboard:'대시보드', avatar:'아바타 설정', gifts:'선물 보관함', cheez:'치즈 정산', analytics:'통계 분석' };
     document.getElementById('pageTitle').textContent = titles[name] || name;
+
+    if (name === 'avatar' && window.initAvatarPage && window.firebaseIdToken) {
+      window.initAvatarPage();
+    }
   }
   document.querySelectorAll('.nav-item[data-page]').forEach(item => {
     item.addEventListener('click', e => { e.preventDefault(); switchPage(item.dataset.page); });
@@ -702,6 +760,558 @@
   const sidebar = document.getElementById('sidebar');
   document.getElementById('sidebarToggle')?.addEventListener('click', () => sidebar.classList.toggle('open'));
   if (window.innerWidth <= 768) document.getElementById('sidebarToggle').style.display = 'flex';
+</script>
+
+<script>
+// ── Avatar Wizard ─────────────────────────────────────────────────────────
+const CHEEZ_API_URL = 'https://chatapi-6qfhsqtgpq-an.a.run.app';
+const CHEEZ_API_KEY = 'ck_live_738878c945a3500f260f0beb03514981a06ea245';
+const FB_BUCKET     = 'fanup-app-storage';
+
+let wizardData = {};
+let wizardStep = 0;
+
+const WIZARD_STEPS = [
+  { id:'name_gender',   label:'이름 & 성별' },
+  { id:'image',         label:'이미지 업로드' },
+  { id:'persona_tags',  label:'성격 & 태그' },
+  { id:'speech',        label:'말투 스타일' },
+  { id:'intro_safety',  label:'인사 & 안전 설정' },
+];
+
+const BOT_MSGS = [
+  '안녕하세요! 👋 저는 아바타 설정 도우미예요.\n먼저 아바타의 이름과 성별을 알려주세요.',
+  '이제 아바타 이미지를 업로드해주세요 🎨\n팬들에게 보여줄 프로필 이미지예요. (선택 사항)',
+  '✨ 아바타의 성격을 만들어볼게요!\n어떤 캐릭터인지 설명하고 성격 태그를 골라주세요.',
+  '💬 팬들과 어떤 말투로 대화할지 설정해요!\n스타일을 고르고 예시 문장도 추가해주세요.',
+  '마지막 단계예요! 🎉\n팬들이 처음 채팅을 열 때 볼 인사 메시지와 안전 필터를 설정해주세요.',
+];
+
+const PERSONALITY_TAGS = [
+  '활발함','유머러스','따뜻함','쿨함','귀여움','츤데레',
+  '게임 러버','음악 천재','먹방 전문','운동 마니아','독서가',
+  '여행자','힐링계','팬 사랑꾼','호기심 많음','애니 덕후','요리왕',
+];
+
+const SPEECH_STYLES = [
+  { v:'밝고 에너지 넘치는 말투',  d:'"와~ 정말이야? 너무 신난다!!"',     e:'⚡' },
+  { v:'차분하고 다정한 말투',     d:'"그렇군요, 걱정하지 않아도 돼요"',   e:'🌙' },
+  { v:'귀엽고 애교 있는 말투',    d:'"아~ 알 것 같아용~ 정말요?"',         e:'🌸' },
+  { v:'쿨하고 담담한 말투',       d:'"응, 알겠어. 해볼게"',                e:'🧊' },
+  { v:'격식체 말투',              d:'"네, 알겠습니다. 최선을 다하겠습니다"', e:'🎩' },
+  { v:'직접 입력',                d:'원하는 말투를 직접 설명해주세요',      e:'✏️' },
+];
+
+function resetWizardData() {
+  wizardData = {
+    existingId: null,
+    name: '', gender: 'other', imageUrl: '',
+    corePersona: '', personalityKeywords: [],
+    speechPattern: '', speechExamples: [''],
+    introMessage: '', defaultSafetyFilter: 'all',
+    background: '', age: '', motivation: '',
+  };
+}
+
+/* ─── render helpers ─────────────────────────────────────── */
+
+function getAnswerSummary(step) {
+  switch (step) {
+    case 0: {
+      if (!wizardData.name) return '';
+      const gMap = { female:'여성', male:'남성', other:'중성/불명' };
+      return `${wizardData.name}  (${gMap[wizardData.gender] || '중성/불명'})`;
+    }
+    case 1: return wizardData.imageUrl ? '이미지 업로드 완료 ✓' : '이미지 없이 진행';
+    case 2: {
+      const p = wizardData.corePersona;
+      return p ? p.slice(0, 42) + (p.length > 42 ? '…' : '') : '';
+    }
+    case 3: return wizardData.speechPattern || '';
+    case 4: {
+      const m = wizardData.introMessage;
+      return m ? m.slice(0, 42) + (m.length > 42 ? '…' : '') : '';
+    }
+    default: return '';
+  }
+}
+
+function renderChat() {
+  const chat = document.getElementById('wizardChat');
+  chat.innerHTML = '';
+  for (let i = 0; i <= wizardStep; i++) {
+    const botEl = document.createElement('div');
+    botEl.className = 'chat-msg bot';
+    botEl.style.animationDelay = (i * 0.04) + 's';
+    botEl.innerHTML = `
+      <div class="chat-avatar-icon">🤖</div>
+      <div class="chat-bubble">${BOT_MSGS[i].replace(/\n/g,'<br>')}</div>`;
+    chat.appendChild(botEl);
+
+    if (i < wizardStep) {
+      const ans = getAnswerSummary(i);
+      if (ans) {
+        const userEl = document.createElement('div');
+        userEl.className = 'chat-msg user';
+        userEl.style.animationDelay = ((i * 0.04) + 0.08) + 's';
+        userEl.innerHTML = `<div class="chat-bubble">${ans}</div>`;
+        chat.appendChild(userEl);
+      }
+    }
+  }
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function renderInput() {
+  const area = document.getElementById('wizardInputArea');
+  const step = WIZARD_STEPS[wizardStep].id;
+
+  if (step === 'name_gender') {
+    area.innerHTML = `
+      <div class="form-group">
+        <label class="form-label">아바타 이름 <span style="color:var(--brand)">*</span></label>
+        <input type="text" class="form-input" id="wizName" placeholder="예: 키리모코, 하루카, ..." value="${escHtml(wizardData.name)}" maxlength="30">
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">성별</label>
+        <div class="wizard-radio-group" id="genderGroup">
+          ${['female','male','other'].map(g => {
+            const label = g==='female'?'여성':g==='male'?'남성':'중성/불명';
+            return `<label class="wizard-radio ${wizardData.gender===g?'selected':''}" onclick="setGender('${g}')">
+              <input type="radio" name="gender" value="${g}" ${wizardData.gender===g?'checked':''} style="display:none">
+              ${label}
+            </label>`;
+          }).join('')}
+        </div>
+      </div>`;
+
+  } else if (step === 'image') {
+    const hasImg = !!wizardData.imageUrl;
+    area.innerHTML = `
+      <div class="upload-zone-sm ${hasImg?'has-img':''}" id="imgZone" onclick="document.getElementById('wizImgFile').click()"
+        ${hasImg?`style="background-image:url('${wizardData.imageUrl}')"`:''}>
+        ${hasImg
+          ? `<div class="upload-overlay">🖼️ 이미지 변경</div>`
+          : `<div style="font-size:28px;margin-bottom:8px;">📸</div>
+             <div style="font-size:0.88rem;color:var(--text-secondary);font-weight:600;">클릭하여 이미지 업로드</div>
+             <div style="font-size:0.74rem;color:var(--text-muted);margin-top:4px;">PNG, JPG · 최대 5MB</div>`}
+      </div>
+      <input type="file" id="wizImgFile" accept="image/*" style="display:none" onchange="handleImgSelect(event)">
+      <div id="imgStatus" style="font-size:0.78rem;color:var(--text-muted);margin-bottom:8px;"></div>
+      <button class="btn btn-ghost btn-sm" onclick="wizardData.imageUrl='';renderInput();updatePreview()">이미지 없이 진행</button>`;
+
+  } else if (step === 'persona_tags') {
+    const tagsHtml = PERSONALITY_TAGS.map(t =>
+      `<span class="tag-option ${wizardData.personalityKeywords.includes(t)?'selected':''}" onclick="toggleTag('${t}')">${t}</span>`
+    ).join('');
+    area.innerHTML = `
+      <div class="form-group">
+        <label class="form-label">핵심 성격 설명</label>
+        <textarea class="form-textarea" id="wizPersona" placeholder="예: 밝고 활발한 게임 버추얼 크리에이터. 팬들과 게임·애니 이야기 하는 걸 좋아합니다." rows="3">${escHtml(wizardData.corePersona)}</textarea>
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">성격 태그 <span style="font-size:0.73rem;color:var(--text-muted)">최대 8개 선택</span></label>
+        <div class="tag-options" id="tagOptions">${tagsHtml}</div>
+      </div>`;
+
+  } else if (step === 'speech') {
+    const speechGrid = SPEECH_STYLES.map(s =>
+      `<div class="speech-style-opt ${wizardData.speechPattern===s.v?'selected':''}" onclick="selectSpeech('${s.v}')">
+        <div class="opt-emoji">${s.e}</div>
+        <div class="opt-name">${s.v}</div>
+        <div class="opt-desc">${s.d}</div>
+      </div>`
+    ).join('');
+    const isCustom = wizardData.speechPattern === '직접 입력';
+    const examplesHtml = wizardData.speechExamples.map((ex, i) =>
+      `<div class="example-row">
+        <input type="text" class="form-input" id="wizEx${i}" placeholder='예: "안녕! 오늘 뭐 하고 있어?"' value="${escHtml(ex)}" oninput="wizardData.speechExamples[${i}]=this.value">
+        ${wizardData.speechExamples.length>1?`<button class="btn-remove" onclick="removeSpeechEx(${i})">✕</button>`:''}
+      </div>`
+    ).join('');
+    area.innerHTML = `
+      <div class="form-group">
+        <label class="form-label">말투 스타일</label>
+        <div class="speech-style-grid">${speechGrid}</div>
+      </div>
+      ${isCustom?`
+      <div class="form-group" id="customSpeechGroup">
+        <label class="form-label">직접 입력</label>
+        <input type="text" class="form-input" id="wizCustomSpeech" placeholder="예: 오빠 느낌의 다정하지만 가끔 츤데레한 말투" value="">
+      </div>`:''}
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">말투 예시 문장 <span style="font-size:0.73rem;color:var(--text-muted)">최대 3개</span></label>
+        <div class="examples-list" id="examplesList">${examplesHtml}</div>
+        ${wizardData.speechExamples.length<3?`<button class="btn btn-ghost btn-sm" style="margin-top:8px;" onclick="addSpeechEx()">+ 예시 추가</button>`:''}
+      </div>`;
+
+  } else if (step === 'intro_safety') {
+    const safetyOpts = [
+      { v:'all',    icon:'🛡️', name:'안전',       desc:'모든 부적절 내용 차단, 어린 팬에게 적합' },
+      { v:'adult',  icon:'🔓', name:'성인 허용',   desc:'성인 팬 대상, 더 다양한 대화 허용' },
+    ];
+    area.innerHTML = `
+      <div class="form-group">
+        <label class="form-label">첫 인사 메시지</label>
+        <textarea class="form-textarea" id="wizIntro" placeholder="예: 안녕하세요! 저는 키리모코예요 😊 오늘도 잘 부탁해요!" rows="3">${escHtml(wizardData.introMessage)}</textarea>
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">안전 필터</label>
+        <div class="safety-opts">
+          ${safetyOpts.map(s=>
+            `<div class="safety-opt ${wizardData.defaultSafetyFilter===s.v?'selected':''}" onclick="selectSafety('${s.v}')">
+              <div class="s-icon">${s.icon}</div>
+              <div><div class="s-name">${s.name}</div><div class="s-desc">${s.desc}</div></div>
+            </div>`
+          ).join('')}
+        </div>
+      </div>`;
+  }
+}
+
+function updatePreview() {
+  const nameEl   = document.getElementById('previewName');
+  const personaEl= document.getElementById('previewPersona');
+  const tagsEl   = document.getElementById('previewTags');
+  const introEl  = document.getElementById('previewIntro');
+  const imgEl    = document.getElementById('previewImg');
+  if (!nameEl) return;
+  nameEl.textContent    = wizardData.name || '이름 미정';
+  personaEl.textContent = wizardData.corePersona || '성격 설명이 여기에 표시됩니다';
+  tagsEl.innerHTML      = wizardData.personalityKeywords.map(t=>`<span class="avatar-preview-tag">${t}</span>`).join('');
+  introEl.textContent   = wizardData.introMessage || '아직 입력되지 않았어요...';
+  if (wizardData.imageUrl) {
+    imgEl.innerHTML = `<img src="${wizardData.imageUrl}" alt="avatar">`;
+  } else {
+    const em = wizardData.gender==='female'?'🌸':wizardData.gender==='male'?'⚡':'🤖';
+    imgEl.innerHTML = `<span style="font-size:36px;">${em}</span>`;
+  }
+}
+
+/* ─── interaction handlers ───────────────────────────────── */
+
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function setGender(g) {
+  wizardData.gender = g;
+  document.querySelectorAll('.wizard-radio').forEach(el => {
+    el.classList.toggle('selected', el.getAttribute('onclick').includes(`'${g}'`));
+  });
+  updatePreview();
+}
+
+function toggleTag(tag) {
+  const idx = wizardData.personalityKeywords.indexOf(tag);
+  if (idx >= 0) wizardData.personalityKeywords.splice(idx, 1);
+  else if (wizardData.personalityKeywords.length < 8) wizardData.personalityKeywords.push(tag);
+  document.querySelectorAll('#tagOptions .tag-option').forEach(el => {
+    el.classList.toggle('selected', wizardData.personalityKeywords.includes(el.textContent.trim()));
+  });
+  updatePreview();
+}
+
+function selectSpeech(v) {
+  wizardData.speechPattern = v;
+  renderInput();
+}
+
+function selectSafety(v) {
+  wizardData.defaultSafetyFilter = v;
+  document.querySelectorAll('.safety-opt').forEach(el => {
+    el.classList.toggle('selected', el.getAttribute('onclick').includes(`'${v}'`));
+  });
+}
+
+function addSpeechEx() {
+  if (wizardData.speechExamples.length < 3) {
+    wizardData.speechExamples.push('');
+    renderInput();
+  }
+}
+
+function removeSpeechEx(i) {
+  wizardData.speechExamples.splice(i, 1);
+  renderInput();
+}
+
+async function handleImgSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { alert('이미지 크기는 5MB 이하여야 해요'); return; }
+  const status = document.getElementById('imgStatus');
+  if (status) status.textContent = '⏳ 업로드 중...';
+  try {
+    const url = await uploadImage(file);
+    wizardData.imageUrl = url;
+    if (status) status.textContent = '✓ 업로드 완료';
+    renderInput();
+    updatePreview();
+  } catch (e) {
+    if (status) status.textContent = '❌ 업로드 실패: ' + e.message;
+  }
+}
+
+async function uploadImage(file) {
+  const uid   = window.firebaseCurrentUser?.uid;
+  const token = window.firebaseIdToken;
+  if (!uid || !token) throw new Error('로그인 필요');
+  const ext     = (file.name.split('.').pop() || 'jpg').toLowerCase();
+  const path    = `avatars/${uid}/avatar_${Date.now()}.${ext}`;
+  const encoded = encodeURIComponent(path);
+  const res = await fetch(
+    `https://firebasestorage.googleapis.com/v0/b/${FB_BUCKET}/o?uploadType=media&name=${encoded}`,
+    { method:'POST', headers:{ 'Authorization':`Bearer ${token}`, 'Content-Type':file.type }, body:file }
+  );
+  if (!res.ok) throw new Error('스토리지 오류 ' + res.status);
+  const d = await res.json();
+  return `https://firebasestorage.googleapis.com/v0/b/${FB_BUCKET}/o/${encoded}?alt=media&token=${d.downloadTokens}`;
+}
+
+/* ─── navigation ─────────────────────────────────────────── */
+
+function validateAndCollect() {
+  const step = WIZARD_STEPS[wizardStep].id;
+  if (step === 'name_gender') {
+    const nameEl = document.getElementById('wizName');
+    if (nameEl) wizardData.name = nameEl.value.trim();
+    if (!wizardData.name) { alert('아바타 이름을 입력해주세요'); return false; }
+  } else if (step === 'persona_tags') {
+    const el = document.getElementById('wizPersona');
+    if (el) wizardData.corePersona = el.value.trim();
+  } else if (step === 'speech') {
+    if (wizardData.speechPattern === '직접 입력') {
+      const el = document.getElementById('wizCustomSpeech');
+      if (el && el.value.trim()) wizardData.speechPattern = el.value.trim();
+    }
+    wizardData.speechExamples = wizardData.speechExamples.map((_, i) => {
+      const el = document.getElementById(`wizEx${i}`);
+      return el ? el.value.trim() : '';
+    }).filter(Boolean);
+    if (!wizardData.speechExamples.length) wizardData.speechExamples = [''];
+  } else if (step === 'intro_safety') {
+    const el = document.getElementById('wizIntro');
+    if (el) wizardData.introMessage = el.value.trim();
+  }
+  return true;
+}
+
+function renderProgress() {
+  const pct = ((wizardStep + 1) / WIZARD_STEPS.length) * 100;
+  document.getElementById('wizardProgressFill').style.width = pct + '%';
+  document.getElementById('wizardStepLabel').textContent = `단계 ${wizardStep + 1} / ${WIZARD_STEPS.length}`;
+  document.getElementById('wizardStepName').textContent = WIZARD_STEPS[wizardStep].label;
+}
+
+function wizardBack() {
+  if (wizardStep <= 0) return;
+  wizardStep--;
+  renderProgress();
+  renderChat();
+  renderInput();
+  updatePreview();
+  document.getElementById('wizardBackBtn').disabled = wizardStep === 0;
+  document.getElementById('wizardNextBtn').textContent = '다음 →';
+}
+
+async function wizardNext() {
+  if (!validateAndCollect()) return;
+  updatePreview();
+  if (wizardStep < WIZARD_STEPS.length - 1) {
+    wizardStep++;
+    renderProgress();
+    renderChat();
+    renderInput();
+    document.getElementById('wizardBackBtn').disabled = false;
+    if (wizardStep === WIZARD_STEPS.length - 1) {
+      document.getElementById('wizardNextBtn').textContent = '완성하기 ✨';
+    }
+  } else {
+    await saveAvatar();
+  }
+}
+
+async function saveAvatar() {
+  const btn = document.getElementById('wizardNextBtn');
+  btn.textContent = '저장 중...'; btn.disabled = true;
+
+  const payload = {
+    name:                 wizardData.name,
+    gender:               wizardData.gender,
+    imageUrl:             wizardData.imageUrl || '',
+    corePersona:          wizardData.corePersona || '',
+    personality:          wizardData.personalityKeywords.join(', '),
+    personalityKeywords:  wizardData.personalityKeywords,
+    speechPattern:        wizardData.speechPattern || '',
+    speechExamples:       wizardData.speechExamples.filter(Boolean).join('\n'),
+    introMessage:         wizardData.introMessage || '',
+    defaultSafetyFilter:  wizardData.defaultSafetyFilter || 'all',
+    background:           wizardData.background || '',
+    age:                  wizardData.age ? Number(wizardData.age) : undefined,
+    motivation:           wizardData.motivation || '',
+    forbiddenBehaviors:   ['개인연락처 요청', '부적절한 대화'],
+    isActive:             true,
+  };
+
+  const token = window.firebaseIdToken;
+  const hdrs = { 'Content-Type':'application/json', 'Authorization':`Bearer ${token}`, 'X-API-Key':CHEEZ_API_KEY };
+
+  try {
+    let res;
+    if (wizardData.existingId) {
+      res = await fetch(`${CHEEZ_API_URL}/api/v1/creator/characters/${wizardData.existingId}`,
+        { method:'PATCH', headers:hdrs, body:JSON.stringify(payload) });
+    } else {
+      res = await fetch(`${CHEEZ_API_URL}/api/v1/creator/characters`,
+        { method:'POST',  headers:hdrs, body:JSON.stringify(payload) });
+    }
+    const result = await res.json();
+    if (!result.success) throw new Error(result.error?.message || '저장 실패');
+
+    const saved = result.data;
+    wizardData.existingId = saved.id;
+
+    document.getElementById('avatar-wizard').style.display = 'none';
+    showExistingAvatar(saved);
+    showToast('🎉 아바타가 저장되었어요!', 'success');
+  } catch (e) {
+    alert('저장 실패: ' + e.message);
+    btn.textContent = '완성하기 ✨'; btn.disabled = false;
+  }
+}
+
+function showToast(msg, type) {
+  const el = document.createElement('div');
+  const bg = type === 'success' ? 'var(--success)' : '#ef4444';
+  el.style.cssText = `position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:${bg};color:#fff;padding:12px 24px;border-radius:100px;font-weight:600;z-index:9999;font-size:0.9rem;box-shadow:0 4px 20px rgba(0,0,0,0.15);`;
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 3000);
+}
+
+/* ─── existing avatar display ────────────────────────────── */
+
+function buildAvatarCard(ch) {
+  const tags = (ch.personalityKeywords || []).slice(0,5).map(t=>`<span class="persona-tag">${t}</span>`).join('');
+  const imgHtml = ch.imageUrl
+    ? `<img src="${ch.imageUrl}" style="width:80px;height:80px;border-radius:20px;object-fit:cover;" alt="avatar">`
+    : `<div style="width:80px;height:80px;border-radius:20px;background:var(--brand-light);color:var(--brand);display:flex;align-items:center;justify-content:center;font-size:32px;">${ch.gender==='female'?'🌸':ch.gender==='male'?'⚡':'🤖'}</div>`;
+  return `
+    <div class="card-header">
+      <span class="card-title">현재 아바타</span>
+      <span class="status status-success">활성화</span>
+    </div>
+    <div style="display:flex;gap:16px;align-items:flex-start;padding:4px 0 16px;">
+      ${imgHtml}
+      <div style="flex:1;">
+        <div style="font-size:1.05rem;font-weight:700;color:var(--text-primary);margin-bottom:4px;">${ch.name||'-'}</div>
+        <div style="font-size:0.82rem;color:var(--text-muted);margin-bottom:10px;line-height:1.4;">${ch.corePersona||''}</div>
+        <div class="persona-tags">${tags}</div>
+      </div>
+    </div>
+    ${ch.introMessage?`<div style="background:var(--bg);padding:10px 14px;border-radius:var(--radius-md);margin-bottom:14px;">
+      <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:3px;">첫 인사 메시지</div>
+      <div style="font-size:0.85rem;color:var(--text-secondary);">"${ch.introMessage}"</div>
+    </div>`:''}
+    <div style="display:flex;gap:8px;">
+      <div style="flex:1;background:var(--bg);padding:9px 13px;border-radius:var(--radius-md);">
+        <div style="font-size:0.71rem;color:var(--text-muted);margin-bottom:2px;">말투</div>
+        <div style="font-size:0.82rem;font-weight:600;color:var(--text-primary);">${ch.speechPattern||'-'}</div>
+      </div>
+      <div style="flex:1;background:var(--bg);padding:9px 13px;border-radius:var(--radius-md);">
+        <div style="font-size:0.71rem;color:var(--text-muted);margin-bottom:2px;">안전 필터</div>
+        <div style="font-size:0.82rem;font-weight:600;color:var(--text-primary);">${ch.defaultSafetyFilter==='all'?'🛡️ 안전':'🔓 성인 허용'}</div>
+      </div>
+    </div>`;
+}
+
+function showExistingAvatar(ch) {
+  document.getElementById('avatar-loading').style.display = 'none';
+  document.getElementById('avatar-empty').style.display = 'none';
+  document.getElementById('avatar-existing-card').innerHTML = buildAvatarCard(ch);
+
+  // 프리뷰
+  const tags = (ch.personalityKeywords||[]).slice(0,5).map(t=>`<span class="avatar-preview-tag">${t}</span>`).join('');
+  const imgHtml = ch.imageUrl
+    ? `<div class="avatar-preview-img"><img src="${ch.imageUrl}" alt="avatar"></div>`
+    : `<div class="avatar-preview-img"><span style="font-size:36px;">${ch.gender==='female'?'🌸':ch.gender==='male'?'⚡':'🤖'}</span></div>`;
+  document.getElementById('existing-preview-content').innerHTML = `
+    <div class="avatar-preview-card">
+      ${imgHtml}
+      <div class="avatar-preview-name">${ch.name||'-'}</div>
+      <div class="avatar-preview-persona">${ch.corePersona||''}</div>
+      <div class="avatar-preview-tags">${tags}</div>
+      ${ch.introMessage?`<div style="padding:10px 12px;background:var(--bg);border-radius:var(--radius-md);text-align:left;margin-top:4px;">
+        <div style="font-size:0.71rem;color:var(--text-muted);margin-bottom:3px;">첫 인사 메시지</div>
+        <div style="font-size:0.82rem;color:var(--text-secondary);font-style:italic;line-height:1.5;">"${ch.introMessage}"</div>
+      </div>`:''}
+    </div>`;
+  document.getElementById('avatar-existing').style.display = 'block';
+}
+
+/* ─── wizard entry ───────────────────────────────────────── */
+
+function startWizard(isEdit) {
+  if (!isEdit) resetWizardData();
+  document.getElementById('avatar-existing').style.display = 'none';
+  document.getElementById('avatar-empty').style.display = 'none';
+  document.getElementById('avatar-wizard').style.display = 'block';
+  wizardStep = 0;
+  document.getElementById('wizardBackBtn').disabled = true;
+  document.getElementById('wizardNextBtn').textContent = '다음 →';
+  renderProgress();
+  renderChat();
+  renderInput();
+  updatePreview();
+  // scroll to top of avatar section
+  document.getElementById('page-avatar').scrollTop = 0;
+}
+
+/* ─── init (called from module script after auth) ────────── */
+
+window.initAvatarPage = async function() {
+  document.getElementById('avatar-loading').style.display = 'block';
+  document.getElementById('avatar-existing').style.display = 'none';
+  document.getElementById('avatar-empty').style.display = 'none';
+  document.getElementById('avatar-wizard').style.display = 'none';
+
+  try {
+    const token = window.firebaseIdToken;
+    if (!token) throw new Error('토큰 없음');
+
+    const res = await fetch(`${CHEEZ_API_URL}/api/v1/creator/characters`, {
+      headers: { 'Authorization':`Bearer ${token}`, 'X-API-Key':CHEEZ_API_KEY }
+    });
+    const json = await res.json();
+    document.getElementById('avatar-loading').style.display = 'none';
+
+    const list = json.data || json;
+    if (Array.isArray(list) && list.length > 0) {
+      const ch = list[0];
+      // pre-populate for edit
+      wizardData.existingId        = ch.id;
+      wizardData.name              = ch.name || '';
+      wizardData.gender            = ch.gender || 'other';
+      wizardData.imageUrl          = ch.imageUrl || '';
+      wizardData.corePersona       = ch.corePersona || '';
+      wizardData.personalityKeywords = ch.personalityKeywords || [];
+      wizardData.speechPattern     = ch.speechPattern || '';
+      wizardData.speechExamples    = ch.speechExamples ? ch.speechExamples.split('\n').filter(Boolean) : [''];
+      wizardData.introMessage      = ch.introMessage || '';
+      wizardData.defaultSafetyFilter = ch.defaultSafetyFilter || 'all';
+      showExistingAvatar(ch);
+    } else {
+      resetWizardData();
+      document.getElementById('avatar-empty').style.display = 'block';
+    }
+  } catch (e) {
+    document.getElementById('avatar-loading').style.display = 'none';
+    resetWizardData();
+    document.getElementById('avatar-empty').style.display = 'block';
+    console.warn('[Avatar] 불러오기 실패:', e.message);
+  }
+};
 </script>
 
 <script type="module">
@@ -725,7 +1335,18 @@ onAuthStateChanged(auth, async user => {
     const creator = await fetchCreator(user.uid);
     if (!creator) { location.replace('studio-login.html'); return; }
     if (creator.status !== 'approved') { location.replace('studio-login.html'); return; }
+
+    // 글로벌에 토큰/유저 노출 (위자드에서 사용)
+    window.firebaseCurrentUser = user;
+    window.firebaseIdToken = await user.getIdToken();
+
     document.body.classList.add('ui-ready');
+
+    // 아바타 페이지가 현재 열려있으면 즉시 초기화
+    const avatarPage = document.getElementById('page-avatar');
+    if (avatarPage && avatarPage.style.display !== 'none') {
+      window.initAvatarPage();
+    }
   } catch {
     location.replace('studio-login.html');
   }
