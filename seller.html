@@ -372,7 +372,7 @@
       <a class="nav-item" href="#" data-page="orders">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
         주문 관리
-        <span class="nav-badge yellow">8</span>
+        <span class="nav-badge yellow" id="badge-orders"></span>
       </a>
       <a class="nav-item" href="#" data-page="products">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
@@ -381,7 +381,7 @@
       <a class="nav-item" href="#" data-page="shipping">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
         배송 처리
-        <span class="nav-badge">3</span>
+        <span class="nav-badge" id="badge-shipping"></span>
       </a>
       <a class="nav-item" href="#" data-page="settlement">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
@@ -436,13 +436,13 @@
         <span class="topbar-title" id="pageTitle">대시보드</span>
       </div>
       <div class="topbar-right">
-        <button class="btn btn-primary btn-sm" onclick="switchPage('products')">
+        <button class="btn btn-primary btn-sm" onclick="goToAddProduct()">
           <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           상품 등록
         </button>
-        <button class="topbar-btn topbar-notif">
+        <button class="topbar-btn topbar-notif" id="notifBtn" onclick="window.switchPage('orders')" title="새 주문 확인">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-          <div class="notif-dot"></div>
+          <div class="notif-dot" id="notif-dot" style="display:none;"></div>
         </button>
         <button class="theme-toggle" id="themeToggle">
           <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -539,18 +539,18 @@
       </div>
 
       <div class="filter-bar">
-        <input class="search-input" type="text" placeholder="주문번호 또는 상품명 검색...">
-        <select class="form-select" style="width:auto;">
-          <option>전체 상태</option>
-          <option>결제 완료</option>
-          <option>준비중</option>
-          <option>배송중</option>
-          <option>배송 완료</option>
+        <input class="search-input" type="text" id="order-search" placeholder="주문번호 또는 상품명 검색..." oninput="applyOrderFilter()">
+        <select class="form-select" style="width:auto;" id="order-status-filter" onchange="applyOrderFilter()">
+          <option value="">전체 상태</option>
+          <option value="paid">결제 완료</option>
+          <option value="preparing">준비중</option>
+          <option value="shipping">배송중</option>
+          <option value="delivered">배송 완료</option>
         </select>
-        <select class="form-select" style="width:auto;">
-          <option>최근 30일</option>
-          <option>최근 7일</option>
-          <option>오늘</option>
+        <select class="form-select" style="width:auto;" id="order-date-filter" onchange="applyOrderFilter()">
+          <option value="30">최근 30일</option>
+          <option value="7">최근 7일</option>
+          <option value="1">오늘</option>
         </select>
         <button class="btn btn-outline btn-sm">
           <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/></svg>
@@ -597,9 +597,14 @@
         <!-- 상품 목록 -->
         <div class="card">
           <div class="card-header">
-            <span class="card-title">등록 상품 (24)</span>
-            <div style="display:flex;gap:6px;">
-              <button class="btn btn-outline btn-sm">필터</button>
+            <span class="card-title" id="product-count">등록 상품</span>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <select class="form-select" style="width:auto;font-size:0.8rem;padding:5px 10px;height:32px;" id="product-status-filter" onchange="applyProductFilter()">
+                <option value="">전체</option>
+                <option value="active">판매중</option>
+                <option value="inactive">중지</option>
+                <option value="pending">심사중</option>
+              </select>
             </div>
           </div>
           <div class="table-wrap">
@@ -757,6 +762,53 @@
           <div class="stat-card-sub">익월 10일 지급 예정</div>
         </div>
       </div>
+
+      <!-- 계좌 등록 카드 -->
+      <div class="card mb-24" style="max-width:560px;">
+        <div class="card-header">
+          <span class="card-title">정산 계좌 등록</span>
+          <span id="bank-registered-badge" style="display:none;font-size:0.75rem;font-weight:700;color:var(--success);background:var(--success-light,#dcfce7);padding:3px 10px;border-radius:50px;">✓ 등록됨</span>
+        </div>
+        <div style="padding:0 20px 20px;display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <div style="flex:1;min-width:140px;">
+              <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:5px;">은행</div>
+              <select id="bank-name" class="form-select">
+                <option value="">은행 선택</option>
+                <option>카카오뱅크</option>
+                <option>국민은행</option>
+                <option>신한은행</option>
+                <option>우리은행</option>
+                <option>하나은행</option>
+                <option>농협은행</option>
+                <option>기업은행</option>
+                <option>토스뱅크</option>
+                <option>케이뱅크</option>
+                <option>SC제일은행</option>
+                <option>씨티은행</option>
+                <option>새마을금고</option>
+                <option>우체국</option>
+              </select>
+            </div>
+            <div style="flex:2;min-width:180px;">
+              <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:5px;">계좌번호 (- 없이 숫자만)</div>
+              <input type="text" id="bank-account-number" class="form-input" placeholder="예: 3333012345678" inputmode="numeric">
+            </div>
+          </div>
+          <div>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:5px;">예금주명</div>
+            <input type="text" id="bank-holder-name" class="form-input" placeholder="사업자명 또는 대표자명" style="max-width:240px;">
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <button class="btn btn-primary btn-sm" onclick="window.saveBankAccount()">저장</button>
+            <span id="bank-save-msg" style="font-size:0.82rem;color:var(--text-muted);"></span>
+          </div>
+          <div style="font-size:0.78rem;color:var(--text-muted);line-height:1.6;background:var(--bg);border-radius:8px;padding:10px 12px;">
+            💡 등록된 계좌로 매월 10일 전월 판매 정산금이 자동 입금됩니다. 계좌 정보는 암호화되어 저장됩니다.
+          </div>
+        </div>
+      </div>
+
       <div class="card">
         <div class="card-header"><span class="card-title">월별 정산 내역</span></div>
         <div class="table-wrap">
@@ -882,6 +934,10 @@
     document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.page === name));
     const titles = { dashboard:'대시보드', orders:'주문 관리', products:'상품 관리', shipping:'배송 처리', settlement:'정산 통계', info:'업체 정보' };
     document.getElementById('pageTitle').textContent = titles[name] || name;
+    // 정산 페이지 진입 시 계좌 정보 재렌더
+    if (name === 'settlement' && window._currentSellerForBank) {
+      window.loadBankAccount && window.loadBankAccount(window._currentSellerForBank);
+    }
   }
   document.querySelectorAll('.nav-item[data-page]').forEach(item => {
     item.addEventListener('click', e => { e.preventDefault(); switchPage(item.dataset.page); });

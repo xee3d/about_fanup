@@ -42,6 +42,8 @@ const storage = getStorage(app);
 // ─── 상태 ───────────────────────────────────────────────────
 let currentSeller = null;   // { id, businessName, ... }
 let ordersUnsub   = null;   // Firestore 실시간 리스너 해제용
+let _allOrders    = [];     // 필터링용 전체 주문 캐시
+let _allProducts  = [];     // 필터링용 전체 상품 캐시
 
 // ─── 로그인 오버레이 주입 (rejected 상태 전용) ───────────────
 function injectLoginOverlay() {
@@ -137,9 +139,9 @@ async function loadProducts() {
     orderBy('createdAt', 'desc')
   );
   const snap = await getDocs(q);
-  const products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  renderProducts(products);
-  renderDashboardStock(products);
+  _allProducts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  applyProductFilter();
+  renderDashboardStock(_allProducts);
 }
 
 function renderProducts(products) {
@@ -181,10 +183,19 @@ function renderProducts(products) {
       <td>₩${Number(p.price).toLocaleString()}</td>
       <td class="${stockClass}">${stock}</td>
       <td>
-        <span class="status ${s.cls}" style="display:inline-flex;align-items:center;gap:5px;">
-          <span style="width:6px;height:6px;border-radius:50%;background:${s.dot};flex-shrink:0;${p.status==='active'?'box-shadow:0 0 0 2px rgba(34,197,94,0.25);':''}"></span>
-          ${s.text}
-        </span>
+        ${(p.status === 'active' || p.status === 'inactive')
+          ? `<label class="toggle-wrap" style="gap:7px;cursor:pointer;" title="클릭해서 판매 상태 변경">
+               <span class="toggle toggle-success" style="width:38px;height:22px;">
+                 <input type="checkbox" ${p.status === 'active' ? 'checked' : ''} onchange="toggleProductStatus('${p.id}', this.checked)" onclick="event.stopPropagation()">
+                 <span class="toggle-slider" style="border-radius:11px;"></span>
+               </span>
+               <span style="font-size:0.78rem;color:${p.status === 'active' ? 'var(--success)' : 'var(--text-muted)'};" class="toggle-status-label-${p.id}">${p.status === 'active' ? '판매중' : '중지'}</span>
+             </label>`
+          : `<span class="status ${s.cls}" style="display:inline-flex;align-items:center;gap:5px;">
+               <span style="width:6px;height:6px;border-radius:50%;background:${s.dot};flex-shrink:0;"></span>
+               ${s.text}
+             </span>`
+        }
       </td>
       <td>
         <button class="btn btn-ghost btn-sm" onclick="editProduct('${p.id}')">수정</button>
@@ -198,6 +209,30 @@ function renderProducts(products) {
   if (el) el.textContent = `등록 상품 (${products.length})`;
   const statEl = document.getElementById('stat-product-count');
   if (statEl) statEl.textContent = products.length;
+}
+
+async function toggleProductStatus(productId, isActive) {
+  const newStatus = isActive ? 'active' : 'inactive';
+  const label = document.querySelector(`.toggle-status-label-${productId}`);
+  try {
+    await updateDoc(doc(db, 'products', productId), {
+      status: newStatus,
+      updatedAt: serverTimestamp(),
+    });
+    if (label) {
+      label.textContent = isActive ? '판매중' : '중지';
+      label.style.color = isActive ? 'var(--success)' : 'var(--text-muted)';
+    }
+  } catch (e) {
+    console.error('상태 변경 실패', e);
+    // 실패 시 원래대로 복원
+    const input = label?.closest('.toggle-wrap')?.querySelector('input');
+    if (input) input.checked = !isActive;
+    if (label) {
+      label.textContent = !isActive ? '판매중' : '중지';
+      label.style.color = !isActive ? 'var(--success)' : 'var(--text-muted)';
+    }
+  }
 }
 
 function renderDashboardStock(products) {
@@ -226,10 +261,10 @@ function subscribeOrders() {
     orderBy('createdAt', 'desc')
   );
   ordersUnsub = onSnapshot(q, snap => {
-    const orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderOrders(orders);
-    renderDashboardOrders(orders);
-    updateDashboardStats(orders);
+    _allOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    applyOrderFilter();
+    renderDashboardOrders(_allOrders);
+    updateDashboardStats(_allOrders);
   });
 }
 
@@ -285,11 +320,14 @@ function renderOrders(orders) {
     `;
     tbody.appendChild(tr);
   });
-  // 배송 처리 탭
-  renderShippingTab(orders.filter(o => o.status === 'preparing' || o.status === 'shipping'));
-  // 주문 수 배지
-  const newCount = orders.filter(o => o.status === 'paid').length;
-  document.querySelectorAll('.nav-badge.yellow').forEach(b => b.textContent = newCount || '');
+  // 배송 처리 탭 (필터된 orders가 아닌 전체 기준)
+  renderShippingTab(_allOrders.filter(o => o.status === 'preparing' || o.status === 'shipping'));
+  // 주문 수 배지 (전체 기준)
+  const newCount = _allOrders.filter(o => o.status === 'paid').length;
+  const orderBadge = document.getElementById('badge-orders');
+  if (orderBadge) orderBadge.textContent = newCount || '';
+  const notifDot = document.getElementById('notif-dot');
+  if (notifDot) notifDot.style.display = newCount > 0 ? 'block' : 'none';
 }
 
 function renderDashboardOrders(orders) {
@@ -334,7 +372,7 @@ function renderShippingTab(orders) {
     `;
     tbody.appendChild(tr);
   });
-  const badge = document.querySelector('.nav-item[data-page="shipping"] .nav-badge');
+  const badge = document.getElementById('badge-shipping');
   if (badge) badge.textContent = orders.filter(o => o.status === 'preparing').length || '';
 }
 
@@ -453,12 +491,13 @@ window.submitProduct = async function(e) {
 
   if (editId) {
     await updateDoc(doc(db, 'products', editId), data);
+    alert(`상품이 수정됐습니다. 관리자 승인 후 판매 활성화됩니다.\n\n미리보기: https://fanup.im/product/${editId}`);
   } else {
     data.createdAt = serverTimestamp();
     data.rating = 0; data.reviewCount = 0;
-    await addDoc(collection(db, 'products'), data);
+    const ref = await addDoc(collection(db, 'products'), data);
+    alert(`상품이 등록됐습니다. 관리자 승인 후 판매 활성화됩니다.\n\n미리보기: https://fanup.im/product/${ref.id}`);
   }
-  alert('상품이 저장됐습니다. 관리자 승인 후 판매 활성화됩니다.');
   resetProductForm();
   await loadProducts();
   window.switchPage && window.switchPage('products');
@@ -723,6 +762,63 @@ window.saveSellerInfo = async function() {
   }
 };
 
+// ─── 계좌 등록 ───────────────────────────────────────────────
+window.loadBankAccount = function loadBankAccount(seller) {
+  const ba = seller.bankAccount;
+  if (!ba) return;
+  const bankNameEl   = document.getElementById('bank-name');
+  const accountNumEl = document.getElementById('bank-account-number');
+  const holderEl     = document.getElementById('bank-holder-name');
+  const badge        = document.getElementById('bank-registered-badge');
+  if (bankNameEl && ba.bankName) {
+    // select에 해당 option이 있으면 선택
+    for (const opt of bankNameEl.options) {
+      if (opt.value === ba.bankName) { bankNameEl.value = ba.bankName; break; }
+    }
+    if (!bankNameEl.value) {
+      const opt = new Option(ba.bankName, ba.bankName);
+      bankNameEl.appendChild(opt);
+      bankNameEl.value = ba.bankName;
+    }
+  }
+  if (accountNumEl && ba.accountNumber) accountNumEl.value = ba.accountNumber;
+  if (holderEl && ba.holderName)        holderEl.value     = ba.holderName;
+  if (badge && ba.bankName)             badge.style.display = '';
+}
+
+window.saveBankAccount = async function() {
+  if (!currentSeller) return;
+  const bankName     = document.getElementById('bank-name')?.value?.trim();
+  const accountNumber = document.getElementById('bank-account-number')?.value?.replace(/\D/g, '');
+  const holderName   = document.getElementById('bank-holder-name')?.value?.trim();
+  const msg          = document.getElementById('bank-save-msg');
+
+  if (!bankName || !accountNumber || !holderName) {
+    if (msg) { msg.style.color = 'var(--danger)'; msg.textContent = '은행, 계좌번호, 예금주를 모두 입력하세요.'; }
+    return;
+  }
+  if (!/^\d{8,20}$/.test(accountNumber)) {
+    if (msg) { msg.style.color = 'var(--danger)'; msg.textContent = '계좌번호는 숫자 8~20자리를 입력하세요.'; }
+    return;
+  }
+
+  if (msg) { msg.style.color = 'var(--text-muted)'; msg.textContent = '저장 중...'; }
+  try {
+    await updateDoc(doc(db, 'sellers', currentSeller.id), {
+      bankAccount: { bankName, accountNumber, holderName },
+      updatedAt: serverTimestamp(),
+    });
+    currentSeller.bankAccount = { bankName, accountNumber, holderName };
+    const badge = document.getElementById('bank-registered-badge');
+    if (badge) badge.style.display = '';
+    if (msg) { msg.style.color = 'var(--success)'; msg.textContent = '✓ 저장됐습니다.'; }
+    setTimeout(() => { if (msg) msg.textContent = ''; }, 2500);
+  } catch(e) {
+    console.error('계좌 저장 실패:', e);
+    if (msg) { msg.style.color = 'var(--danger)'; msg.textContent = '저장에 실패했습니다.'; }
+  }
+};
+
 // ─── 로그아웃 ────────────────────────────────────────────────
 window.sellerLogout = async function() {
   if (ordersUnsub) { ordersUnsub(); ordersUnsub = null; }
@@ -761,8 +857,10 @@ onAuthStateChanged(auth, async user => {
 
   // approved → 대시보드 활성화
   currentSeller = seller;
+  window._currentSellerForBank = seller;
   hideOverlay();
   updateSellerInfo(seller);
+  loadBankAccount(seller);
   await loadProducts();
   subscribeOrders();
 });
@@ -808,6 +906,46 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('prod-images-input')?.click();
     }
   });
+
+  // ─── 필터 함수들 ──────────────────────────────────────────
+  window.applyOrderFilter = function() {
+    const search = (document.getElementById('order-search')?.value || '').toLowerCase();
+    const status = document.getElementById('order-status-filter')?.value || '';
+    const days   = parseInt(document.getElementById('order-date-filter')?.value || '30');
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - days);
+
+    const filtered = _allOrders.filter(o => {
+      const matchSearch = !search ||
+        `#FU-${o.id.slice(-8).toUpperCase()}`.toLowerCase().includes(search) ||
+        (o.productName || '').toLowerCase().includes(search);
+      const matchStatus = !status || o.status === status;
+      const date = o.createdAt?.toDate ? o.createdAt.toDate() : new Date(0);
+      const matchDate = date >= cutoff;
+      return matchSearch && matchStatus && matchDate;
+    });
+    renderOrders(filtered);
+  };
+
+  window.applyProductFilter = function() {
+    const status = document.getElementById('product-status-filter')?.value || '';
+    const filtered = status ? _allProducts.filter(p => p.status === status) : _allProducts;
+    renderProducts(filtered);
+    // 카운트는 전체 기준
+    const el = document.getElementById('product-count');
+    if (el) el.textContent = `등록 상품 (${_allProducts.length})`;
+  };
+
+  // ─── 상품 등록 버튼: products 페이지로 이동 후 폼으로 스크롤 ──
+  window.goToAddProduct = function() {
+    resetProductForm();
+    window.switchPage('products');
+    setTimeout(() => {
+      const form = document.getElementById('prod-form');
+      if (form) form.closest('.card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      document.getElementById('prod-name')?.focus();
+    }, 100);
+  };
 
   // ─── 상세 이미지 선택 → 로컬 미리보기 썸네일 ─────────────
   document.getElementById('prod-detail-images-input')?.addEventListener('change', function() {

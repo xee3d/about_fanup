@@ -85,6 +85,14 @@ img { display: block; max-width: 100%; }
 }
 
 /* ─── Sidebar ─── */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 199;
+}
+
 .sidebar {
   width: var(--sidebar-width);
   background: var(--bg-sidebar);
@@ -459,6 +467,7 @@ tbody tr:hover td { background: var(--bg); }
 .toggle input:checked + .toggle-slider { background: var(--brand); }
 .toggle input:checked + .toggle-slider::before { transform: translateX(18px); }
 .toggle-label { font-size: 0.875rem; color: var(--text-secondary); }
+.toggle.toggle-success input:checked + .toggle-slider { background: var(--success, #22c55e); }
 
 /* ─── Tabs ─── */
 .tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
@@ -579,7 +588,8 @@ tbody tr:hover td { background: var(--bg); }
   .topbar-title { font-size: 0.9rem; }
 
   /* 사이드바 오버레이 & 토글 */
-  .sidebar-overlay { display: block; }
+  .sidebar-overlay { display: block; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+  .sidebar-overlay.visible { opacity: 1; pointer-events: auto; }
   #sidebarToggle { display: flex !important; }
 
   /* 카드 그리드 */

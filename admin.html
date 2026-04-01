@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FANUP Admin</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <style>
+    /* ── Admin 전용 스타일 ── */
+    .admin-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: linear-gradient(135deg, #7C3AED, #EC4899);
+      color: #fff; font-size: 0.65rem; font-weight: 800;
+      letter-spacing: 0.1em; padding: 3px 8px; border-radius: 50px;
+      text-transform: uppercase;
+    }
+
+    /* 로그인 화면 */
+    .auth-screen {
+      min-height: 100vh; display: flex; align-items: center;
+      justify-content: center; background: var(--bg);
+    }
+    .auth-box {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 40px 36px;
+      width: min(420px, 90vw); text-align: center;
+      box-shadow: var(--shadow-md);
+    }
+    .auth-box .logo { height: 28px; margin: 0 auto 8px; filter: var(--logo-filter); }
+    .auth-box h1 { font-size: 1.25rem; font-weight: 800; margin-bottom: 4px; }
+    .auth-box p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 28px; }
+    .btn-google {
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 10px; width: 100%; padding: 12px 20px;
+      border: 1.5px solid var(--border); border-radius: 8px;
+      background: var(--bg-card); color: var(--text-primary);
+      font-size: 0.9rem; font-weight: 600; cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .btn-google:hover { background: var(--bg); border-color: var(--brand); }
+    .auth-error {
+      margin-top: 14px; padding: 10px 14px; border-radius: 8px;
+      background: var(--danger-light); color: var(--danger);
+      font-size: 0.82rem; display: none;
+    }
+
+    /* 탭 */
+    .tab-bar {
+      display: flex; gap: 2px; margin-bottom: 20px;
+      background: var(--bg); border-radius: var(--radius);
+      padding: 4px; border: 1px solid var(--border);
+      width: fit-content;
+    }
+    .tab-btn {
+      padding: 7px 18px; border-radius: 7px; border: none;
+      background: transparent; color: var(--text-muted);
+      font-size: 0.85rem; font-weight: 600; cursor: pointer;
+      transition: all 0.15s; white-space: nowrap;
+    }
+    .tab-btn.active {
+      background: var(--bg-card); color: var(--text-primary);
+      box-shadow: var(--shadow-sm);
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* 필터 칩 */
+    .filter-chips { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+    .chip {
+      padding: 4px 12px; border-radius: 50px; font-size: 0.78rem;
+      font-weight: 600; cursor: pointer; border: 1.5px solid var(--border);
+      background: var(--bg-card); color: var(--text-muted);
+      transition: all 0.15s;
+    }
+    .chip.active { border-color: var(--brand); color: var(--brand); background: var(--brand-light); }
+
+    /* 카드형 목록 아이템 */
+    .apply-item {
+      display: grid; grid-template-columns: 1fr auto;
+      gap: 8px 12px; padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      align-items: start;
+    }
+    .apply-item:last-child { border-bottom: none; }
+    .apply-name { font-size: 0.92rem; font-weight: 700; color: var(--text-primary); }
+    .apply-meta {
+      display: flex; gap: 10px; flex-wrap: wrap;
+      font-size: 0.75rem; color: var(--text-muted); margin-top: 3px;
+    }
+    .apply-meta span { display: flex; align-items: center; gap: 3px; }
+    .apply-actions { display: flex; gap: 6px; align-items: center; }
+    .apply-reason {
+      grid-column: 1 / -1; margin-top: 4px;
+      display: none; gap: 6px;
+    }
+    .apply-reason input {
+      flex: 1; padding: 7px 10px; border: 1px solid var(--border);
+      border-radius: 7px; font-size: 0.82rem; background: var(--bg);
+      color: var(--text-primary); font-family: inherit;
+    }
+    .apply-reason input:focus { outline: none; border-color: var(--brand); }
+
+    /* 상태 배지 */
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 9px; border-radius: 50px;
+      font-size: 0.72rem; font-weight: 700; white-space: nowrap;
+    }
+    .badge::before {
+      content: ''; width: 5px; height: 5px; border-radius: 50%;
+      background: currentColor; opacity: 0.7; flex-shrink: 0;
+    }
+    .badge-pending  { background: var(--warning-light); color: #B45309; }
+    .badge-active   { background: var(--success-light); color: #065F46; }
+    .badge-approved { background: var(--success-light); color: #065F46; }
+    .badge-rejected { background: var(--danger-light);  color: #B91C1C; }
+    .badge-inactive { background: var(--border);         color: var(--text-muted); }
+
+    /* 플랫폼 아이콘 */
+    .platform-tag {
+      padding: 2px 7px; border-radius: 4px; font-size: 0.7rem;
+      font-weight: 700; background: var(--brand-light); color: var(--brand);
+    }
+
+    /* 빈 상태 */
+    .empty-state {
+      text-align: center; padding: 48px 24px;
+      color: var(--text-muted); font-size: 0.88rem;
+    }
+    .empty-state svg { margin: 0 auto 12px; opacity: 0.3; }
+
+    /* 통계 미니 */
+    .stat-mini {
+      display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap;
+    }
+    .stat-mini-item {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 10px 16px; flex: 1; min-width: 90px;
+    }
+    .stat-mini-num {
+      font-size: 1.5rem; font-weight: 900; color: var(--text-primary);
+      line-height: 1; margin-bottom: 2px;
+    }
+    .stat-mini-label { font-size: 0.72rem; color: var(--text-muted); font-weight: 500; }
+
+    /* 로딩 */
+    .loading-row {
+      text-align: center; padding: 40px; color: var(--text-muted); font-size: 0.85rem;
+    }
+
+    /* 모바일 */
+    @media (max-width: 768px) {
+      .apply-item { grid-template-columns: 1fr; }
+      .apply-actions { justify-content: flex-end; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── 로그인 화면 ── -->
+<div class="auth-screen" id="authScreen">
+  <div class="auth-box">
+    <img class="logo" src="assets/fanup_logo.png" alt="FANUP" onerror="this.style.display='none'">
+    <h1>FANUP Admin</h1>
+    <p>운영진 전용 관리 페이지입니다.</p>
+    <button class="btn-google" id="googleLoginBtn">
+      <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Google로 로그인
+    </button>
+    <div class="auth-error" id="authError">접근 권한이 없습니다.</div>
+  </div>
+</div>
+
+<!-- ── 대시보드 ── -->
+<div class="dash-shell" id="dashShell" style="display:none;">
+
+  <!-- 사이드바 -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <a href="index.html">
+        <img src="assets/fanup_logo.png" alt="FANUP" class="logo-img" onerror="this.style.display='none'">
+      </a>
+      <span class="admin-badge">Admin</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-group-label">관리</div>
+      <a class="nav-item active" data-tab="creators" onclick="switchTab('creators'); return false;" href="#">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        크리에이터 신청
+        <span class="nav-badge" id="pending-creators-count" style="display:none;"></span>
+      </a>
+      <a class="nav-item" data-tab="sellers" onclick="switchTab('sellers'); return false;" href="#">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        판매자 관리
+        <span class="nav-badge" id="pending-sellers-count" style="display:none;"></span>
+      </a>
+      <a class="nav-item" data-tab="settlement" onclick="switchTab('settlement'); return false;" href="#">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        크리에이터 정산
+      </a>
+      <a class="nav-item" data-tab="seller-settlement" onclick="switchTab('seller-settlement'); return false;" href="#">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        판매자 정산
+        <span class="nav-badge" id="pending-seller-settle-count" style="display:none;"></span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="user-avatar" id="adminAvatar">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div>
+          <div class="user-name" id="adminName">관리자</div>
+          <div class="user-role">운영진</div>
+        </div>
+      </div>
+      <button id="logoutBtn" style="
+        width:100%; margin-top:10px; padding:8px 12px;
+        background:transparent; border:1px solid var(--border);
+        border-radius:8px; color:var(--text-muted); font-size:0.8rem;
+        font-family:inherit; cursor:pointer; text-align:left;
+        display:flex; align-items:center; gap:8px; transition:background 0.15s, color 0.15s;
+      " onmouseover="this.style.background='var(--danger-light)';this.style.color='var(--danger)'"
+         onmouseout="this.style.background='transparent';this.style.color='var(--text-muted)'">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        로그아웃
+      </button>
+    </div>
+  </aside>
+
+  <!-- 사이드바 오버레이 -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+  <!-- 메인 -->
+  <div class="dash-main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="topbar-btn" id="sidebarToggle" style="display:none;" onclick="toggleSidebar()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <span class="topbar-title" id="pageTitle">크리에이터 신청</span>
+      </div>
+      <div class="topbar-right">
+        <button class="topbar-btn" onclick="reloadCurrentTab()" title="새로고침">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        </button>
+        <button class="theme-toggle" id="themeToggle">
+          <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- ── 크리에이터 신청 탭 ── -->
+    <div class="page-content tab-panel active" id="tab-creators">
+      <div class="page-header">
+        <h1>크리에이터 신청 관리</h1>
+        <p>신청된 크리에이터 파트너를 검토하고 승인하세요.</p>
+      </div>
+
+      <div class="stat-mini" id="creator-stats"></div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="filter-chips" id="creator-filter-chips">
+            <button class="chip active" data-status="all">전체</button>
+            <button class="chip" data-status="pending">심사 대기</button>
+            <button class="chip" data-status="approved">승인됨</button>
+            <button class="chip" data-status="rejected">반려됨</button>
+          </div>
+        </div>
+        <div id="creator-list"><div class="loading-row">불러오는 중...</div></div>
+      </div>
+    </div>
+
+    <!-- ── 정산 관리 탭 ── -->
+    <div class="page-content tab-panel" id="tab-settlement">
+      <div class="page-header">
+        <h1>정산 관리</h1>
+        <p>크리에이터 치즈 후원 내역을 정산합니다. 수수료 30% · 원천세 3.3% 자동 계산.</p>
+      </div>
+
+      <!-- 기간 선택 + 미리보기 -->
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-header">
+          <span class="card-title">정산 미리보기</span>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input type="month" id="settlement-period"
+              style="padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.85rem;background:var(--bg-card);color:var(--text-primary);">
+            <button class="btn btn-outline btn-sm" onclick="loadSettlementPreview()">조회</button>
+            <button class="btn btn-primary btn-sm" onclick="createAllSettlements()" id="create-all-btn" style="display:none;">
+              전체 배치 생성
+            </button>
+          </div>
+        </div>
+        <div id="settlement-preview-area">
+          <div style="text-align:center;padding:32px;color:var(--text-muted);font-size:0.9rem;">기간을 선택하고 조회하세요.</div>
+        </div>
+      </div>
+
+      <!-- 정산 배치 목록 -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">정산 배치 이력</span>
+          <div style="display:flex;gap:6px;">
+            <button class="chip active" data-bstatus="" onclick="filterBatches(this,'')">전체</button>
+            <button class="chip" data-bstatus="pending" onclick="filterBatches(this,'pending')">대기</button>
+            <button class="chip" data-bstatus="approved" onclick="filterBatches(this,'approved')">승인됨</button>
+            <button class="chip" data-bstatus="completed" onclick="filterBatches(this,'completed')">완료</button>
+            <button class="chip" data-bstatus="failed" onclick="filterBatches(this,'failed')">실패</button>
+          </div>
+        </div>
+        <div id="settlement-batch-list"><div class="loading-row">불러오는 중...</div></div>
+      </div>
+    </div>
+
+    <!-- ── 판매자 정산 탭 ── -->
+    <div class="page-content tab-panel" id="tab-seller-settlement">
+      <div class="page-header">
+        <h1>판매자 정산</h1>
+        <p>주문 기반으로 판매자 정산 배치를 생성·승인·완료 처리합니다. 수수료 10% 자동 계산.</p>
+      </div>
+
+      <!-- 기간 선택 + 미리보기 -->
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-header">
+          <span class="card-title">정산 미리보기</span>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input type="month" id="seller-settle-period"
+              style="padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.85rem;background:var(--bg-card);color:var(--text-primary);">
+            <button class="btn btn-outline btn-sm" onclick="loadSellerSettlePreview()">조회</button>
+            <button class="btn btn-primary btn-sm" id="seller-settle-all-btn" style="display:none;" onclick="createAllSellerBatches()">전체 배치 생성</button>
+          </div>
+        </div>
+        <div id="seller-settle-preview-area">
+          <div style="text-align:center;padding:32px;color:var(--text-muted);font-size:0.9rem;">기간을 선택하고 조회하세요.</div>
+        </div>
+      </div>
+
+      <!-- 배치 이력 -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">정산 배치 이력</span>
+          <div style="display:flex;gap:6px;">
+            <button class="chip active" data-ss-status="" onclick="filterSellerBatches(this,'')">전체</button>
+            <button class="chip" data-ss-status="pending" onclick="filterSellerBatches(this,'pending')">대기</button>
+            <button class="chip" data-ss-status="approved" onclick="filterSellerBatches(this,'approved')">승인됨</button>
+            <button class="chip" data-ss-status="completed" onclick="filterSellerBatches(this,'completed')">완료</button>
+            <button class="chip" data-ss-status="failed" onclick="filterSellerBatches(this,'failed')">실패</button>
+          </div>
+        </div>
+        <div id="seller-settle-batch-list"><div class="loading-row">불러오는 중...</div></div>
+      </div>
+    </div>
+
+    <!-- ── 판매자 관리 탭 ── -->
+    <div class="page-content tab-panel" id="tab-sellers">
+      <div class="page-header">
+        <h1>판매자 관리</h1>
+        <p>판매자 계정을 검토하고 승인하세요.</p>
+      </div>
+
+      <div class="stat-mini" id="seller-stats"></div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="filter-chips" id="seller-filter-chips">
+            <button class="chip active" data-status="all">전체</button>
+            <button class="chip" data-status="pending">승인 대기</button>
+            <button class="chip" data-status="approved">승인됨</button>
+            <button class="chip" data-status="rejected">반려됨</button>
+          </div>
+        </div>
+        <div id="seller-list"><div class="loading-row">불러오는 중...</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp }         from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js';
+import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, signOut }
+                                  from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js';
+import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, orderBy, query, where, limit as fsLimit, serverTimestamp, Timestamp }
+                                  from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js';
+
+// ── Firebase 초기화 ──────────────────────────────────────────
+const app  = initializeApp({
+  apiKey:            'AIzaSyAsQZo491B1W3s_s2WcqrTMdgH810Putao',
+  authDomain:        'fanup-app.firebaseapp.com',
+  projectId:         'fanup-app',
+  storageBucket:     'fanup-app-storage',
+  messagingSenderId: '542708276250',
+  appId:             '1:542708276250:web:a2f01ca6b84ed1d50845a3',
+});
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+// ── 어드민 UID 화이트리스트 ──────────────────────────────────
+// ⚠️ 본인의 Google 계정 UID를 추가하세요.
+// Firebase Console → Authentication → Users → UID 열 확인
+const ADMIN_UIDS = [
+  '4Kws6RrLa2UIES3gYePDNT39ZDs2',  // director@tinrobot.co.kr
+];
+
+// ── 상태 ────────────────────────────────────────────────────
+let allCreators = [];
+let allSellers  = [];
+let creatorFilter = 'all';
+let sellerFilter  = 'all';
+
+// ── 인증 ────────────────────────────────────────────────────
+onAuthStateChanged(auth, user => {
+  if (!user) {
+    showAuthScreen();
+    return;
+  }
+  if (!ADMIN_UIDS.includes(user.uid)) {
+    showAuthScreen(true);
+    signOut(auth);
+    return;
+  }
+  showDashboard(user);
+  loadAll();
+});
+
+// redirect 결과 처리 (로그인 후 돌아왔을 때)
+getRedirectResult(auth).catch(e => console.warn('[Admin] redirect result:', e?.message));
+
+document.getElementById('googleLoginBtn').addEventListener('click', async () => {
+  try {
+    await signInWithRedirect(auth, new GoogleAuthProvider());
+  } catch (e) {
+    // popup fallback
+    try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch(e2) { console.error(e2); }
+  }
+});
+
+document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
+
+function showAuthScreen(denied = false) {
+  document.getElementById('authScreen').style.display = '';
+  document.getElementById('dashShell').style.display  = 'none';
+  document.getElementById('authError').style.display  = denied ? '' : 'none';
+}
+
+function showDashboard(user) {
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('dashShell').style.display  = '';
+  document.getElementById('adminName').textContent = user.displayName || user.email || '관리자';
+}
+
+// ── 데이터 로드 ─────────────────────────────────────────────
+async function loadAll() {
+  await Promise.all([loadCreators(), loadSellers()]);
+}
+
+async function loadCreators() {
+  const snap = await getDocs(query(collection(db, 'creators'), orderBy('createdAt', 'desc')));
+  allCreators = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  updateCreatorStats();
+  renderCreators();
+}
+
+async function loadSellers() {
+  const snap = await getDocs(query(collection(db, 'sellers'), orderBy('createdAt', 'desc')));
+  allSellers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  updateSellerStats();
+  renderSellers();
+}
+
+window.reloadCurrentTab = function() {
+  const active = document.querySelector('.tab-panel.active');
+  if (active?.id === 'tab-creators') loadCreators();
+  else if (active?.id === 'tab-settlement') loadBatches();
+  else loadSellers();
+};
+
+// ── 통계 ────────────────────────────────────────────────────
+function updateCreatorStats() {
+  const pending  = allCreators.filter(c => c.status === 'pending').length;
+  const active   = allCreators.filter(c => c.status === 'approved').length;
+  const rejected = allCreators.filter(c => c.status === 'rejected').length;
+
+  document.getElementById('creator-stats').innerHTML = `
+    <div class="stat-mini-item">
+      <div class="stat-mini-num">${allCreators.length}</div>
+      <div class="stat-mini-label">전체</div>
+    </div>
+    <div class="stat-mini-item" style="border-color:var(--warning);">
+      <div class="stat-mini-num" style="color:var(--warning);">${pending}</div>
+      <div class="stat-mini-label">심사 대기</div>
+    </div>
+    <div class="stat-mini-item" style="border-color:var(--success);">
+      <div class="stat-mini-num" style="color:var(--success);">${active}</div>
+      <div class="stat-mini-label">승인됨</div>
+    </div>
+    <div class="stat-mini-item">
+      <div class="stat-mini-num" style="color:var(--danger);">${rejected}</div>
+      <div class="stat-mini-label">반려됨</div>
+    </div>`;
+
+  const badge = document.getElementById('pending-creators-count');
+  badge.textContent = pending;
+  badge.style.display = pending > 0 ? '' : 'none';
+}
+
+function updateSellerStats() {
+  const pending  = allSellers.filter(s => s.status === 'pending').length;
+  const approved = allSellers.filter(s => s.status === 'approved').length;
+  const rejected = allSellers.filter(s => s.status === 'rejected').length;
+
+  document.getElementById('seller-stats').innerHTML = `
+    <div class="stat-mini-item">
+      <div class="stat-mini-num">${allSellers.length}</div>
+      <div class="stat-mini-label">전체</div>
+    </div>
+    <div class="stat-mini-item" style="border-color:var(--warning);">
+      <div class="stat-mini-num" style="color:var(--warning);">${pending}</div>
+      <div class="stat-mini-label">승인 대기</div>
+    </div>
+    <div class="stat-mini-item" style="border-color:var(--success);">
+      <div class="stat-mini-num" style="color:var(--success);">${approved}</div>
+      <div class="stat-mini-label">승인됨</div>
+    </div>
+    <div class="stat-mini-item">
+      <div class="stat-mini-num" style="color:var(--danger);">${rejected}</div>
+      <div class="stat-mini-label">반려됨</div>
+    </div>`;
+
+  const badge = document.getElementById('pending-sellers-count');
+  badge.textContent = pending;
+  badge.style.display = pending > 0 ? '' : 'none';
+}
+
+// ── 크리에이터 렌더 ─────────────────────────────────────────
+function renderCreators() {
+  const list = document.getElementById('creator-list');
+  const items = creatorFilter === 'all'
+    ? allCreators
+    : allCreators.filter(c => c.status === creatorFilter);
+
+  if (items.length === 0) {
+    list.innerHTML = `<div class="empty-state">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>
+      <div>${creatorFilter === 'all' ? '신청 내역이 없습니다.' : '해당 상태의 신청이 없습니다.'}</div>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = items.map(c => {
+    const dateStr = c.createdAt?.toDate
+      ? c.createdAt.toDate().toLocaleDateString('ko-KR', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' })
+      : '날짜 없음';
+    const platform = c.platform || c.platformType || '';
+    const name = c.creatorName || c.displayName || c.name || '이름 없음';
+    const channel = c.channelUrl || c.channelName || '';
+    const email = c.email || '';
+    const badge = statusBadge(c.status);
+    const isPending = c.status === 'pending';
+
+    return `<div class="apply-item" id="creator-item-${c.id}">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span class="apply-name">${escHtml(name)}</span>
+          ${platform ? `<span class="platform-tag">${escHtml(platform.toUpperCase())}</span>` : ''}
+          ${badge}
+        </div>
+        <div class="apply-meta">
+          ${email ? `<span><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>${escHtml(email)}</span>` : ''}
+          ${channel ? `<span><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><a href="${escHtml(channel)}" target="_blank" rel="noopener" style="color:var(--brand);">채널 보기</a></span>` : ''}
+          <span>${dateStr}</span>
+        </div>
+        ${c.rejectionReason ? `<div style="margin-top:4px;font-size:0.78rem;color:var(--danger);">반려 사유: ${escHtml(c.rejectionReason)}</div>` : ''}
+      </div>
+      <div class="apply-actions">
+        ${isPending ? `
+          <button class="btn btn-primary btn-sm" onclick="approveCreator('${c.id}')">승인</button>
+          <button class="btn btn-outline btn-sm" style="color:var(--danger);border-color:var(--danger);" onclick="toggleRejectCreator('${c.id}')">반려</button>
+        ` : `
+          ${c.status !== 'approved' ? `<button class="btn btn-outline btn-sm" onclick="approveCreator('${c.id}')">재승인</button>` : ''}
+          ${c.status === 'approved' ? `<button class="btn btn-outline btn-sm" style="color:var(--danger);border-color:var(--danger);" onclick="toggleRejectCreator('${c.id}')">승인 취소</button>` : ''}
+        `}
+      </div>
+      <div class="apply-reason" id="reject-creator-${c.id}" style="display:flex;">
+        <input type="text" placeholder="반려 사유 (선택 입력)" id="reject-reason-creator-${c.id}">
+        <button class="btn btn-sm" style="background:var(--danger);color:#fff;" onclick="rejectCreator('${c.id}')">확인</button>
+        <button class="btn btn-outline btn-sm" onclick="toggleRejectCreator('${c.id}')">취소</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  // 반려 영역 초기 숨김
+  document.querySelectorAll('[id^="reject-creator-"]').forEach(el => el.style.display = 'none');
+}
+
+// ── 판매자 렌더 ──────────────────────────────────────────────
+function renderSellers() {
+  const list = document.getElementById('seller-list');
+  const items = sellerFilter === 'all'
+    ? allSellers
+    : allSellers.filter(s => s.status === sellerFilter);
+
+  if (items.length === 0) {
+    list.innerHTML = `<div class="empty-state">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <div>${sellerFilter === 'all' ? '판매자 계정이 없습니다.' : '해당 상태의 판매자가 없습니다.'}</div>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = items.map(s => {
+    const dateStr = s.createdAt?.toDate
+      ? s.createdAt.toDate().toLocaleDateString('ko-KR', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' })
+      : '날짜 없음';
+    const name  = s.businessName || s.name || '업체명 없음';
+    const email = s.email || '';
+    const badge = statusBadge(s.status, true);
+    const isPending = s.status === 'pending';
+
+    return `<div class="apply-item" id="seller-item-${s.id}">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span class="apply-name">${escHtml(name)}</span>
+          ${badge}
+        </div>
+        <div class="apply-meta">
+          ${email ? `<span><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>${escHtml(email)}</span>` : ''}
+          ${s.uid ? `<span>UID: ${s.uid.slice(0,12)}…</span>` : ''}
+          <span>${dateStr}</span>
+        </div>
+        ${s.rejectionReason ? `<div style="margin-top:4px;font-size:0.78rem;color:var(--danger);">반려 사유: ${escHtml(s.rejectionReason)}</div>` : ''}
+      </div>
+      <div class="apply-actions">
+        ${isPending ? `
+          <button class="btn btn-primary btn-sm" onclick="approveSeller('${s.id}')">승인</button>
+          <button class="btn btn-outline btn-sm" style="color:var(--danger);border-color:var(--danger);" onclick="toggleRejectSeller('${s.id}')">반려</button>
+        ` : `
+          ${s.status !== 'approved' ? `<button class="btn btn-outline btn-sm" onclick="approveSeller('${s.id}')">재승인</button>` : ''}
+          ${s.status === 'approved' ? `<button class="btn btn-outline btn-sm" style="color:var(--danger);border-color:var(--danger);" onclick="toggleRejectSeller('${s.id}')">정지</button>` : ''}
+        `}
+      </div>
+      <div class="apply-reason" id="reject-seller-${s.id}" style="display:none;">
+        <input type="text" placeholder="반려/정지 사유 (선택 입력)" id="reject-reason-seller-${s.id}">
+        <button class="btn btn-sm" style="background:var(--danger);color:#fff;" onclick="rejectSeller('${s.id}')">확인</button>
+        <button class="btn btn-outline btn-sm" onclick="toggleRejectSeller('${s.id}')">취소</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── 크리에이터 액션 ─────────────────────────────────────────
+window.approveCreator = async function(id) {
+  await updateDoc(doc(db, 'creators', id), { status: 'approved', approvedAt: serverTimestamp(), rejectionReason: '' });
+  const item = allCreators.find(c => c.id === id);
+  if (item) { item.status = 'approved'; item.rejectionReason = ''; }
+  updateCreatorStats(); renderCreators();
+};
+
+window.toggleRejectCreator = function(id) {
+  const el = document.getElementById(`reject-creator-${id}`);
+  if (!el) return;
+  el.style.display = el.style.display === 'none' ? 'flex' : 'none';
+};
+
+window.rejectCreator = async function(id) {
+  const reason = document.getElementById(`reject-reason-creator-${id}`)?.value.trim() || '';
+  await updateDoc(doc(db, 'creators', id), { status: 'rejected', rejectionReason: reason, rejectedAt: serverTimestamp() });
+  const item = allCreators.find(c => c.id === id);
+  if (item) { item.status = 'rejected'; item.rejectionReason = reason; }
+  updateCreatorStats(); renderCreators();
+};
+
+// ── 판매자 액션 ──────────────────────────────────────────────
+window.approveSeller = async function(id) {
+  await updateDoc(doc(db, 'sellers', id), { status: 'approved', approvedAt: serverTimestamp(), rejectionReason: '' });
+  const item = allSellers.find(s => s.id === id);
+  if (item) { item.status = 'approved'; item.rejectionReason = ''; }
+  updateSellerStats(); renderSellers();
+};
+
+window.toggleRejectSeller = function(id) {
+  const el = document.getElementById(`reject-seller-${id}`);
+  if (!el) return;
+  el.style.display = el.style.display === 'none' ? 'flex' : 'none';
+};
+
+window.rejectSeller = async function(id) {
+  const reason = document.getElementById(`reject-reason-seller-${id}`)?.value.trim() || '';
+  await updateDoc(doc(db, 'sellers', id), { status: 'rejected', rejectionReason: reason, rejectedAt: serverTimestamp() });
+  const item = allSellers.find(s => s.id === id);
+  if (item) { item.status = 'rejected'; item.rejectionReason = reason; }
+  updateSellerStats(); renderSellers();
+};
+
+// ── 필터 칩 ──────────────────────────────────────────────────
+document.getElementById('creator-filter-chips').addEventListener('click', e => {
+  const chip = e.target.closest('.chip');
+  if (!chip) return;
+  document.querySelectorAll('#creator-filter-chips .chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  creatorFilter = chip.dataset.status;
+  renderCreators();
+});
+
+document.getElementById('seller-filter-chips').addEventListener('click', e => {
+  const chip = e.target.closest('.chip');
+  if (!chip) return;
+  document.querySelectorAll('#seller-filter-chips .chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  sellerFilter = chip.dataset.status;
+  renderSellers();
+});
+
+// ── 유틸 ────────────────────────────────────────────────────
+function statusBadge(status, isSeller = false) {
+  const map = {
+    pending:  '<span class="badge badge-pending">심사 대기</span>',
+    active:   '<span class="badge badge-active">승인됨</span>',
+    approved: '<span class="badge badge-approved">승인됨</span>',
+    rejected: '<span class="badge badge-rejected">반려됨</span>',
+    inactive: '<span class="badge badge-inactive">비활성</span>',
+  };
+  return map[status] || `<span class="badge badge-inactive">${status || '미확인'}</span>`;
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── 정산 ─────────────────────────────────────────────────────
+
+const CHEEZ_API = 'https://chatapi-6qfhsqtgpq-an.a.run.app';
+// Cheez API Key — fanup 테넌트용 (Bearer 크로스 프로젝트 토큰 문제 우회)
+const CHEEZ_ADMIN_API_KEY = 'ck_live_738878c945a3500f260f0beb03514981a06ea245';
+let _settBatches = [];
+let _batchStatusFilter = '';
+
+// 이번 달 기본값 세팅
+{
+  const now = new Date();
+  const ym = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const el = document.getElementById('settlement-period');
+  if (el) el.value = ym;
+}
+
+async function settlementFetch(path, opts = {}) {
+  const user = auth.currentUser;
+  if (!user) throw new Error('로그인 필요');
+  const res = await fetch(`${CHEEZ_API}${path}`, {
+    ...opts,
+    headers: {
+      'Content-Type': 'application/json',
+      'X-API-Key': CHEEZ_ADMIN_API_KEY,
+      ...(opts.headers || {}),
+    },
+  });
+  const data = await res.json();
+  if (!data.success) throw new Error(data.error?.message || '오류');
+  return data.data;
+}
+
+window.loadSettlementPreview = async function() {
+  const period = document.getElementById('settlement-period').value;
+  if (!period) { alert('기간을 선택하세요.'); return; }
+  const area = document.getElementById('settlement-preview-area');
+  area.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted);">조회 중...</div>';
+  try {
+    const data = await settlementFetch(`/api/v1/settlement/preview?period=${period}`);
+    const { creators, summary } = data;
+    document.getElementById('create-all-btn').style.display = summary.eligible_creators > 0 ? '' : 'none';
+
+    if (!creators.length) {
+      area.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted);">해당 기간 후원 내역 없음</div>';
+      return;
+    }
+
+    area.innerHTML = `
+      <div class="stat-mini" style="margin-bottom:16px;">
+        <div class="stat-mini-item"><div class="stat-mini-num">${summary.total_creators}</div><div class="stat-mini-label">대상 크리에이터</div></div>
+        <div class="stat-mini-item" style="border-color:var(--success);"><div class="stat-mini-num" style="color:var(--success);">${summary.eligible_creators}</div><div class="stat-mini-label">정산 가능</div></div>
+        <div class="stat-mini-item" style="border-color:var(--brand);"><div class="stat-mini-num" style="color:var(--brand);">${summary.total_net_krw.toLocaleString()}원</div><div class="stat-mini-label">총 실지급액</div></div>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>크리에이터</th><th>후원 치즈</th><th>총액(원)</th><th>수수료</th><th>원천세</th><th>실지급액</th><th>계좌</th><th></th></tr></thead>
+        <tbody>
+          ${creators.map(c => `
+            <tr style="${c.is_below_minimum ? 'opacity:0.5;' : ''}">
+              <td class="td-main">${escHtml(c.creator_name)}<br><span style="font-size:0.72rem;color:var(--text-muted);">${c.creator_id.slice(0,8)}</span></td>
+              <td>${c.total_donated_cheese.toLocaleString()}</td>
+              <td>₩${c.gross_krw.toLocaleString()}</td>
+              <td style="color:var(--danger);">-₩${c.platform_fee_krw.toLocaleString()}</td>
+              <td style="color:var(--warning);">-₩${c.withholding_tax_krw.toLocaleString()}</td>
+              <td style="font-weight:700;color:var(--success);">₩${c.net_krw.toLocaleString()}</td>
+              <td style="font-size:0.78rem;">${c.account_number ? `${c.bank_code} ${c.account_number}<br>${escHtml(c.account_holder||'')}` : '<span style="color:var(--danger);">계좌 미등록</span>'}</td>
+              <td>${c.is_below_minimum
+                ? '<span style="font-size:0.75rem;color:var(--text-muted);">최소금액 미달</span>'
+                : `<button class="btn btn-primary btn-sm" onclick="createOneBatch('${c.creator_id}','${period}')">배치 생성</button>`
+              }</td>
+            </tr>`).join('')}
+        </tbody>
+      </table></div>`;
+  } catch(e) {
+    area.innerHTML = `<div style="text-align:center;padding:24px;color:var(--danger);">오류: ${escHtml(e.message)}</div>`;
+  }
+};
+
+window.createOneBatch = async function(creator_id, period) {
+  if (!confirm(`${period} 정산 배치를 생성할까요?`)) return;
+  try {
+    const { batch_id } = await settlementFetch('/api/v1/settlement/batches', {
+      method: 'POST',
+      body: JSON.stringify({ creator_id, period }),
+    });
+    alert(`배치 생성 완료: ${batch_id}`);
+    loadBatches();
+  } catch(e) { alert('오류: ' + e.message); }
+};
+
+window.createAllSettlements = async function() {
+  const period = document.getElementById('settlement-period').value;
+  if (!confirm(`${period} 전체 크리에이터 정산 배치를 일괄 생성할까요?`)) return;
+  const area = document.getElementById('settlement-preview-area');
+  const rows = area.querySelectorAll('tbody tr:not([style*="opacity"])');
+  let ok = 0, fail = 0;
+  for (const row of rows) {
+    const btn = row.querySelector('button');
+    if (!btn) continue;
+    const creatorId = btn.getAttribute('onclick').match(/'([^']+)'/)?.[1];
+    if (!creatorId) continue;
+    try {
+      await settlementFetch('/api/v1/settlement/batches', {
+        method: 'POST',
+        body: JSON.stringify({ creator_id: creatorId, period }),
+      });
+      ok++;
+    } catch { fail++; }
+  }
+  alert(`배치 생성 완료: ${ok}개 성공, ${fail}개 실패`);
+  loadBatches();
+};
+
+async function loadBatches() {
+  const area = document.getElementById('settlement-batch-list');
+  area.innerHTML = '<div class="loading-row">불러오는 중...</div>';
+  try {
+    const url = `/api/v1/settlement/batches?limit=100${_batchStatusFilter ? `&status=${_batchStatusFilter}` : ''}`;
+    _settBatches = await settlementFetch(url);
+    renderBatches();
+  } catch(e) {
+    area.innerHTML = `<div style="text-align:center;padding:24px;color:var(--danger);">오류: ${escHtml(e.message)}</div>`;
+  }
+}
+
+function renderBatches() {
+  const area = document.getElementById('settlement-batch-list');
+  if (!_settBatches.length) {
+    area.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-muted);">배치 없음</div>';
+    return;
+  }
+  const statusMap = {
+    pending:    '<span class="badge badge-pending">대기</span>',
+    approved:   '<span class="badge badge-approved">승인됨</span>',
+    processing: '<span class="badge badge-pending">처리중</span>',
+    completed:  '<span class="badge badge-active">완료</span>',
+    failed:     '<span class="badge badge-rejected">실패</span>',
+  };
+  area.innerHTML = `<div class="table-wrap"><table>
+    <thead><tr><th>배치ID</th><th>크리에이터</th><th>기간</th><th>실지급액</th><th>상태</th><th></th></tr></thead>
+    <tbody>
+      ${_settBatches.map(b => {
+        const createdAt = b.created_at?.seconds ? new Date(b.created_at.seconds*1000).toLocaleDateString('ko-KR') : '-';
+        const period = b.period_start?.seconds
+          ? new Date(b.period_start.seconds*1000).toISOString().slice(0,7)
+          : '-';
+        return `<tr>
+          <td class="td-code" style="font-size:0.75rem;">${b.batch_id?.slice(-10)||b.id?.slice(-10)||'-'}</td>
+          <td class="td-main">${escHtml(b.creator_name||b.creator_id||'-')}</td>
+          <td>${period}</td>
+          <td style="font-weight:600;color:var(--success);">₩${(b.net_krw||0).toLocaleString()}</td>
+          <td>${statusMap[b.status]||b.status}</td>
+          <td style="display:flex;gap:4px;flex-wrap:wrap;">
+            ${b.status==='pending' ? `<button class="btn btn-outline btn-sm" onclick="approveBatch('${b.batch_id||b.id}')">승인</button>` : ''}
+            ${b.status==='approved' ? `<button class="btn btn-primary btn-sm" onclick="executeBatch('${b.batch_id||b.id}')">이체 실행</button>` : ''}
+            ${b.hecto_transfer_id ? `<span style="font-size:0.72rem;color:var(--text-muted);">${b.hecto_transfer_id}</span>` : ''}
+          </td>
+        </tr>`;
+      }).join('')}
+    </tbody>
+  </table></div>`;
+}
+
+window.approveBatch = async function(batchId) {
+  if (!confirm('이 배치를 승인할까요?')) return;
+  try {
+    await settlementFetch(`/api/v1/settlement/batches/${batchId}/approve`, { method: 'POST' });
+    await loadBatches();
+  } catch(e) { alert('오류: ' + e.message); }
+};
+
+window.executeBatch = async function(batchId) {
+  if (!confirm('이체를 실행할까요? 이 작업은 되돌릴 수 없습니다.')) return;
+  try {
+    const { transfer_id } = await settlementFetch(`/api/v1/settlement/batches/${batchId}/execute`, { method: 'POST' });
+    alert(`이체 완료! 이체ID: ${transfer_id}`);
+    await loadBatches();
+  } catch(e) { alert('오류: ' + e.message); }
+};
+
+window.filterBatches = function(el, status) {
+  document.querySelectorAll('[data-bstatus]').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  _batchStatusFilter = status;
+  loadBatches();
+};
+
+// ── 판매자 정산 ───────────────────────────────────────────────
+let _ssPreviewData   = [];   // 미리보기용 판매자별 집계
+let _ssBatches       = [];   // 배치 이력
+let _ssStatusFilter  = '';
+
+// 이번 달 기본값
+{
+  const now = new Date();
+  const ym  = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  document.addEventListener('DOMContentLoaded', () => {
+    const el = document.getElementById('seller-settle-period');
+    if (el) el.value = ym;
+  });
+}
+
+/** 판매자별 orders 집계 */
+window.loadSellerSettlePreview = async function() {
+  const period = document.getElementById('seller-settle-period')?.value;
+  if (!period) { alert('기간을 선택하세요.'); return; }
+  const area = document.getElementById('seller-settle-preview-area');
+  area.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted);">조회 중...</div>';
+
+  try {
+    const [year, mon] = period.split('-').map(Number);
+    const from = Timestamp.fromDate(new Date(year, mon - 1, 1));
+    const to   = Timestamp.fromDate(new Date(year, mon, 0, 23, 59, 59));
+
+    // orders: 취소/환불 제외, 해당 월
+    const ordQ = query(
+      collection(db, 'orders'),
+      where('createdAt', '>=', from),
+      where('createdAt', '<=', to),
+    );
+    const ordSnap = await getDocs(ordQ);
+    const orders  = ordSnap.docs
+      .map(d => ({ id: d.id, ...d.data() }))
+      .filter(o => o.status !== 'cancelled' && o.status !== 'refunded');
+
+    // 판매자 id 목록
+    const sellerIds = [...new Set(orders.map(o => o.vendorId).filter(Boolean))];
+    if (!sellerIds.length) {
+      area.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-muted);">해당 기간 주문 없음</div>';
+      document.getElementById('seller-settle-all-btn').style.display = 'none';
+      return;
+    }
+
+    // sellers 문서 가져오기 (10개씩 나눠서 in 쿼리)
+    const sellerMap = {};
+    for (let i = 0; i < sellerIds.length; i += 10) {
+      const chunk = sellerIds.slice(i, i + 10);
+      const sSnap = await getDocs(query(collection(db, 'sellers'), where('__name__', 'in', chunk)));
+      sSnap.docs.forEach(d => { sellerMap[d.id] = { id: d.id, ...d.data() }; });
+    }
+
+    // 집계
+    const byVendor = {};
+    orders.forEach(o => {
+      if (!o.vendorId) return;
+      if (!byVendor[o.vendorId]) byVendor[o.vendorId] = { totalSales: 0, commission: 0, orderCount: 0 };
+      byVendor[o.vendorId].totalSales  += o.totalAmount || 0;
+      byVendor[o.vendorId].commission  += o.commissionAmount || 0;
+      byVendor[o.vendorId].orderCount  += 1;
+    });
+
+    const MIN_SETTLEMENT = 10000; // 최소 정산금액 1만원
+    _ssPreviewData = Object.entries(byVendor).map(([vendorId, d]) => {
+      const net = d.totalSales - d.commission;
+      const s   = sellerMap[vendorId] || {};
+      return {
+        vendorId, net, totalSales: d.totalSales,
+        commission: d.commission, orderCount: d.orderCount,
+        businessName: s.businessName || vendorId.slice(0,8),
+        bankAccount:  s.bankAccount  || null,
+        isBelowMin:   net < MIN_SETTLEMENT,
+      };
+    }).sort((a, b) => b.net - a.net);
+
+    const totalNet     = _ssPreviewData.reduce((s, r) => s + r.net, 0);
+    const eligibleCount = _ssPreviewData.filter(r => !r.isBelowMin).length;
+    document.getElementById('seller-settle-all-btn').style.display = eligibleCount > 0 ? '' : 'none';
+
+    area.innerHTML = `
+      <div class="stat-mini" style="margin-bottom:16px;">
+        <div class="stat-mini-item"><div class="stat-mini-num">${_ssPreviewData.length}</div><div class="stat-mini-label">대상 판매자</div></div>
+        <div class="stat-mini-item" style="border-color:var(--success);"><div class="stat-mini-num" style="color:var(--success);">${eligibleCount}</div><div class="stat-mini-label">정산 가능</div></div>
+        <div class="stat-mini-item" style="border-color:var(--brand);"><div class="stat-mini-num" style="color:var(--brand);">₩${totalNet.toLocaleString()}</div><div class="stat-mini-label">총 지급예정</div></div>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>판매자</th><th>주문수</th><th>총 판매액</th><th>수수료</th><th>실지급액</th><th>계좌</th><th></th></tr></thead>
+        <tbody>
+          ${_ssPreviewData.map(r => `
+            <tr style="${r.isBelowMin ? 'opacity:0.5;' : ''}">
+              <td class="td-main">${escHtml(r.businessName)}<br><span style="font-size:0.72rem;color:var(--text-muted);">${r.vendorId.slice(0,8)}</span></td>
+              <td>${r.orderCount}</td>
+              <td>₩${r.totalSales.toLocaleString()}</td>
+              <td style="color:var(--danger);">-₩${r.commission.toLocaleString()}</td>
+              <td style="font-weight:700;color:var(--success);">₩${r.net.toLocaleString()}</td>
+              <td style="font-size:0.78rem;">${r.bankAccount
+                ? `${escHtml(r.bankAccount.bankName)} ${escHtml(r.bankAccount.accountNumber.slice(-4).padStart(r.bankAccount.accountNumber.length,'*'))}<br>${escHtml(r.bankAccount.holderName)}`
+                : '<span style="color:var(--danger);">계좌 미등록</span>'
+              }</td>
+              <td>${r.isBelowMin
+                ? '<span style="font-size:0.75rem;color:var(--text-muted);">최소금액 미달</span>'
+                : `<button class="btn btn-primary btn-sm" onclick="createSellerBatch('${r.vendorId}','${period}')">배치 생성</button>`
+              }</td>
+            </tr>`).join('')}
+        </tbody>
+      </table></div>`;
+  } catch(e) {
+    console.error('[loadSellerSettlePreview]', e);
+    area.innerHTML = `<div style="text-align:center;padding:24px;color:var(--danger);">오류: ${escHtml(e.message)}</div>`;
+  }
+};
+
+async function _doCreateSellerBatch(row, period) {
+  const [year, mon] = period.split('-').map(Number);
+  await addDoc(collection(db, 'seller_settlements'), {
+    vendorId:     row.vendorId,
+    businessName: row.businessName,
+    period,
+    period_start: Timestamp.fromDate(new Date(year, mon - 1, 1)),
+    period_end:   Timestamp.fromDate(new Date(year, mon, 0, 23, 59, 59)),
+    totalSales:   row.totalSales,
+    commission:   row.commission,
+    net_krw:      row.net,
+    orderCount:   row.orderCount,
+    bankAccount:  row.bankAccount || null,
+    status:       'pending',
+    created_at:   serverTimestamp(),
+    created_by:   auth.currentUser?.uid || '',
+  });
+}
+
+window.createSellerBatch = async function(vendorId, period) {
+  if (!confirm(`${period} 판매자 정산 배치를 생성할까요?`)) return;
+  try {
+    const row = _ssPreviewData.find(r => r.vendorId === vendorId);
+    if (!row) throw new Error('집계 데이터 없음');
+    await _doCreateSellerBatch(row, period);
+    alert('배치 생성 완료');
+    loadSellerBatches();
+  } catch(e) { alert('오류: ' + e.message); }
+};
+
+window.createAllSellerBatches = async function() {
+  const period = document.getElementById('seller-settle-period')?.value;
+  if (!confirm(`${period} 전체 판매자 정산 배치를 일괄 생성할까요?`)) return;
+  let ok = 0, fail = 0;
+  for (const row of _ssPreviewData.filter(r => !r.isBelowMin)) {
+    try {
+      await _doCreateSellerBatch(row, period);
+      ok++;
+    } catch { fail++; }
+  }
+  alert(`완료: ${ok}개 성공, ${fail}개 실패`);
+  loadSellerBatches();
+};
+
+async function loadSellerBatches() {
+  const area = document.getElementById('seller-settle-batch-list');
+  if (!area) return;
+  area.innerHTML = '<div class="loading-row">불러오는 중...</div>';
+  try {
+    let q = query(
+      collection(db, 'seller_settlements'),
+      orderBy('created_at', 'desc'),
+      fsLimit(100)
+    );
+    if (_ssStatusFilter) q = query(
+      collection(db, 'seller_settlements'),
+      where('status', '==', _ssStatusFilter),
+      orderBy('created_at', 'desc'),
+      fsLimit(100)
+    );
+    const snap = await getDocs(q);
+    _ssBatches = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderSellerBatches();
+    // 대기 뱃지
+    const pending = _ssBatches.filter(b => b.status === 'pending').length;
+    const badge = document.getElementById('pending-seller-settle-count');
+    if (badge) { badge.textContent = pending || ''; badge.style.display = pending ? '' : 'none'; }
+  } catch(e) {
+    area.innerHTML = `<div style="text-align:center;padding:24px;color:var(--danger);">오류: ${escHtml(e.message)}</div>`;
+  }
+}
+
+function renderSellerBatches() {
+  const area = document.getElementById('seller-settle-batch-list');
+  if (!area) return;
+  if (!_ssBatches.length) {
+    area.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-muted);">배치 없음</div>';
+    return;
+  }
+  const statusMap = {
+    pending:    '<span class="badge badge-pending">대기</span>',
+    approved:   '<span class="badge badge-approved">승인됨</span>',
+    processing: '<span class="badge badge-pending">처리중</span>',
+    completed:  '<span class="badge badge-active">완료</span>',
+    failed:     '<span class="badge badge-rejected">실패</span>',
+  };
+  area.innerHTML = `<div class="table-wrap"><table>
+    <thead><tr><th>배치ID</th><th>판매자</th><th>기간</th><th>주문수</th><th>실지급액</th><th>계좌</th><th>상태</th><th></th></tr></thead>
+    <tbody>
+      ${_ssBatches.map(b => {
+        const createdAt = b.created_at?.seconds ? new Date(b.created_at.seconds*1000).toLocaleDateString('ko-KR') : '-';
+        const ba = b.bankAccount;
+        const baStr = ba
+          ? `${escHtml(ba.bankName)} ${escHtml(ba.accountNumber.slice(-4).padStart(ba.accountNumber.length,'*'))}<br>${escHtml(ba.holderName)}`
+          : '<span style="color:var(--danger);">계좌 미등록</span>';
+        return `<tr>
+          <td class="td-code" style="font-size:0.75rem;">${b.id.slice(-10)}</td>
+          <td class="td-main">${escHtml(b.businessName||b.vendorId?.slice(0,8)||'-')}<br><span style="font-size:0.7rem;color:var(--text-muted);">${createdAt}</span></td>
+          <td>${escHtml(b.period||'-')}</td>
+          <td>${b.orderCount||0}</td>
+          <td style="font-weight:600;color:var(--success);">₩${(b.net_krw||0).toLocaleString()}</td>
+          <td style="font-size:0.78rem;">${baStr}</td>
+          <td>${statusMap[b.status]||b.status}</td>
+          <td style="display:flex;gap:4px;flex-wrap:wrap;">
+            ${b.status==='pending' ? `<button class="btn btn-outline btn-sm" onclick="approveSellerBatch('${b.id}')">승인</button>` : ''}
+            ${b.status==='approved' ? `<button class="btn btn-primary btn-sm" onclick="completeSellerBatch('${b.id}')">이체 완료</button>` : ''}
+          </td>
+        </tr>`;
+      }).join('')}
+    </tbody>
+  </table></div>`;
+}
+
+window.approveSellerBatch = async function(id) {
+  if (!confirm('배치를 승인할까요?')) return;
+  try {
+    await updateDoc(doc(db, 'seller_settlements', id), {
+      status:      'approved',
+      approved_at: serverTimestamp(),
+      approved_by: auth.currentUser?.uid || '',
+    });
+    await loadSellerBatches();
+  } catch(e) { alert('오류: ' + e.message); }
+};
+
+window.completeSellerBatch = async function(id) {
+  if (!confirm('이체 완료 처리할까요? 실제 이체가 완료된 후 클릭하세요.')) return;
+  try {
+    await updateDoc(doc(db, 'seller_settlements', id), {
+      status:       'completed',
+      completed_at: serverTimestamp(),
+      completed_by: auth.currentUser?.uid || '',
+    });
+    await loadSellerBatches();
+  } catch(e) { alert('오류: ' + e.message); }
+};
+
+window.filterSellerBatches = function(el, status) {
+  document.querySelectorAll('[data-ss-status]').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  _ssStatusFilter = status;
+  loadSellerBatches();
+};
+
+// ── 탭 전환 ──────────────────────────────────────────────────
+window.switchTab = function(tab) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`tab-${tab}`)?.classList.add('active');
+  document.querySelector(`.nav-item[data-tab="${tab}"]`)?.classList.add('active');
+  const titles = { creators: '크리에이터 신청', sellers: '판매자 관리', settlement: '크리에이터 정산', 'seller-settlement': '판매자 정산' };
+  document.getElementById('pageTitle').textContent = titles[tab] || '';
+  if (tab === 'settlement') loadBatches();
+  if (tab === 'seller-settlement') loadSellerBatches();
+  closeSidebar();
+};
+
+// ── 사이드바 토글 (모바일) ───────────────────────────────────
+window.toggleSidebar  = function() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('show'); };
+window.closeSidebar   = function() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('show'); };
+
+// ── 다크모드 ─────────────────────────────────────────────────
+const saved = localStorage.getItem('fanup-theme') || 'light';
+document.documentElement.setAttribute('data-theme', saved);
+document.getElementById('themeToggle').addEventListener('click', () => {
+  const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('fanup-theme', next);
+});
+</script>
+</body>
+</html>

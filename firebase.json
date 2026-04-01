@@ -1,0 +1,50 @@
+{
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "hosting": [
+    {
+      "site": "about-fanup",
+      "public": ".",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**",
+        "CNAME"
+      ]
+    },
+    {
+      "site": "seller-fanup",
+      "public": ".",
+      "rewrites": [
+        {
+          "source": "/",
+          "destination": "/seller.html"
+        }
+      ],
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**",
+        "CNAME"
+      ]
+    },
+    {
+      "site": "studio-fanup",
+      "public": ".",
+      "rewrites": [
+        {
+          "source": "/",
+          "destination": "/studio-login.html"
+        }
+      ],
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**",
+        "CNAME"
+      ]
+    }
+  ]
+}

@@ -175,6 +175,7 @@
   </style>
 </head>
 <body>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 <div class="dash-shell">
 
   <!-- ── SIDEBAR ── -->
@@ -198,10 +199,16 @@
       <a class="nav-item" href="#" data-page="gifts">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
         선물 보관함
-        <span class="nav-badge">3</span>
+        <span class="nav-badge" id="gifts-nav-badge" style="display:none"></span>
       </a>
       <a class="nav-item" href="#" data-page="cheez">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <!-- 팩맨이 코인 먹는 아이콘 -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <!-- 팩맨 몸 (입 열린 원, 오른쪽 방향) -->
+          <path d="M11 2a9 9 0 1 0 0 18A9 9 0 0 0 11 2zm0 2 7.2 4.5L11 13V4z"/>
+          <!-- 코인 점들 -->
+          <circle cx="21" cy="11" r="1.5"/>
+        </svg>
         치즈 정산
       </a>
       <a class="nav-item" href="#" data-page="analytics">
@@ -212,24 +219,24 @@
 
     <div class="sidebar-section">
       <div class="sidebar-section-title">설정</div>
-      <a class="nav-item" href="#">
+      <a class="nav-item" href="#" data-page="settings">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
         계정 설정
       </a>
-      <a class="nav-item" href="index.html">
+      <a class="nav-item" href="https://fanup.im" target="_blank" rel="noopener">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        랜딩 페이지
+        팬업 홈
       </a>
     </div>
 
     <div class="sidebar-footer">
-      <div class="sidebar-user">
-        <div class="user-avatar">
+      <div class="sidebar-user" id="sidebar-user-card" onclick="switchPage('settings')" style="cursor:pointer;">
+        <div class="user-avatar" id="sidebar-user-avatar">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         </div>
         <div>
-          <div class="user-name">키리모코 여우</div>
-          <div class="user-role">파트너 크리에이터</div>
+          <div class="user-name" id="sidebar-user-name">—</div>
+          <div class="user-role" id="sidebar-user-role">크리에이터</div>
         </div>
       </div>
     </div>
@@ -247,15 +254,15 @@
         <span class="topbar-title" id="pageTitle">대시보드</span>
       </div>
       <div class="topbar-right">
-        <button class="topbar-btn topbar-notif">
+        <button class="topbar-btn topbar-notif" id="topbar-notif-btn" onclick="switchPage('gifts')" title="선물 알림">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-          <div class="notif-dot"></div>
+          <div class="notif-dot" id="topbar-notif-dot" style="display:none"></div>
         </button>
         <button class="theme-toggle" id="themeToggle">
           <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
           <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
         </button>
-        <div class="topbar-avatar">
+        <div class="topbar-avatar" id="topbar-avatar" onclick="switchPage('settings')" title="계정 설정" style="cursor:pointer;">
           <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         </div>
       </div>
@@ -265,7 +272,7 @@
     <div class="page-content" id="page-dashboard">
       <div class="page-header">
         <h1>대시보드</h1>
-        <p>안녕하세요, 키리모코 여우님. 오늘도 팬들이 기다리고 있어요.</p>
+        <p id="dashboard-greeting">로딩 중...</p>
       </div>
 
       <!-- Stats -->
@@ -275,38 +282,32 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
             보유 치즈
           </div>
-          <div class="stat-card-value brand">12,840</div>
-          <div class="stat-card-sub">
-            <span class="stat-delta-up">+2,340</span> 오늘
-          </div>
+          <div class="stat-card-value brand" id="dashboard-cheese-value">—</div>
+          <div class="stat-card-sub" id="dashboard-cheese-sub">로딩 중...</div>
         </div>
         <div class="stat-card">
           <div class="stat-card-label">
             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
             이번 달 예상 수익
           </div>
-          <div class="stat-card-value">₩248,600</div>
-          <div class="stat-card-sub">
-            <span class="stat-delta-up">+12%</span> 전월 대비
-          </div>
+          <div class="stat-card-value" id="dashboard-revenue-value">—</div>
+          <div class="stat-card-sub" id="dashboard-revenue-sub">원천징수 공제 전</div>
         </div>
         <div class="stat-card">
           <div class="stat-card-label">
             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            오늘 AI 대화 수
+            전체 팬 채팅방
           </div>
-          <div class="stat-card-value">347</div>
-          <div class="stat-card-sub">
-            <span class="stat-delta-up">+48</span> 어제 대비
-          </div>
+          <div class="stat-card-value" id="dashboard-chat-value">—</div>
+          <div class="stat-card-sub" id="dashboard-chat-sub">누적 채팅방 수</div>
         </div>
         <div class="stat-card">
           <div class="stat-card-label">
             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/></svg>
             미수령 선물
           </div>
-          <div class="stat-card-value">3</div>
-          <div class="stat-card-sub">배송 확인 필요</div>
+          <div class="stat-card-value" id="dashboard-pending-gifts">—</div>
+          <div class="stat-card-sub" id="dashboard-pending-gifts-sub">로딩 중...</div>
         </div>
       </div>
 
@@ -317,35 +318,8 @@
             <span class="card-title">최근 받은 선물</span>
             <span class="card-action" onclick="switchPage('gifts')">전체 보기</span>
           </div>
-          <div class="gift-item">
-            <div class="gift-thumb">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
-            </div>
-            <div class="gift-info">
-              <div class="gift-name">블루베리 마카롱 세트</div>
-              <div class="gift-from">팬 익명 · 오늘 오전 11:24</div>
-            </div>
-            <span class="status status-warning">배송중</span>
-          </div>
-          <div class="gift-item">
-            <div class="gift-thumb">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
-            </div>
-            <div class="gift-info">
-              <div class="gift-name">치즈케이크 홀케이크</div>
-              <div class="gift-from">팬 익명 · 어제</div>
-            </div>
-            <span class="status status-success">수령 완료</span>
-          </div>
-          <div class="gift-item">
-            <div class="gift-thumb">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
-            </div>
-            <div class="gift-info">
-              <div class="gift-name">피규어 한정판 (게임 캐릭터)</div>
-              <div class="gift-from">팬 익명 · 2일 전</div>
-            </div>
-            <span class="status status-info">준비중</span>
+          <div id="dashboard-gifts-list">
+            <div style="padding:24px;text-align:center;color:var(--text-muted);font-size:0.85rem;">로딩 중...</div>
           </div>
         </div>
 
@@ -355,16 +329,16 @@
             <span class="card-title">이번 주 수익 추이</span>
             <span class="card-action" onclick="switchPage('analytics')">상세 보기</span>
           </div>
-          <div class="chart-bars">
-            <div class="chart-bar" style="height:40%"></div>
-            <div class="chart-bar" style="height:55%"></div>
-            <div class="chart-bar" style="height:35%"></div>
-            <div class="chart-bar" style="height:70%"></div>
-            <div class="chart-bar" style="height:60%"></div>
-            <div class="chart-bar active" style="height:85%"></div>
-            <div class="chart-bar" style="height:50%"></div>
+          <div class="chart-bars" id="dashboard-chart-bars">
+            <div class="chart-bar" style="height:0%"></div>
+            <div class="chart-bar" style="height:0%"></div>
+            <div class="chart-bar" style="height:0%"></div>
+            <div class="chart-bar" style="height:0%"></div>
+            <div class="chart-bar" style="height:0%"></div>
+            <div class="chart-bar" style="height:0%"></div>
+            <div class="chart-bar active" style="height:0%"></div>
           </div>
-          <div class="chart-labels">
+          <div class="chart-labels" id="dashboard-chart-labels">
             <span class="chart-label">월</span>
             <span class="chart-label">화</span>
             <span class="chart-label">수</span>
@@ -376,12 +350,12 @@
           <div class="divider"></div>
           <div class="flex-between">
             <div>
-              <div class="text-xs text-muted mb-4" style="margin-bottom:4px;">이번 주 총 수익</div>
-              <div style="font-size:1.3rem;font-weight:800;color:var(--brand);letter-spacing:-0.03em;">₩62,400</div>
+              <div class="text-xs text-muted mb-4" style="margin-bottom:4px;">이번 주 누적 수익</div>
+              <div style="font-size:1.3rem;font-weight:800;color:var(--brand);letter-spacing:-0.03em;" id="dashboard-week-revenue">—</div>
             </div>
             <div style="text-align:right;">
-              <div class="text-xs text-muted" style="margin-bottom:4px;">AI 대화 건수</div>
-              <div style="font-size:1.3rem;font-weight:800;color:var(--text-primary);letter-spacing:-0.03em;">2,184</div>
+              <div class="text-xs text-muted" style="margin-bottom:4px;">이번 주 후원 치즈</div>
+              <div style="font-size:1.3rem;font-weight:800;color:var(--text-primary);letter-spacing:-0.03em;" id="dashboard-week-cheese">—</div>
             </div>
           </div>
         </div>
@@ -393,23 +367,23 @@
           <span class="card-title">AI 아바타 상태</span>
           <a class="card-action" onclick="switchPage('avatar')">설정 변경</a>
         </div>
-        <div class="avatar-card" style="margin-bottom:0;">
-          <div class="avatar-img">
+        <div class="avatar-card" style="margin-bottom:0;" id="dashboard-avatar-card">
+          <div class="avatar-img" id="dashboard-avatar-img">
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           </div>
           <div class="avatar-meta">
-            <div class="avatar-name">키리모코 AI 아바타</div>
-            <div class="avatar-status">
-              <span class="dot-live"></span>
-              현재 활성화 · 오늘 347회 대화
+            <div class="avatar-name" id="dashboard-avatar-name">로딩 중...</div>
+            <div class="avatar-status" id="dashboard-avatar-status">
+              <span class="dot-live" style="background:var(--text-muted)"></span>
+              <span id="dashboard-avatar-status-text">아바타 정보 확인 중</span>
             </div>
           </div>
-          <div class="toggle-wrap">
+          <div class="toggle-wrap" id="dashboard-avatar-toggle-wrap" style="display:none;">
             <label class="toggle">
-              <input type="checkbox" checked>
+              <input type="checkbox" id="dashboard-avatar-toggle">
               <span class="toggle-slider"></span>
             </label>
-            <span class="toggle-label">활성화</span>
+            <span class="toggle-label" id="dashboard-avatar-toggle-label">비활성화</span>
           </div>
         </div>
       </div>
@@ -433,15 +407,70 @@
         <div class="grid-2">
           <div>
             <div class="card" id="avatar-existing-card" style="margin-bottom:14px;"></div>
-            <div style="display:flex;gap:10px;">
-              <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="startWizard(true)">✏️ 아바타 수정</button>
+            <div style="display:flex;gap:8px;" id="existing-action-btns">
+              <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="startEditForm()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;vertical-align:-2px"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                아바타 수정
+              </button>
+              <a id="testChatBtn" href="#" target="_blank" rel="noopener" class="btn btn-outline"
+                 style="gap:6px;white-space:nowrap;text-decoration:none;" title="앱에서 테스트하기">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                테스트
+              </a>
               <button class="btn btn-outline" onclick="startWizard(false)">새로 만들기</button>
             </div>
           </div>
           <div>
-            <div class="card">
-              <div class="card-header"><span class="card-title">아바타 미리보기</span></div>
-              <div id="existing-preview-content"></div>
+            <div class="card" id="channel-settings-card">
+              <div class="card-header">
+                <span class="card-title">채널 &amp; 팬 설정</span>
+                <button class="btn btn-primary" style="padding:6px 14px;font-size:0.8rem;" onclick="saveChannelSettings()">저장</button>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px 20px;">
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label">콘텐츠 분야</label>
+                  <select class="form-input" id="chChannelCategory">
+                    <option value="">선택하세요</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label">팬 호칭</label>
+                  <div style="display:flex;gap:8px;">
+                    <select class="form-input" id="chFanNickname" onchange="toggleChFanNickCustom()">
+                      <option value="팬님">팬님</option>
+                      <option value="구독자님">구독자님</option>
+                      <option value="시청자님">시청자님</option>
+                      <option value="custom">직접 입력</option>
+                    </select>
+                    <input type="text" class="form-input" id="chFanNicknameCustom" placeholder="직접 입력" style="display:none;width:120px;">
+                  </div>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label">YouTube</label>
+                  <input type="url" class="form-input" id="chYoutubeUrl" placeholder="https://youtube.com/@...">
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label">Instagram</label>
+                  <input type="url" class="form-input" id="chInstagramUrl" placeholder="https://instagram.com/...">
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label">Twitch</label>
+                  <input type="url" class="form-input" id="chTwitchUrl" placeholder="https://twitch.tv/...">
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label">채널 홍보 문구</label>
+                  <input type="text" class="form-input" id="chChannelPromoLine" placeholder="구독하면 복 받아요!">
+                </div>
+                <div class="form-group" style="margin-bottom:0;grid-column:span 2;">
+                  <label class="form-label">채널 소개</label>
+                  <textarea class="form-input" id="chChannelSlogan" rows="2" style="resize:none;" placeholder="채널을 한 줄로 소개해주세요"></textarea>
+                </div>
+                <div class="form-group" style="margin-bottom:0;grid-column:span 2;">
+                  <label class="form-label">최신 콘텐츠</label>
+                  <textarea class="form-input" id="chLatestContent" rows="2" style="resize:none;" placeholder="최근 올린 영상이나 방송 내용"></textarea>
+                </div>
+              </div>
+              <div id="chSaveStatus" style="margin-top:10px;font-size:0.78rem;display:none;"></div>
             </div>
           </div>
         </div>
@@ -449,10 +478,155 @@
 
       <!-- 아바타 없음 -->
       <div id="avatar-empty" style="display:none;text-align:center;padding:80px 20px;">
-        <div style="font-size:56px;margin-bottom:16px;">🤖</div>
+        <div style="width:72px;height:72px;border-radius:24px;background:var(--brand-light);color:var(--brand);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        </div>
         <h3 style="margin-bottom:8px;color:var(--text-primary);">아직 아바타가 없어요</h3>
         <p style="color:var(--text-muted);margin-bottom:28px;">Cheez AI를 활용해 팬들과 대화할 아바타를 만들어보세요!</p>
-        <button class="btn btn-primary" style="padding:13px 30px;font-size:0.95rem;" onclick="startWizard(false)">✨ 아바타 만들기</button>
+        <button class="btn btn-primary" style="padding:13px 30px;font-size:0.95rem;" onclick="startWizard(false)">아바타 만들기</button>
+      </div>
+
+      <!-- 수정 폼 (전체 필드 한 페이지) -->
+      <div id="avatar-edit" style="display:none;">
+        <div style="max-width:720px;">
+
+          <!-- AI 자동 생성 -->
+          <div style="background:var(--brand-light);border:1.5px solid var(--brand);border-radius:var(--radius-md);padding:14px 16px;margin-bottom:16px;">
+            <div style="font-size:0.8rem;font-weight:700;color:var(--brand);margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 8v4l3 3"/><circle cx="18" cy="6" r="3" fill="currentColor"/></svg>
+              AI 자동 생성으로 설정 채우기
+            </div>
+            <div style="display:flex;gap:8px;align-items:flex-end;">
+              <textarea id="editAiConceptInput" class="form-input" rows="2"
+                style="flex:1;font-size:0.82rem;resize:none;min-height:56px;"
+                placeholder="예: 인간세계로 나온 문어 버튜버. 타코야키 알바하다 방송 입문. 먹방 특화, 바다 그리워함"></textarea>
+              <button class="btn btn-primary" style="white-space:nowrap;padding:0 14px;height:56px;font-size:0.82rem;" onclick="generateAvatarAIEdit()">생성</button>
+            </div>
+            <div id="editAiGenStatus" style="font-size:0.75rem;color:var(--text-muted);margin-top:6px;display:none;"></div>
+          </div>
+
+          <!-- 섹션 1: 기본 정보 -->
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-header"><span class="card-title">기본 정보</span></div>
+            <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:16px;">
+              <div class="upload-zone-sm" id="editImgZone"
+                onclick="document.getElementById('editImgFile').click()"
+                style="width:88px;height:88px;flex-shrink:0;">
+                <div id="editImgPlaceholder">
+                  <div style="font-size:22px;color:var(--text-muted);">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                  </div>
+                  <div style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;">이미지</div>
+                </div>
+              </div>
+              <div style="flex:1;">
+                <div class="form-group" style="margin-bottom:12px;">
+                  <label class="form-label">이름 <span style="color:var(--brand)">*</span></label>
+                  <input type="text" class="form-input" id="editName" placeholder="예: 키리모코, 하루카 ..." maxlength="30">
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label">성별</label>
+                  <div class="wizard-radio-group" id="editGenderGroup">
+                    <label class="wizard-radio" data-val="female" onclick="editSetGender('female')"><input type="radio" name="editGender" value="female" style="display:none">여성</label>
+                    <label class="wizard-radio" data-val="male"   onclick="editSetGender('male')"><input type="radio" name="editGender" value="male"   style="display:none">남성</label>
+                    <label class="wizard-radio" data-val="other"  onclick="editSetGender('other')"><input type="radio" name="editGender" value="other"  style="display:none">중성/불명</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <input type="file" id="editImgFile" accept="image/*" style="display:none" onchange="handleEditImgSelect(event)">
+            <div id="editImgStatus" style="font-size:0.78rem;color:var(--text-muted);min-height:18px;"></div>
+          </div>
+
+          <!-- 섹션 2: 캐릭터 성격 -->
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-header"><span class="card-title">캐릭터 성격</span></div>
+            <div class="form-group">
+              <label class="form-label">핵심 페르소나</label>
+              <textarea class="form-textarea" id="editCorePersona" placeholder="예: 밝고 활발한 게임 버추얼 크리에이터. 팬들과 게임·애니 이야기 하는 걸 좋아합니다." rows="3"></textarea>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">성격 키워드 <span style="font-size:0.73rem;color:var(--text-muted)">최대 8개</span></label>
+              <div class="tag-options" id="editPersonalityTagsContainer"></div>
+            </div>
+          </div>
+
+          <!-- 섹션 3: 말투 스타일 -->
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-header"><span class="card-title">말투 스타일</span></div>
+            <div class="form-group">
+              <label class="form-label">말투</label>
+              <select class="form-input" id="editSpeechPattern">
+                <option value="">선택하세요</option>
+                <option value="밝고 에너지 넘치는 말투">밝고 에너지 넘치는 말투</option>
+                <option value="차분하고 다정한 말투">차분하고 다정한 말투</option>
+                <option value="귀엽고 애교 있는 말투">귀엽고 애교 있는 말투</option>
+                <option value="쿨하고 담담한 말투">쿨하고 담담한 말투</option>
+                <option value="격식체 말투">격식체 말투</option>
+                <option value="직접 입력">직접 입력</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">말투 예시 <span style="font-size:0.73rem;color:var(--text-muted)">선택</span></label>
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <input type="text" class="form-input" id="editSpeechEx0" placeholder='예: "오늘 방송 와줘서 고마워~"'>
+                <input type="text" class="form-input" id="editSpeechEx1" placeholder='예: "다음에 또 놀러 와!"'>
+                <input type="text" class="form-input" id="editSpeechEx2" placeholder='예: "팬님 덕분에 오늘도 힘났어요"'>
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">첫 인사 메시지 <span style="font-size:0.73rem;color:var(--text-muted)">팬이 채팅을 열 때 첫 번째로 보이는 메시지</span></label>
+              <textarea class="form-textarea" id="editIntroMessage" placeholder="예: 안녕! 나야, 키리모코~ 오늘 방송 어떻게 봤어? 궁금한 거 뭐든 물어봐!" rows="2"></textarea>
+            </div>
+          </div>
+
+          <!-- 섹션 4: AI 채팅 설정 -->
+          <div class="card" style="margin-bottom:24px;">
+            <div class="card-header"><span class="card-title">AI 채팅 설정</span></div>
+            <div class="form-group">
+              <label class="form-label">라이브 스타일</label>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <div class="safety-opt" id="editStoryOpt_live" onclick="editSelectStoryStyle('live')" style="gap:10px;">
+                  <div class="s-icon" style="font-size:18px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg></div>
+                  <div><div class="s-name">라이브 스타일</div><div class="s-desc">실시간 방송 채팅처럼 반응</div></div>
+                </div>
+                <div class="safety-opt" id="editStoryOpt_classic" onclick="editSelectStoryStyle('classic')" style="gap:10px;">
+                  <div class="s-icon" style="font-size:18px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+                  <div><div class="s-name">일반 채팅</div><div class="s-desc">1:1 대화 중심 AI 채팅 스타일</div></div>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">글쓰기 스타일</label>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <div class="safety-opt" id="editWritingOpt_light-novel" onclick="editSelectWritingStyle('light-novel')" style="gap:10px;">
+                  <div><div class="s-name">라이트노벨체</div><div class="s-desc">생동감 있는 묘사와 감정 표현</div></div>
+                </div>
+                <div class="safety-opt" id="editWritingOpt_classic" onclick="editSelectWritingStyle('classic')" style="gap:10px;">
+                  <div><div class="s-name">일반체</div><div class="s-desc">자연스러운 대화 중심</div></div>
+                </div>
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">안전 필터</label>
+              <div class="safety-opts">
+                <div class="safety-opt" id="editSafetyOpt_all" onclick="editSelectSafety('all')">
+                  <div><div class="s-name">전체 안전</div><div class="s-desc">모든 부적절 내용 차단</div></div>
+                </div>
+                <div class="safety-opt" id="editSafetyOpt_adult" onclick="editSelectSafety('adult')">
+                  <div><div class="s-name">성인 허용</div><div class="s-desc">성인 팬 대상 콘텐츠 허용</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 하단 버튼 -->
+          <div style="display:flex;gap:10px;margin-bottom:40px;">
+            <button class="btn btn-primary" style="flex:1;justify-content:center;" id="editSaveBtn" onclick="saveEdit()">저장하기</button>
+            <button class="btn btn-outline" onclick="cancelEdit()">취소</button>
+          </div>
+
+        </div>
       </div>
 
       <!-- 위자드 -->
@@ -462,7 +636,7 @@
           <div class="wizard-chat-col">
             <div class="wizard-progress-wrap">
               <div class="wizard-progress-label">
-                <span id="wizardStepLabel">단계 1 / 5</span>
+                <span id="wizardStepLabel">단계 1 / 4</span>
                 <span id="wizardStepName">이름 &amp; 성별</span>
               </div>
               <div class="wizard-progress-bar-bg">
@@ -482,7 +656,7 @@
               <div class="card-header"><span class="card-title">실시간 미리보기</span></div>
               <div class="avatar-preview-card">
                 <div class="avatar-preview-img" id="previewImg">
-                  <span style="font-size:36px;">🤖</span>
+                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--brand)"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
                 </div>
                 <div class="avatar-preview-name" id="previewName">이름 미정</div>
                 <div class="avatar-preview-persona" id="previewPersona">성격 설명이 여기에 표시됩니다</div>
@@ -507,14 +681,10 @@
 
       <div class="flex-between mb-20">
         <div class="tabs" style="margin-bottom:0;border-bottom:none;">
-          <button class="tab-btn active">전체 (12)</button>
-          <button class="tab-btn">배송중 (3)</button>
-          <button class="tab-btn">수령 완료 (9)</button>
+          <button class="tab-btn active" onclick="window.filterGifts('all')" id="gifts-tab-all">전체 (<span id="gifts-count-all">0</span>)</button>
+          <button class="tab-btn" onclick="window.filterGifts('shipping')" id="gifts-tab-shipping">배송중 (<span id="gifts-count-shipping">0</span>)</button>
+          <button class="tab-btn" onclick="window.filterGifts('delivered')" id="gifts-tab-delivered">수령 완료 (<span id="gifts-count-delivered">0</span>)</button>
         </div>
-        <button class="btn btn-outline btn-sm">
-          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
-          필터
-        </button>
       </div>
 
       <div class="card">
@@ -530,55 +700,8 @@
                 <th>액션</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td><span class="td-main">블루베리 마카롱 세트</span></td>
-                <td class="td-code">fan_****3821</td>
-                <td><span class="status status-success">보호됨</span></td>
-                <td class="text-sm text-muted">2026.03.25</td>
-                <td><span class="status status-warning">배송중</span></td>
-                <td>
-                  <div style="display:flex;gap:6px;">
-                    <button class="btn btn-ghost btn-sm">감사 메시지</button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td><span class="td-main">치즈케이크 홀케이크</span></td>
-                <td class="td-code">fan_****7214</td>
-                <td><span class="status status-success">보호됨</span></td>
-                <td class="text-sm text-muted">2026.03.24</td>
-                <td><span class="status status-success">수령 완료</span></td>
-                <td>
-                  <div style="display:flex;gap:6px;">
-                    <button class="btn btn-primary btn-sm">감사 메시지 보내기</button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td><span class="td-main">피규어 한정판</span></td>
-                <td class="td-code">fan_****5503</td>
-                <td><span class="status status-success">보호됨</span></td>
-                <td class="text-sm text-muted">2026.03.23</td>
-                <td><span class="status status-info">준비중</span></td>
-                <td>
-                  <div style="display:flex;gap:6px;">
-                    <button class="btn btn-ghost btn-sm">감사 메시지</button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td><span class="td-main">스타벅스 기프티콘 5만원</span></td>
-                <td class="td-code">fan_****9901</td>
-                <td><span class="status status-success">보호됨</span></td>
-                <td class="text-sm text-muted">2026.03.21</td>
-                <td><span class="status status-success">수령 완료</span></td>
-                <td>
-                  <div style="display:flex;gap:6px;">
-                    <button class="btn btn-primary btn-sm">감사 메시지 보내기</button>
-                  </div>
-                </td>
-              </tr>
+            <tbody id="gifts-tbody">
+              <tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text-muted)">로딩 중...</td></tr>
             </tbody>
           </table>
         </div>
@@ -595,38 +718,79 @@
       <div class="grid-2 mb-24">
         <div class="cheez-balance">
           <div class="cheez-balance-label">현재 보유 치즈</div>
-          <div class="cheez-balance-value">12,840</div>
-          <div class="cheez-balance-sub">≈ ₩128,400 (치즈당 ₩10)</div>
-          <button class="btn btn-white">현금 정산 신청</button>
+          <div class="cheez-balance-value" id="cheez-balance-value">—</div>
+          <div class="cheez-balance-sub" id="cheez-balance-krw">잔액 로딩 중...</div>
+          <button class="btn btn-white" onclick="window.requestSettlement()" id="cheez-request-btn" disabled>현금 정산 신청</button>
         </div>
         <div>
           <div class="stat-grid stat-grid-2">
             <div class="stat-card">
-              <div class="stat-card-label">이번 달 수익</div>
-              <div class="stat-card-value brand">₩248,600</div>
-              <div class="stat-card-sub"><span class="stat-delta-up">+12%</span> 전월 대비</div>
+              <div class="stat-card-label">이번 달 누적 치즈</div>
+              <div class="stat-card-value brand" id="cheez-this-month">—</div>
+              <div class="stat-card-sub" id="cheez-this-month-krw">≈ ₩0</div>
             </div>
             <div class="stat-card">
-              <div class="stat-card-label">누적 정산액</div>
-              <div class="stat-card-value">₩1.2M</div>
-              <div class="stat-card-sub">총 8회 정산 완료</div>
+              <div class="stat-card-label">플랫폼 수수료 (30%)</div>
+              <div class="stat-card-value" id="cheez-fee">—</div>
+              <div class="stat-card-sub">공제 후 수취액 기준</div>
             </div>
             <div class="stat-card">
-              <div class="stat-card-label">정산 대기</div>
-              <div class="stat-card-value">₩64,200</div>
-              <div class="stat-card-sub">익월 10일 지급</div>
+              <div class="stat-card-label">예상 정산액</div>
+              <div class="stat-card-value" id="cheez-net-krw">—</div>
+              <div class="stat-card-sub">원천징수(3.3%) 공제 전</div>
             </div>
             <div class="stat-card">
-              <div class="stat-card-label">팬 이벤트 사용</div>
-              <div class="stat-card-value">3,200</div>
-              <div class="stat-card-sub">치즈 역조공</div>
+              <div class="stat-card-label">최소 정산 기준</div>
+              <div class="stat-card-value">₩10,000</div>
+              <div class="stat-card-sub">미달 시 다음 달로 이월</div>
             </div>
           </div>
         </div>
       </div>
 
+      <!-- 계좌 등록 카드 -->
+      <div class="card mb-24" id="bank-account-card">
+        <div class="card-header">
+          <span class="card-title">정산 계좌 등록</span>
+          <span id="bank-account-status-badge"></span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:4px 0 8px;">
+          <div>
+            <label class="form-label">예금주명 <span style="color:var(--danger)">*</span></label>
+            <input type="text" class="form-input" id="bank-holder" placeholder="홍길동">
+          </div>
+          <div>
+            <label class="form-label">은행 <span style="color:var(--danger)">*</span></label>
+            <select class="form-input" id="bank-name">
+              <option value="">은행 선택</option>
+              <option>국민은행</option><option>신한은행</option><option>우리은행</option>
+              <option>하나은행</option><option>기업은행</option><option>농협은행</option>
+              <option>카카오뱅크</option><option>토스뱅크</option><option>케이뱅크</option>
+              <option>SC제일은행</option><option>씨티은행</option><option>우체국</option>
+              <option>새마을금고</option><option>신협</option><option>수협</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">계좌번호 <span style="color:var(--danger)">*</span></label>
+            <input type="text" class="form-input" id="bank-number" placeholder="숫자만 입력 (- 제외)">
+          </div>
+          <div>
+            <label class="form-label">주민등록번호 앞 6자리 (원천징수용)</label>
+            <input type="text" class="form-input" id="bank-rrn" placeholder="예: 900101" maxlength="6">
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button class="btn btn-primary" onclick="window.saveBankAccount()">계좌 저장</button>
+          <span id="bank-save-msg" style="font-size:0.82rem;color:var(--success);align-self:center;display:none;">저장되었습니다.</span>
+        </div>
+      </div>
+
+      <!-- 정산 내역 -->
       <div class="card">
-        <div class="card-header"><span class="card-title">정산 내역</span></div>
+        <div class="card-header">
+          <span class="card-title">정산 내역</span>
+          <span style="font-size:0.8rem;color:var(--text-muted)" id="cheez-history-period"></span>
+        </div>
         <div class="table-wrap">
           <table>
             <thead>
@@ -634,34 +798,98 @@
                 <th>정산일</th>
                 <th>구분</th>
                 <th>치즈</th>
-                <th>금액</th>
+                <th>수취액</th>
                 <th>상태</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td class="text-sm">2026.03.10</td>
-                <td class="td-main">월 정산</td>
-                <td>18,240</td>
-                <td style="font-weight:700;color:var(--brand);">₩182,400</td>
-                <td><span class="status status-success">입금 완료</span></td>
-              </tr>
-              <tr>
-                <td class="text-sm">2026.02.10</td>
-                <td class="td-main">월 정산</td>
-                <td>14,600</td>
-                <td style="font-weight:700;color:var(--brand);">₩146,000</td>
-                <td><span class="status status-success">입금 완료</span></td>
-              </tr>
-              <tr>
-                <td class="text-sm">2026.01.10</td>
-                <td class="td-main">월 정산</td>
-                <td>9,800</td>
-                <td style="font-weight:700;color:var(--brand);">₩98,000</td>
-                <td><span class="status status-success">입금 완료</span></td>
-              </tr>
+            <tbody id="cheez-history-tbody">
+              <tr><td colspan="5" class="text-center text-muted" style="padding:24px">로딩 중...</td></tr>
             </tbody>
           </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PAGE: SETTINGS ── -->
+    <div class="page-content" id="page-settings" style="display:none;">
+      <div class="page-header">
+        <h1>계정 설정</h1>
+        <p>프로필, 알림, 보안 설정을 관리하세요.</p>
+      </div>
+
+      <!-- 프로필 -->
+      <div class="card mb-24">
+        <div class="card-header"><span class="card-title">프로필 정보</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:4px 0 8px;">
+          <div>
+            <label class="form-label">이름 / 채널명</label>
+            <input type="text" class="form-input" id="settings-display-name" placeholder="채널명">
+          </div>
+          <div>
+            <label class="form-label">이메일 (변경 불가)</label>
+            <input type="text" class="form-input" id="settings-email" disabled style="opacity:0.6">
+          </div>
+          <div>
+            <label class="form-label">YouTube</label>
+            <input type="text" class="form-input" id="settings-youtube" placeholder="채널 URL 또는 @핸들">
+          </div>
+          <div>
+            <label class="form-label">Instagram</label>
+            <input type="text" class="form-input" id="settings-instagram" placeholder="@아이디">
+          </div>
+          <div>
+            <label class="form-label">TikTok</label>
+            <input type="text" class="form-input" id="settings-tiktok" placeholder="@아이디">
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button class="btn btn-primary" onclick="window.saveSettings()">저장</button>
+          <span id="settings-save-msg" style="font-size:0.82rem;color:var(--success);align-self:center;display:none;">저장되었습니다.</span>
+        </div>
+      </div>
+
+      <!-- 신원 정보 -->
+      <div class="card mb-24">
+        <div class="card-header">
+          <span class="card-title">신원 정보</span>
+          <span style="font-size:0.78rem;color:var(--text-muted);">정산/계약 용도로만 사용됩니다</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:4px 0 8px;">
+          <div>
+            <label class="form-label">실명(정산/계약용)</label>
+            <input type="text" class="form-input" id="identity-legalName" placeholder="예: 홍길동">
+          </div>
+          <div>
+            <label class="form-label">생년월일</label>
+            <input type="date" class="form-input" id="identity-birthdate">
+          </div>
+          <div>
+            <label class="form-label">연락처</label>
+            <input type="tel" class="form-input" id="identity-phone" placeholder="010-0000-0000">
+          </div>
+          <div>
+            <label class="form-label">거주 국가</label>
+            <select class="form-input" id="identity-country" style="cursor:pointer;">
+              <option value="">선택</option>
+              <option value="KR">대한민국</option>
+              <option value="JP">일본</option>
+              <option value="US">미국</option>
+              <option value="OTHER">기타</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
+          <button class="btn btn-primary" onclick="window.saveIdentity()">저장</button>
+          <span id="identity-save-msg" style="font-size:0.82rem;color:var(--success);display:none;">저장되었습니다.</span>
+        </div>
+      </div>
+
+      <!-- 로그아웃 -->
+      <div class="card">
+        <div class="card-header"><span class="card-title">보안</span></div>
+        <div style="padding:4px 0 8px;">
+          <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:12px;">현재 로그인된 계정: <strong id="settings-email-inline">—</strong></p>
+          <button class="btn btn-outline" onclick="window.doSignOut()" style="color:var(--danger);border-color:var(--danger);">로그아웃</button>
         </div>
       </div>
     </div>
@@ -745,11 +973,21 @@
     document.querySelectorAll('.nav-item').forEach(n => {
       n.classList.toggle('active', n.dataset.page === name);
     });
-    const titles = { dashboard:'대시보드', avatar:'아바타 설정', gifts:'선물 보관함', cheez:'치즈 정산', analytics:'통계 분석' };
+    const titles = { dashboard:'대시보드', avatar:'아바타 설정', gifts:'선물 보관함', cheez:'치즈 정산', analytics:'통계 분석', settings:'계정 설정' };
     document.getElementById('pageTitle').textContent = titles[name] || name;
 
-    if (name === 'avatar' && window.initAvatarPage && window.firebaseIdToken) {
-      window.initAvatarPage();
+    if (name === 'avatar') {
+      if (typeof renderChannelSettingsOptions === 'function') renderChannelSettingsOptions();
+      if (window.initAvatarPage && window.firebaseIdToken) window.initAvatarPage();
+    }
+    if (name === 'settings') {
+      if (window.loadSettingsPage && window.firebaseCurrentUser) window.loadSettingsPage();
+    }
+    if (name === 'gifts') {
+      if (window.loadGiftsPage && window.firebaseCurrentUser) window.loadGiftsPage();
+    }
+    if (name === 'cheez') {
+      if (window.loadCheezPage && window.firebaseCurrentUser) window.loadCheezPage();
     }
   }
   document.querySelectorAll('.nav-item[data-page]').forEach(item => {
@@ -758,7 +996,31 @@
 
   // Mobile sidebar
   const sidebar = document.getElementById('sidebar');
-  document.getElementById('sidebarToggle')?.addEventListener('click', () => sidebar.classList.toggle('open'));
+  const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+  function openSidebar() {
+    sidebar.classList.add('open');
+    sidebarOverlay.style.display = 'block';
+    requestAnimationFrame(() => sidebarOverlay.classList.add('visible'));
+  }
+  function closeSidebar() {
+    sidebar.classList.remove('open');
+    sidebarOverlay.classList.remove('visible');
+    setTimeout(() => { sidebarOverlay.style.display = 'none'; }, 200);
+  }
+  window.closeSidebar = closeSidebar;
+
+  document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+    sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+  });
+
+  // 모바일에서 nav 항목 클릭 시 사이드바 닫기
+  sidebar.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      if (window.innerWidth <= 768) closeSidebar();
+    });
+  });
+
   if (window.innerWidth <= 768) document.getElementById('sidebarToggle').style.display = 'flex';
 </script>
 
@@ -772,19 +1034,38 @@ let wizardData = {};
 let wizardStep = 0;
 
 const WIZARD_STEPS = [
-  { id:'name_gender',   label:'이름 & 성별' },
-  { id:'image',         label:'이미지 업로드' },
-  { id:'persona_tags',  label:'성격 & 태그' },
+  { id:'basic_info',    label:'기본 정보' },
+  { id:'persona_tags',  label:'캐릭터 성격' },
   { id:'speech',        label:'말투 스타일' },
-  { id:'intro_safety',  label:'인사 & 안전 설정' },
+  { id:'chat_config',   label:'AI 채팅 설정' },
 ];
 
 const BOT_MSGS = [
-  '안녕하세요! 👋 저는 아바타 설정 도우미예요.\n먼저 아바타의 이름과 성별을 알려주세요.',
-  '이제 아바타 이미지를 업로드해주세요 🎨\n팬들에게 보여줄 프로필 이미지예요. (선택 사항)',
-  '✨ 아바타의 성격을 만들어볼게요!\n어떤 캐릭터인지 설명하고 성격 태그를 골라주세요.',
-  '💬 팬들과 어떤 말투로 대화할지 설정해요!\n스타일을 고르고 예시 문장도 추가해주세요.',
-  '마지막 단계예요! 🎉\n팬들이 처음 채팅을 열 때 볼 인사 메시지와 안전 필터를 설정해주세요.',
+  '안녕하세요! 아바타 설정을 시작할게요.\n이름, 성별, 프로필 이미지를 설정해주세요.',
+  '아바타의 캐릭터를 만들어볼게요.\n어떤 성격인지 설명하고 태그를 골라주세요.',
+  '팬들과 어떤 말투로 대화할지 설정해요.\n스타일을 고르고 예시 문장도 추가해주세요.',
+  '마지막 단계예요.\n첫 인사 메시지와 채팅 스타일을 설정해주세요.',
+];
+
+const CHANNEL_CATEGORIES = [
+  { v:'game',    label:'게임' },
+  { v:'vtuber',  label:'버튜버' },
+  { v:'music',   label:'음악/노래' },
+  { v:'food',    label:'먹방/요리' },
+  { v:'beauty',  label:'뷰티/패션' },
+  { v:'fitness', label:'운동/헬스' },
+  { v:'daily',   label:'일상/브이로그' },
+  { v:'asmr',    label:'ASMR' },
+  { v:'art',     label:'그림/아트' },
+  { v:'other',   label:'기타' },
+];
+
+const FAN_NICKNAMES = [
+  { v:'팬님',    label:'팬님' },
+  { v:'구독자님', label:'구독자님' },
+  { v:'시청자',  label:'시청자' },
+  { v:'여러분',  label:'여러분' },
+  { v:'custom',  label:'직접 입력' },
 ];
 
 const PERSONALITY_TAGS = [
@@ -793,23 +1074,44 @@ const PERSONALITY_TAGS = [
   '여행자','힐링계','팬 사랑꾼','호기심 많음','애니 덕후','요리왕',
 ];
 
+const SPEECH_STYLE_ICONS = {
+  energy:  `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+  calm:    `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`,
+  cute:    `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 13s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>`,
+  cool:    `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>`,
+  formal:  `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`,
+  custom:  `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>`,
+};
 const SPEECH_STYLES = [
-  { v:'밝고 에너지 넘치는 말투',  d:'"와~ 정말이야? 너무 신난다!!"',     e:'⚡' },
-  { v:'차분하고 다정한 말투',     d:'"그렇군요, 걱정하지 않아도 돼요"',   e:'🌙' },
-  { v:'귀엽고 애교 있는 말투',    d:'"아~ 알 것 같아용~ 정말요?"',         e:'🌸' },
-  { v:'쿨하고 담담한 말투',       d:'"응, 알겠어. 해볼게"',                e:'🧊' },
-  { v:'격식체 말투',              d:'"네, 알겠습니다. 최선을 다하겠습니다"', e:'🎩' },
-  { v:'직접 입력',                d:'원하는 말투를 직접 설명해주세요',      e:'✏️' },
+  { v:'밝고 에너지 넘치는 말투',  d:'"와~ 정말이야? 너무 신난다!!"',      e:'energy' },
+  { v:'차분하고 다정한 말투',     d:'"그렇군요, 걱정하지 않아도 돼요"',    e:'calm'   },
+  { v:'귀엽고 애교 있는 말투',    d:'"아~ 알 것 같아용~ 정말요?"',          e:'cute'   },
+  { v:'쿨하고 담담한 말투',       d:'"응, 알겠어. 해볼게"',                 e:'cool'   },
+  { v:'격식체 말투',              d:'"네, 알겠습니다. 최선을 다하겠습니다"', e:'formal' },
+  { v:'직접 입력',                d:'원하는 말투를 직접 설명해주세요',       e:'custom' },
 ];
 
 function resetWizardData() {
   wizardData = {
     existingId: null,
+    // Step 1: 기본 정보
     name: '', gender: 'other', imageUrl: '',
+    // Step 2: 채널 & 팬 설정
+    channelCategory: '',
+    youtubeUrl: '', instagramUrl: '', twitchUrl: '',
+    fanNickname: '팬님', fanNicknameCustom: '',
+    channelSlogan: '',
+    latestContent: '',
+    // Step 3: 성격
     corePersona: '', personalityKeywords: [],
+    // Step 4: 말투
     speechPattern: '', speechExamples: [''],
-    introMessage: '', defaultSafetyFilter: 'all',
-    background: '', age: '', motivation: '',
+    // Step 5: AI 채팅 설정
+    defaultStoryStyle: 'live',
+    defaultWritingStyle: 'light-novel',
+    introMessage: '',
+    channelPromoLine: '',
+    defaultSafetyFilter: 'all',
   };
 }
 
@@ -820,15 +1122,15 @@ function getAnswerSummary(step) {
     case 0: {
       if (!wizardData.name) return '';
       const gMap = { female:'여성', male:'남성', other:'중성/불명' };
-      return `${wizardData.name}  (${gMap[wizardData.gender] || '중성/불명'})`;
+      const imgMark = wizardData.imageUrl ? ' · 이미지 ✓' : '';
+      return `${wizardData.name} (${gMap[wizardData.gender] || '중성/불명'})${imgMark}`;
     }
-    case 1: return wizardData.imageUrl ? '이미지 업로드 완료 ✓' : '이미지 없이 진행';
-    case 2: {
+    case 1: {
       const p = wizardData.corePersona;
       return p ? p.slice(0, 42) + (p.length > 42 ? '…' : '') : '';
     }
-    case 3: return wizardData.speechPattern || '';
-    case 4: {
+    case 2: return wizardData.speechPattern || '';
+    case 3: {
       const m = wizardData.introMessage;
       return m ? m.slice(0, 42) + (m.length > 42 ? '…' : '') : '';
     }
@@ -844,7 +1146,7 @@ function renderChat() {
     botEl.className = 'chat-msg bot';
     botEl.style.animationDelay = (i * 0.04) + 's';
     botEl.innerHTML = `
-      <div class="chat-avatar-icon">🤖</div>
+      <div class="chat-avatar-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="3"/><line x1="8" y1="15" x2="8" y2="17"/><line x1="12" y1="15" x2="12" y2="17"/><line x1="16" y1="15" x2="16" y2="17"/></svg></div>
       <div class="chat-bubble">${BOT_MSGS[i].replace(/\n/g,'<br>')}</div>`;
     chat.appendChild(botEl);
 
@@ -866,39 +1168,53 @@ function renderInput() {
   const area = document.getElementById('wizardInputArea');
   const step = WIZARD_STEPS[wizardStep].id;
 
-  if (step === 'name_gender') {
-    area.innerHTML = `
-      <div class="form-group">
-        <label class="form-label">아바타 이름 <span style="color:var(--brand)">*</span></label>
-        <input type="text" class="form-input" id="wizName" placeholder="예: 키리모코, 하루카, ..." value="${escHtml(wizardData.name)}" maxlength="30">
-      </div>
-      <div class="form-group" style="margin-bottom:0;">
-        <label class="form-label">성별</label>
-        <div class="wizard-radio-group" id="genderGroup">
-          ${['female','male','other'].map(g => {
-            const label = g==='female'?'여성':g==='male'?'남성':'중성/불명';
-            return `<label class="wizard-radio ${wizardData.gender===g?'selected':''}" onclick="setGender('${g}')">
-              <input type="radio" name="gender" value="${g}" ${wizardData.gender===g?'checked':''} style="display:none">
-              ${label}
-            </label>`;
-          }).join('')}
-        </div>
-      </div>`;
-
-  } else if (step === 'image') {
+  if (step === 'basic_info') {
     const hasImg = !!wizardData.imageUrl;
     area.innerHTML = `
-      <div class="upload-zone-sm ${hasImg?'has-img':''}" id="imgZone" onclick="document.getElementById('wizImgFile').click()"
-        ${hasImg?`style="background-image:url('${wizardData.imageUrl}')"`:''}>
-        ${hasImg
-          ? `<div class="upload-overlay">🖼️ 이미지 변경</div>`
-          : `<div style="font-size:28px;margin-bottom:8px;">📸</div>
-             <div style="font-size:0.88rem;color:var(--text-secondary);font-weight:600;">클릭하여 이미지 업로드</div>
-             <div style="font-size:0.74rem;color:var(--text-muted);margin-top:4px;">PNG, JPG · 최대 5MB</div>`}
+      <div style="background:var(--brand-light);border:1.5px solid var(--brand);border-radius:var(--radius-md);padding:12px 14px;margin-bottom:16px;">
+        <div style="font-size:0.8rem;font-weight:700;color:var(--brand);margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 8v4l3 3"/><circle cx="18" cy="6" r="3" fill="currentColor"/></svg>
+          AI 자동 생성
+        </div>
+        <div style="display:flex;gap:8px;align-items:flex-end;">
+          <textarea id="aiConceptInput" class="form-input" rows="2"
+            style="flex:1;font-size:0.82rem;resize:none;min-height:56px;"
+            placeholder="예: 인간세계로 나온 문어 버튜버. 타코야키 알바하다 방송 입문. 먹방 특화, 바다 그리워함"></textarea>
+          <button class="btn btn-primary" style="white-space:nowrap;padding:0 14px;height:56px;font-size:0.82rem;" onclick="generateAvatarAI()">생성</button>
+        </div>
+        <div id="aiGenStatus" style="font-size:0.75rem;color:var(--text-muted);margin-top:6px;display:none;"></div>
+      </div>
+      <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:16px;">
+        <div class="upload-zone-sm ${hasImg?'has-img':''}" id="imgZone"
+          onclick="document.getElementById('wizImgFile').click()"
+          style="width:88px;height:88px;flex-shrink:0;${hasImg?`background-image:url('${escHtml(wizardData.imageUrl)}')`:''}">
+          ${hasImg
+            ? `<div class="upload-overlay" style="font-size:0.7rem;">변경</div>`
+            : `<div style="font-size:22px;margin-bottom:4px;color:var(--text-muted);">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+               </div>
+               <div style="font-size:0.72rem;color:var(--text-muted);">이미지 추가</div>`}
+        </div>
+        <div style="flex:1;">
+          <div class="form-group" style="margin-bottom:12px;">
+            <label class="form-label">아바타 이름 <span style="color:var(--brand)">*</span></label>
+            <input type="text" class="form-input" id="wizName" placeholder="예: 키리모코, 하루카 ..." value="${escHtml(wizardData.name)}" maxlength="30">
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">성별</label>
+            <div class="wizard-radio-group" id="genderGroup">
+              ${['female','male','other'].map(g => {
+                const label = g==='female'?'여성':g==='male'?'남성':'중성/불명';
+                return `<label class="wizard-radio ${wizardData.gender===g?'selected':''}" onclick="setGender('${g}')">
+                  <input type="radio" name="gender" value="${g}" ${wizardData.gender===g?'checked':''} style="display:none">
+                  ${label}</label>`;
+              }).join('')}
+            </div>
+          </div>
+        </div>
       </div>
       <input type="file" id="wizImgFile" accept="image/*" style="display:none" onchange="handleImgSelect(event)">
-      <div id="imgStatus" style="font-size:0.78rem;color:var(--text-muted);margin-bottom:8px;"></div>
-      <button class="btn btn-ghost btn-sm" onclick="wizardData.imageUrl='';renderInput();updatePreview()">이미지 없이 진행</button>`;
+      <div id="imgStatus" style="font-size:0.78rem;color:var(--text-muted);min-height:18px;"></div>`;
 
   } else if (step === 'persona_tags') {
     const tagsHtml = PERSONALITY_TAGS.map(t =>
@@ -907,17 +1223,17 @@ function renderInput() {
     area.innerHTML = `
       <div class="form-group">
         <label class="form-label">핵심 성격 설명</label>
-        <textarea class="form-textarea" id="wizPersona" placeholder="예: 밝고 활발한 게임 버추얼 크리에이터. 팬들과 게임·애니 이야기 하는 걸 좋아합니다." rows="3">${escHtml(wizardData.corePersona)}</textarea>
+        <textarea class="form-textarea" id="wizPersona" placeholder="예: 밝고 활발한 게임 버추얼 크리에이터. 팬들과 게임·애니 이야기 하는 걸 좋아합니다. 팬들 한 명 한 명 기억하려 노력해요." rows="3">${escHtml(wizardData.corePersona)}</textarea>
       </div>
       <div class="form-group" style="margin-bottom:0;">
-        <label class="form-label">성격 태그 <span style="font-size:0.73rem;color:var(--text-muted)">최대 8개 선택</span></label>
+        <label class="form-label">성격 태그 <span style="font-size:0.73rem;color:var(--text-muted)">최대 8개</span></label>
         <div class="tag-options" id="tagOptions">${tagsHtml}</div>
       </div>`;
 
   } else if (step === 'speech') {
     const speechGrid = SPEECH_STYLES.map(s =>
       `<div class="speech-style-opt ${wizardData.speechPattern===s.v?'selected':''}" onclick="selectSpeech('${s.v}')">
-        <div class="opt-emoji">${s.e}</div>
+        <div class="opt-emoji">${SPEECH_STYLE_ICONS[s.e] || s.e}</div>
         <div class="opt-name">${s.v}</div>
         <div class="opt-desc">${s.d}</div>
       </div>`
@@ -925,7 +1241,7 @@ function renderInput() {
     const isCustom = wizardData.speechPattern === '직접 입력';
     const examplesHtml = wizardData.speechExamples.map((ex, i) =>
       `<div class="example-row">
-        <input type="text" class="form-input" id="wizEx${i}" placeholder='예: "안녕! 오늘 뭐 하고 있어?"' value="${escHtml(ex)}" oninput="wizardData.speechExamples[${i}]=this.value">
+        <input type="text" class="form-input" id="wizEx${i}" placeholder='예: "오늘 방송 와줘서 고마워~"' value="${escHtml(ex)}" oninput="wizardData.speechExamples[${i}]=this.value">
         ${wizardData.speechExamples.length>1?`<button class="btn-remove" onclick="removeSpeechEx(${i})">✕</button>`:''}
       </div>`
     ).join('');
@@ -937,7 +1253,7 @@ function renderInput() {
       ${isCustom?`
       <div class="form-group" id="customSpeechGroup">
         <label class="form-label">직접 입력</label>
-        <input type="text" class="form-input" id="wizCustomSpeech" placeholder="예: 오빠 느낌의 다정하지만 가끔 츤데레한 말투" value="">
+        <input type="text" class="form-input" id="wizCustomSpeech" placeholder="예: 오빠 느낌의 다정하지만 가끔 츤데레한 말투" value="${escHtml(wizardData.speechPattern==='직접 입력'?'':wizardData.speechPattern)}">
       </div>`:''}
       <div class="form-group" style="margin-bottom:0;">
         <label class="form-label">말투 예시 문장 <span style="font-size:0.73rem;color:var(--text-muted)">최대 3개</span></label>
@@ -945,25 +1261,54 @@ function renderInput() {
         ${wizardData.speechExamples.length<3?`<button class="btn btn-ghost btn-sm" style="margin-top:8px;" onclick="addSpeechEx()">+ 예시 추가</button>`:''}
       </div>`;
 
-  } else if (step === 'intro_safety') {
+  } else if (step === 'chat_config') {
     const safetyOpts = [
-      { v:'all',    icon:'🛡️', name:'안전',       desc:'모든 부적절 내용 차단, 어린 팬에게 적합' },
-      { v:'adult',  icon:'🔓', name:'성인 허용',   desc:'성인 팬 대상, 더 다양한 대화 허용' },
+      { v:'all',   label:'전체 안전', desc:'모든 부적절 내용 차단' },
+      { v:'adult', label:'성인 허용', desc:'성인 팬 대상 콘텐츠 허용' },
+    ];
+    const storyOpts = [
+      { v:'live',    label:'라이브 스타일', desc:'실시간 방송 채팅처럼 반응 · 팬업 기본값', icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>' },
+      { v:'classic', label:'일반 채팅',     desc:'1:1 대화 중심의 일반적인 AI 채팅 스타일', icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>' },
+    ];
+    const writingOpts = [
+      { v:'light-novel', label:'라이트노벨체', desc:'생동감 있는 묘사와 감정 표현' },
+      { v:'classic',     label:'일반체',       desc:'자연스러운 대화 중심' },
     ];
     area.innerHTML = `
       <div class="form-group">
-        <label class="form-label">첫 인사 메시지</label>
-        <textarea class="form-textarea" id="wizIntro" placeholder="예: 안녕하세요! 저는 키리모코예요 😊 오늘도 잘 부탁해요!" rows="3">${escHtml(wizardData.introMessage)}</textarea>
+        <label class="form-label">AI 채팅 스타일</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          ${storyOpts.map(o=>`
+            <div class="safety-opt ${wizardData.defaultStoryStyle===o.v?'selected':''}" onclick="selectStoryStyle('${o.v}')" style="gap:10px;">
+              <div class="s-icon" style="font-size:18px;">${o.icon}</div>
+              <div><div class="s-name">${o.label}</div><div class="s-desc">${o.desc}</div></div>
+            </div>`).join('')}
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">텍스트 스타일</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          ${writingOpts.map(o=>`
+            <div class="safety-opt ${wizardData.defaultWritingStyle===o.v?'selected':''}" onclick="selectWritingStyle('${o.v}')" style="gap:10px;">
+              <div><div class="s-name">${o.label}</div><div class="s-desc">${o.desc}</div></div>
+            </div>`).join('')}
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">첫 인사 메시지 <span style="font-size:0.73rem;color:var(--text-muted)">팬이 채팅을 열 때 첫 번째로 보이는 메시지</span></label>
+        <textarea class="form-textarea" id="wizIntro" placeholder="예: 안녕! 나야, 키리모코~ 오늘 방송 어떻게 봤어? 궁금한 거 뭐든 물어봐!" rows="2">${escHtml(wizardData.introMessage)}</textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">채널 홍보 문구 <span style="font-size:0.73rem;color:var(--text-muted)">채팅 중 자연스럽게 사용 · 선택</span></label>
+        <input type="text" class="form-input" id="wizPromo" placeholder="예: 매주 화목 밤 11시에 라이브 하니까 놀러와!" value="${escHtml(wizardData.channelPromoLine)}" maxlength="100" oninput="wizardData.channelPromoLine=this.value">
       </div>
       <div class="form-group" style="margin-bottom:0;">
         <label class="form-label">안전 필터</label>
         <div class="safety-opts">
-          ${safetyOpts.map(s=>
-            `<div class="safety-opt ${wizardData.defaultSafetyFilter===s.v?'selected':''}" onclick="selectSafety('${s.v}')">
-              <div class="s-icon">${s.icon}</div>
-              <div><div class="s-name">${s.name}</div><div class="s-desc">${s.desc}</div></div>
-            </div>`
-          ).join('')}
+          ${safetyOpts.map(s=>`
+            <div class="safety-opt ${wizardData.defaultSafetyFilter===s.v?'selected':''}" onclick="selectSafety('${s.v}')">
+              <div><div class="s-name">${s.label}</div><div class="s-desc">${s.desc}</div></div>
+            </div>`).join('')}
         </div>
       </div>`;
   }
@@ -983,8 +1328,7 @@ function updatePreview() {
   if (wizardData.imageUrl) {
     imgEl.innerHTML = `<img src="${wizardData.imageUrl}" alt="avatar">`;
   } else {
-    const em = wizardData.gender==='female'?'🌸':wizardData.gender==='male'?'⚡':'🤖';
-    imgEl.innerHTML = `<span style="font-size:36px;">${em}</span>`;
+    imgEl.innerHTML = `<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--brand)"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>`;
   }
 }
 
@@ -996,10 +1340,26 @@ function escHtml(s) {
 
 function setGender(g) {
   wizardData.gender = g;
-  document.querySelectorAll('.wizard-radio').forEach(el => {
+  document.querySelectorAll('#genderGroup .wizard-radio').forEach(el => {
     el.classList.toggle('selected', el.getAttribute('onclick').includes(`'${g}'`));
   });
   updatePreview();
+}
+
+function setChannelCategory(v) {
+  wizardData.channelCategory = v;
+  document.querySelectorAll('.tag-options .tag-option').forEach(el => {
+    const cat = CHANNEL_CATEGORIES.find(c => c.label === el.textContent.trim());
+    if (cat) el.classList.toggle('selected', cat.v === v);
+  });
+}
+
+function setFanNickname(v) {
+  wizardData.fanNickname = v;
+  document.querySelectorAll('[name="fanNick"]').forEach(el => {
+    el.closest('label').classList.toggle('selected', el.value === v);
+  });
+  renderInput();
 }
 
 function toggleTag(tag) {
@@ -1017,11 +1377,19 @@ function selectSpeech(v) {
   renderInput();
 }
 
+function selectStoryStyle(v) {
+  wizardData.defaultStoryStyle = v;
+  renderInput();
+}
+
+function selectWritingStyle(v) {
+  wizardData.defaultWritingStyle = v;
+  renderInput();
+}
+
 function selectSafety(v) {
   wizardData.defaultSafetyFilter = v;
-  document.querySelectorAll('.safety-opt').forEach(el => {
-    el.classList.toggle('selected', el.getAttribute('onclick').includes(`'${v}'`));
-  });
+  renderInput();
 }
 
 function addSpeechEx() {
@@ -1049,31 +1417,102 @@ async function handleImgSelect(event) {
     renderInput();
     updatePreview();
   } catch (e) {
-    if (status) status.textContent = '❌ 업로드 실패: ' + e.message;
+    if (status) status.textContent = '업로드 실패: ' + e.message; status.style.color='var(--danger)';
   }
 }
 
+async function generateAvatarAI() {
+  const conceptEl = document.getElementById('aiConceptInput');
+  const statusEl  = document.getElementById('aiGenStatus');
+  const concept   = conceptEl?.value?.trim();
+  if (!concept) { alert('아바타 컨셉을 입력해주세요.'); return; }
+
+  statusEl.style.display = 'block';
+  statusEl.textContent   = '✨ AI가 아바타를 설계하는 중...';
+  const btn = document.querySelector('[onclick="generateAvatarAI()"]');
+  if (btn) { btn.disabled = true; btn.textContent = '생성 중...'; }
+
+  try {
+    const token = await getFreshToken();
+    const res = await fetch(`${CHEEZ_API_URL}/api/v1/creator/characters/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${token}`, 'X-API-Key':CHEEZ_API_KEY },
+      body: JSON.stringify({ concept }),
+    });
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error?.message || '생성 실패');
+
+    const d = json.data;
+    // wizardData에 반영
+    if (d.name)               { wizardData.name = d.name; }
+    if (d.gender)             { wizardData.gender = d.gender; }
+    if (d.corePersona)        { wizardData.corePersona = d.corePersona; }
+    if (d.personality)        {} // personality는 keywords로 처리
+    if (Array.isArray(d.personalityKeywords)) { wizardData.personalityKeywords = d.personalityKeywords.slice(0,8); }
+    if (d.speechPattern)      { wizardData.speechPattern = '직접 입력'; wizardData.speechPatternCustom = d.speechPattern; }
+    if (d.speechExamples)     { wizardData.speechExamples = String(d.speechExamples).split('\n').filter(Boolean).slice(0,3); while(wizardData.speechExamples.length<1) wizardData.speechExamples.push(''); }
+    if (d.introMessage)       { wizardData.introMessage = d.introMessage; }
+    if (d.background)         { wizardData.channelSlogan = d.background; }
+    if (d.channelSlogan)      { wizardData.channelSlogan = d.channelSlogan; }
+    if (d.motivation)         { wizardData.channelPromoLine = d.motivation; }
+    if (d.characterArc)       { wizardData.latestContent = d.characterArc; }
+
+    statusEl.textContent = '✅ 생성 완료! 아래 내용을 확인하고 수정하세요.';
+    statusEl.style.color = 'var(--success)';
+    renderInput();
+    renderChat();
+    updatePreview();
+  } catch(e) {
+    statusEl.textContent = '❌ 생성 실패: ' + e.message;
+    statusEl.style.color = 'var(--danger)';
+    if (btn) { btn.disabled = false; btn.textContent = '생성'; }
+  }
+}
+
+async function getFreshToken() {
+  const user = window.firebaseCurrentUser;
+  if (!user) throw new Error('로그인 필요');
+  const token = await user.getIdToken(true); // 항상 fresh token 발급
+  window.firebaseIdToken = token;
+  return token;
+}
+
 async function uploadImage(file) {
-  const uid   = window.firebaseCurrentUser?.uid;
-  const token = window.firebaseIdToken;
-  if (!uid || !token) throw new Error('로그인 필요');
-  const ext     = (file.name.split('.').pop() || 'jpg').toLowerCase();
-  const path    = `avatars/${uid}/avatar_${Date.now()}.${ext}`;
-  const encoded = encodeURIComponent(path);
-  const res = await fetch(
-    `https://firebasestorage.googleapis.com/v0/b/${FB_BUCKET}/o?uploadType=media&name=${encoded}`,
-    { method:'POST', headers:{ 'Authorization':`Bearer ${token}`, 'Content-Type':file.type }, body:file }
-  );
-  if (!res.ok) throw new Error('스토리지 오류 ' + res.status);
-  const d = await res.json();
-  return `https://firebasestorage.googleapis.com/v0/b/${FB_BUCKET}/o/${encoded}?alt=media&token=${d.downloadTokens}`;
+  const uid = window.firebaseCurrentUser?.uid;
+  if (!uid) throw new Error('로그인 필요');
+
+  // Firebase Storage 대신 Cloudflare R2 사용 (앱과 동일, CORS 이슈 없음)
+  const extMap = { 'image/gif':'gif', 'image/png':'png', 'image/webp':'webp' };
+  const ext    = extMap[file.type] || 'jpg';
+  const filename = `avatars/${uid}/avatar_${Date.now()}.${ext}`;
+
+  // 1. Cloud Function에서 pre-signed URL 발급
+  const res = await fetch('https://asia-northeast3-fanup-app.cloudfunctions.net/getR2UploadUrl', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ filename, contentType: file.type || 'image/jpeg' }),
+  });
+  if (!res.ok) throw new Error(`업로드 URL 발급 실패: ${res.status}`);
+  const { uploadUrl, fileUrl } = await res.json();
+
+  // 2. R2에 직접 PUT 업로드
+  await new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('PUT', uploadUrl);
+    xhr.setRequestHeader('Content-Type', file.type || 'image/jpeg');
+    xhr.onload  = () => xhr.status < 300 ? resolve() : reject(new Error(`R2 업로드 실패: ${xhr.status}`));
+    xhr.onerror = () => reject(new Error('R2 업로드 네트워크 오류'));
+    xhr.send(file);
+  });
+
+  return fileUrl;
 }
 
 /* ─── navigation ─────────────────────────────────────────── */
 
 function validateAndCollect() {
   const step = WIZARD_STEPS[wizardStep].id;
-  if (step === 'name_gender') {
+  if (step === 'basic_info') {
     const nameEl = document.getElementById('wizName');
     if (nameEl) wizardData.name = nameEl.value.trim();
     if (!wizardData.name) { alert('아바타 이름을 입력해주세요'); return false; }
@@ -1090,9 +1529,11 @@ function validateAndCollect() {
       return el ? el.value.trim() : '';
     }).filter(Boolean);
     if (!wizardData.speechExamples.length) wizardData.speechExamples = [''];
-  } else if (step === 'intro_safety') {
-    const el = document.getElementById('wizIntro');
-    if (el) wizardData.introMessage = el.value.trim();
+  } else if (step === 'chat_config') {
+    const intro = document.getElementById('wizIntro');
+    const promo = document.getElementById('wizPromo');
+    if (intro) wizardData.introMessage    = intro.value.trim();
+    if (promo) wizardData.channelPromoLine = promo.value.trim();
   }
   return true;
 }
@@ -1125,36 +1566,81 @@ async function wizardNext() {
     renderInput();
     document.getElementById('wizardBackBtn').disabled = false;
     if (wizardStep === WIZARD_STEPS.length - 1) {
-      document.getElementById('wizardNextBtn').textContent = '완성하기 ✨';
+      document.getElementById('wizardNextBtn').textContent = '완성하기';
     }
   } else {
     await saveAvatar();
   }
 }
 
-async function saveAvatar() {
-  const btn = document.getElementById('wizardNextBtn');
+function buildCreatorSystemPrompt() {
+  const fanNick = wizardData.fanNickname === 'custom'
+    ? (wizardData.fanNicknameCustom || '팬님')
+    : wizardData.fanNickname || '팬님';
+
+  const cat = CHANNEL_CATEGORIES.find(c => c.v === wizardData.channelCategory);
+  const catLabel = cat ? cat.label : '';
+
+  const lines = [];
+
+  lines.push(`당신은 크리에이터 "${wizardData.name}"의 AI 아바타입니다.`);
+  lines.push(`팬들을 "${fanNick}"라고 부르세요.`);
+
+  if (catLabel) lines.push(`콘텐츠 분야: ${catLabel}`);
+  if (wizardData.channelSlogan) lines.push(`채널 소개: ${wizardData.channelSlogan}`);
+
+  const channels = [];
+  if (wizardData.youtubeUrl)    channels.push(`YouTube: ${wizardData.youtubeUrl}`);
+  if (wizardData.instagramUrl)  channels.push(`Instagram: ${wizardData.instagramUrl}`);
+  if (wizardData.twitchUrl)     channels.push(`Twitch: ${wizardData.twitchUrl}`);
+  if (channels.length) lines.push('채널:\n' + channels.join('\n'));
+
+  if (wizardData.latestContent) lines.push(`최신 콘텐츠: ${wizardData.latestContent}`);
+  if (wizardData.channelPromoLine) lines.push(`채널 홍보 문구 (자연스럽게 활용): "${wizardData.channelPromoLine}"`);
+
+  lines.push('');
+  lines.push('지침:');
+  lines.push('- 팬과 대화할 때 채널 및 콘텐츠 정보를 자연스럽게 언급하세요.');
+  lines.push('- 과도한 홍보보다 팬과의 진정한 교류를 우선하세요.');
+  lines.push('- 팬의 이름을 기억하고 개인화된 반응을 보여주세요.');
+
+  return lines.join('\n');
+}
+
+async function saveAvatar(source) {
+  const isEdit = source === 'edit';
+  const btn = isEdit
+    ? document.getElementById('editSaveBtn')
+    : document.getElementById('wizardNextBtn');
+  const origText = isEdit ? '저장하기' : '완성하기';
   btn.textContent = '저장 중...'; btn.disabled = true;
 
-  const payload = {
-    name:                 wizardData.name,
-    gender:               wizardData.gender,
-    imageUrl:             wizardData.imageUrl || '',
-    corePersona:          wizardData.corePersona || '',
-    personality:          wizardData.personalityKeywords.join(', '),
-    personalityKeywords:  wizardData.personalityKeywords,
-    speechPattern:        wizardData.speechPattern || '',
-    speechExamples:       wizardData.speechExamples.filter(Boolean).join('\n'),
-    introMessage:         wizardData.introMessage || '',
-    defaultSafetyFilter:  wizardData.defaultSafetyFilter || 'all',
-    background:           wizardData.background || '',
-    age:                  wizardData.age ? Number(wizardData.age) : undefined,
-    motivation:           wizardData.motivation || '',
-    forbiddenBehaviors:   ['개인연락처 요청', '부적절한 대화'],
-    isActive:             true,
-  };
+  const speechExStr  = wizardData.speechExamples.filter(Boolean).join('\n');
+  const background   = [wizardData.channelSlogan, wizardData.channelCategory].filter(Boolean).join(' / ');
+  const personalityStr = wizardData.personalityKeywords.join(', ');
 
-  const token = window.firebaseIdToken;
+  // 빈 문자열/배열은 서버 검증 실패 방지를 위해 제외
+  const payload = Object.fromEntries(Object.entries({
+    name:                wizardData.name,
+    type:                'creator',   // 서버 Firestore 저장 시 필수
+    gender:              wizardData.gender || undefined,
+    imageUrl:            wizardData.imageUrl || undefined,
+    corePersona:         wizardData.corePersona || undefined,
+    personality:         personalityStr || undefined,
+    personalityKeywords: wizardData.personalityKeywords.length ? wizardData.personalityKeywords : undefined,
+    speechPattern:       wizardData.speechPattern || undefined,
+    speechExamples:      speechExStr || undefined,
+    introMessage:        wizardData.introMessage || undefined,
+    defaultSafetyFilter: wizardData.defaultSafetyFilter || 'all',
+    defaultStoryStyle:   wizardData.defaultStoryStyle || 'live',
+    defaultWritingStyle: wizardData.defaultWritingStyle || 'light-novel',
+    background:          background || undefined,
+    forbiddenBehaviors:  ['개인연락처 요청', '부적절한 대화'],
+    systemPrompt:        buildCreatorSystemPrompt(),
+    owner_uid:           window.firebaseCurrentUser?.uid || undefined,
+  }).filter(([, v]) => v !== undefined));
+
+  const token = await getFreshToken();
   const hdrs = { 'Content-Type':'application/json', 'Authorization':`Bearer ${token}`, 'X-API-Key':CHEEZ_API_KEY };
 
   try {
@@ -1167,17 +1653,23 @@ async function saveAvatar() {
         { method:'POST',  headers:hdrs, body:JSON.stringify(payload) });
     }
     const result = await res.json();
-    if (!result.success) throw new Error(result.error?.message || '저장 실패');
+    if (!res.ok || !result.success) throw new Error(result.error?.message || result.message || '저장 실패');
 
     const saved = result.data;
     wizardData.existingId = saved.id;
 
+    // Firestore creators 문서에 characterId 동기화
+    if (window.updateCreatorCharacterId) {
+      window.updateCreatorCharacterId(saved.id);
+    }
+
     document.getElementById('avatar-wizard').style.display = 'none';
+    document.getElementById('avatar-edit').style.display = 'none';
     showExistingAvatar(saved);
-    showToast('🎉 아바타가 저장되었어요!', 'success');
+    showToast('아바타가 저장되었어요!', 'success');
   } catch (e) {
     alert('저장 실패: ' + e.message);
-    btn.textContent = '완성하기 ✨'; btn.disabled = false;
+    btn.textContent = origText; btn.disabled = false;
   }
 }
 
@@ -1196,34 +1688,49 @@ function buildAvatarCard(ch) {
   const tags = (ch.personalityKeywords || []).slice(0,5).map(t=>`<span class="persona-tag">${t}</span>`).join('');
   const imgHtml = ch.imageUrl
     ? `<img src="${ch.imageUrl}" style="width:80px;height:80px;border-radius:20px;object-fit:cover;" alt="avatar">`
-    : `<div style="width:80px;height:80px;border-radius:20px;background:var(--brand-light);color:var(--brand);display:flex;align-items:center;justify-content:center;font-size:32px;">${ch.gender==='female'?'🌸':ch.gender==='male'?'⚡':'🤖'}</div>`;
+    : `<div style="width:80px;height:80px;border-radius:20px;background:var(--brand-light);color:var(--brand);display:flex;align-items:center;justify-content:center;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+       </div>`;
+  const storyBadge = ch.defaultStoryStyle === 'live'
+    ? `<span style="display:inline-flex;align-items:center;gap:4px;background:#fee2e2;color:#dc2626;font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:100px;">
+        <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg>LIVE
+       </span>`
+    : '';
   return `
     <div class="card-header">
       <span class="card-title">현재 아바타</span>
       <span class="status status-success">활성화</span>
     </div>
-    <div style="display:flex;gap:16px;align-items:flex-start;padding:4px 0 16px;">
+    <div style="display:flex;gap:16px;align-items:flex-start;padding:4px 0 14px;">
       ${imgHtml}
-      <div style="flex:1;">
-        <div style="font-size:1.05rem;font-weight:700;color:var(--text-primary);margin-bottom:4px;">${ch.name||'-'}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <div style="font-size:1.05rem;font-weight:700;color:var(--text-primary);">${ch.name||'-'}</div>
+          ${storyBadge}
+        </div>
         <div style="font-size:0.82rem;color:var(--text-muted);margin-bottom:10px;line-height:1.4;">${ch.corePersona||''}</div>
         <div class="persona-tags">${tags}</div>
       </div>
     </div>
-    ${ch.introMessage?`<div style="background:var(--bg);padding:10px 14px;border-radius:var(--radius-md);margin-bottom:14px;">
+    ${ch.introMessage?`<div style="background:var(--bg);padding:10px 14px;border-radius:var(--radius-md);margin-bottom:12px;">
       <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:3px;">첫 인사 메시지</div>
       <div style="font-size:0.85rem;color:var(--text-secondary);">"${ch.introMessage}"</div>
     </div>`:''}
-    <div style="display:flex;gap:8px;">
-      <div style="flex:1;background:var(--bg);padding:9px 13px;border-radius:var(--radius-md);">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
+      <div style="background:var(--bg);padding:9px 13px;border-radius:var(--radius-md);">
         <div style="font-size:0.71rem;color:var(--text-muted);margin-bottom:2px;">말투</div>
-        <div style="font-size:0.82rem;font-weight:600;color:var(--text-primary);">${ch.speechPattern||'-'}</div>
+        <div style="font-size:0.8rem;font-weight:600;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${ch.speechPattern||'-'}</div>
       </div>
-      <div style="flex:1;background:var(--bg);padding:9px 13px;border-radius:var(--radius-md);">
+      <div style="background:var(--bg);padding:9px 13px;border-radius:var(--radius-md);">
+        <div style="font-size:0.71rem;color:var(--text-muted);margin-bottom:2px;">채팅 스타일</div>
+        <div style="font-size:0.8rem;font-weight:600;color:var(--text-primary);">${ch.defaultStoryStyle==='live'?'라이브':'일반'}</div>
+      </div>
+      <div style="background:var(--bg);padding:9px 13px;border-radius:var(--radius-md);">
         <div style="font-size:0.71rem;color:var(--text-muted);margin-bottom:2px;">안전 필터</div>
-        <div style="font-size:0.82rem;font-weight:600;color:var(--text-primary);">${ch.defaultSafetyFilter==='all'?'🛡️ 안전':'🔓 성인 허용'}</div>
+        <div style="font-size:0.8rem;font-weight:600;color:var(--text-primary);">${ch.defaultSafetyFilter==='all'?'안전':'성인 허용'}</div>
       </div>
-    </div>`;
+    </div>
+    `;
 }
 
 function showExistingAvatar(ch) {
@@ -1232,21 +1739,8 @@ function showExistingAvatar(ch) {
   document.getElementById('avatar-existing-card').innerHTML = buildAvatarCard(ch);
 
   // 프리뷰
-  const tags = (ch.personalityKeywords||[]).slice(0,5).map(t=>`<span class="avatar-preview-tag">${t}</span>`).join('');
-  const imgHtml = ch.imageUrl
-    ? `<div class="avatar-preview-img"><img src="${ch.imageUrl}" alt="avatar"></div>`
-    : `<div class="avatar-preview-img"><span style="font-size:36px;">${ch.gender==='female'?'🌸':ch.gender==='male'?'⚡':'🤖'}</span></div>`;
-  document.getElementById('existing-preview-content').innerHTML = `
-    <div class="avatar-preview-card">
-      ${imgHtml}
-      <div class="avatar-preview-name">${ch.name||'-'}</div>
-      <div class="avatar-preview-persona">${ch.corePersona||''}</div>
-      <div class="avatar-preview-tags">${tags}</div>
-      ${ch.introMessage?`<div style="padding:10px 12px;background:var(--bg);border-radius:var(--radius-md);text-align:left;margin-top:4px;">
-        <div style="font-size:0.71rem;color:var(--text-muted);margin-bottom:3px;">첫 인사 메시지</div>
-        <div style="font-size:0.82rem;color:var(--text-secondary);font-style:italic;line-height:1.5;">"${ch.introMessage}"</div>
-      </div>`:''}
-    </div>`;
+  const testBtn = document.getElementById('testChatBtn');
+  if (testBtn) testBtn.href = `https://fanup.im/chat/${ch.id}`;
   document.getElementById('avatar-existing').style.display = 'block';
 }
 
@@ -1268,6 +1762,294 @@ function startWizard(isEdit) {
   document.getElementById('page-avatar').scrollTop = 0;
 }
 
+/* ─── edit form (single-page) ────────────────────────────── */
+
+async function generateAvatarAIEdit() {
+  const conceptEl = document.getElementById('editAiConceptInput');
+  const statusEl  = document.getElementById('editAiGenStatus');
+  const concept   = conceptEl?.value?.trim();
+  if (!concept) { alert('아바타 컨셉을 입력해주세요.'); return; }
+
+  statusEl.style.display = 'block';
+  statusEl.textContent   = '✨ AI가 아바타를 설계하는 중...';
+  statusEl.style.color   = 'var(--text-muted)';
+  const btn = document.querySelector('[onclick="generateAvatarAIEdit()"]');
+  if (btn) { btn.disabled = true; btn.textContent = '생성 중...'; }
+
+  try {
+    const token = await getFreshToken();
+    const res = await fetch(`${CHEEZ_API_URL}/api/v1/creator/characters/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${token}`, 'X-API-Key':CHEEZ_API_KEY },
+      body: JSON.stringify({ concept }),
+    });
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error?.message || '생성 실패');
+
+    const d = json.data;
+    // 폼 필드에 직접 반영
+    if (d.name)         { const el = document.getElementById('editName');         if(el) el.value = d.name; }
+    if (d.corePersona)  { const el = document.getElementById('editCorePersona');  if(el) el.value = d.corePersona; }
+    if (d.channelSlogan || d.background) {
+      wizardData.channelSlogan = d.channelSlogan || d.background;
+      const el = document.getElementById('chChannelSlogan');
+      if(el) el.value = wizardData.channelSlogan;
+    }
+    if (d.motivation)   { wizardData.channelPromoLine = d.motivation; const el = document.getElementById('chChannelPromoLine'); if(el) el.value = d.motivation; }
+    if (d.characterArc) { wizardData.latestContent = d.characterArc; const el = document.getElementById('chLatestContent'); if(el) el.value = d.characterArc; }
+    if (d.introMessage) { const el = document.getElementById('editIntroMessage'); if(el) el.value = d.introMessage; }
+    if (d.speechPattern){ const el = document.getElementById('editSpeechPattern'); if(el) el.value = '직접 입력'; el && (el.dispatchEvent(new Event('change'))); }
+    if (d.speechExamples) {
+      const exArr = String(d.speechExamples).split('\n').filter(Boolean);
+      [0,1,2].forEach(i => {
+        const el = document.getElementById(`editSpeechEx${i}`);
+        if(el) el.value = exArr[i] || '';
+      });
+    }
+    if (Array.isArray(d.personalityKeywords)) {
+      wizardData.personalityKeywords = d.personalityKeywords.slice(0,8);
+      if (typeof renderEditPersonalityTags === 'function') renderEditPersonalityTags();
+    }
+    if (d.gender) {
+      document.querySelectorAll('#editGenderGroup .wizard-radio').forEach(el => {
+        el.classList.toggle('selected', el.dataset.val === d.gender);
+      });
+      wizardData.gender = d.gender;
+    }
+
+    statusEl.textContent = '✅ 생성 완료! 내용을 확인하고 저장하세요.';
+    statusEl.style.color = 'var(--success)';
+    if (btn) { btn.disabled = false; btn.textContent = '다시 생성'; }
+  } catch(e) {
+    statusEl.textContent = '❌ 생성 실패: ' + e.message;
+    statusEl.style.color = 'var(--danger)';
+    if (btn) { btn.disabled = false; btn.textContent = '생성'; }
+  }
+}
+
+function startEditForm() {
+  document.getElementById('avatar-existing').style.display = 'none';
+  document.getElementById('avatar-empty').style.display = 'none';
+  document.getElementById('avatar-wizard').style.display = 'none';
+  document.getElementById('avatar-edit').style.display = 'block';
+
+  // 기본 정보
+  document.getElementById('editName').value = wizardData.name || '';
+  editSetGender(wizardData.gender || 'other');
+
+  // 이미지 미리보기
+  const zone = document.getElementById('editImgZone');
+  const placeholder = document.getElementById('editImgPlaceholder');
+  if (wizardData.imageUrl) {
+    zone.classList.add('has-img');
+    zone.style.backgroundImage = `url('${escHtml(wizardData.imageUrl)}')`;
+    placeholder.innerHTML = `<div class="upload-overlay" style="font-size:0.7rem;">변경</div>`;
+  } else {
+    zone.classList.remove('has-img');
+    zone.style.backgroundImage = '';
+    placeholder.innerHTML = `<div style="font-size:22px;color:var(--text-muted);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><div style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;">이미지</div>`;
+  }
+
+  // 성격
+  document.getElementById('editCorePersona').value = wizardData.corePersona || '';
+  renderEditPersonalityTags();
+
+  // 말투
+  document.getElementById('editSpeechPattern').value = wizardData.speechPattern || '';
+  const exs = wizardData.speechExamples || [''];
+  document.getElementById('editSpeechEx0').value = exs[0] || '';
+  document.getElementById('editSpeechEx1').value = exs[1] || '';
+  document.getElementById('editSpeechEx2').value = exs[2] || '';
+  document.getElementById('editIntroMessage').value = wizardData.introMessage || '';
+
+  // AI 채팅 설정
+  editSelectStoryStyle(wizardData.defaultStoryStyle || 'live');
+  editSelectWritingStyle(wizardData.defaultWritingStyle || 'light-novel');
+  editSelectSafety(wizardData.defaultSafetyFilter || 'all');
+
+  document.getElementById('page-avatar').scrollTop = 0;
+}
+
+function cancelEdit() {
+  document.getElementById('avatar-edit').style.display = 'none';
+  document.getElementById('avatar-existing').style.display = 'block';
+}
+
+async function saveEdit() {
+  // 기본 정보 수집
+  wizardData.name = document.getElementById('editName').value.trim();
+  if (!wizardData.name) { alert('아바타 이름을 입력해주세요'); return; }
+
+  // 성격 수집
+  wizardData.corePersona = document.getElementById('editCorePersona').value.trim();
+
+  // 말투 수집
+  wizardData.speechPattern = document.getElementById('editSpeechPattern').value;
+  const ex0 = document.getElementById('editSpeechEx0').value.trim();
+  const ex1 = document.getElementById('editSpeechEx1').value.trim();
+  const ex2 = document.getElementById('editSpeechEx2').value.trim();
+  wizardData.speechExamples = [ex0, ex1, ex2].filter(Boolean);
+  if (!wizardData.speechExamples.length) wizardData.speechExamples = [''];
+  wizardData.introMessage = document.getElementById('editIntroMessage').value.trim();
+
+  await saveAvatar('edit');
+}
+
+function renderEditPersonalityTags() {
+  const container = document.getElementById('editPersonalityTagsContainer');
+  if (!container) return;
+  container.innerHTML = PERSONALITY_TAGS.map(t =>
+    `<span class="tag-option ${wizardData.personalityKeywords.includes(t)?'selected':''}" onclick="editToggleTag('${t}')">${t}</span>`
+  ).join('');
+}
+
+function editToggleTag(tag) {
+  const idx = wizardData.personalityKeywords.indexOf(tag);
+  if (idx >= 0) wizardData.personalityKeywords.splice(idx, 1);
+  else if (wizardData.personalityKeywords.length < 8) wizardData.personalityKeywords.push(tag);
+  renderEditPersonalityTags();
+}
+
+function editSetGender(g) {
+  wizardData.gender = g;
+  document.querySelectorAll('#editGenderGroup .wizard-radio').forEach(el => {
+    el.classList.toggle('selected', el.dataset.val === g);
+  });
+}
+
+function editToggleFanNickCustom() {
+  const sel = document.getElementById('editFanNickname');
+  const custom = document.getElementById('editFanNicknameCustom');
+  if (custom) custom.style.display = sel.value === 'custom' ? 'block' : 'none';
+}
+
+function editSelectStoryStyle(v) {
+  wizardData.defaultStoryStyle = v;
+  ['live','classic'].forEach(opt => {
+    const el = document.getElementById('editStoryOpt_' + opt);
+    if (el) el.classList.toggle('selected', opt === v);
+  });
+}
+
+function editSelectWritingStyle(v) {
+  wizardData.defaultWritingStyle = v;
+  ['light-novel','classic'].forEach(opt => {
+    const el = document.getElementById('editWritingOpt_' + opt);
+    if (el) el.classList.toggle('selected', opt === v);
+  });
+}
+
+function editSelectSafety(v) {
+  wizardData.defaultSafetyFilter = v;
+  ['all','adult'].forEach(opt => {
+    const el = document.getElementById('editSafetyOpt_' + opt);
+    if (el) el.classList.toggle('selected', opt === v);
+  });
+}
+
+async function handleEditImgSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { alert('이미지 크기는 5MB 이하여야 해요'); return; }
+  const status = document.getElementById('editImgStatus');
+  if (status) status.textContent = '업로드 중...';
+  try {
+    const url = await uploadImage(file);
+    wizardData.imageUrl = url;
+    if (status) status.textContent = '업로드 완료';
+    const zone = document.getElementById('editImgZone');
+    const placeholder = document.getElementById('editImgPlaceholder');
+    zone.classList.add('has-img');
+    zone.style.backgroundImage = `url('${escHtml(url)}')`;
+    placeholder.innerHTML = `<div class="upload-overlay" style="font-size:0.7rem;">변경</div>`;
+  } catch (e) {
+    if (status) { status.textContent = '업로드 실패: ' + e.message; status.style.color='var(--danger)'; }
+  }
+}
+
+/* ─── channel settings (standalone card) ────────────────── */
+
+function renderChannelSettingsOptions() {
+  const sel = document.getElementById('chChannelCategory');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">선택하세요</option>' +
+    CHANNEL_CATEGORIES.map(c => `<option value="${c.v}">${c.label}</option>`).join('');
+}
+
+function toggleChFanNickCustom() {
+  const sel = document.getElementById('chFanNickname');
+  const custom = document.getElementById('chFanNicknameCustom');
+  if (!sel || !custom) return;
+  custom.style.display = sel.value === 'custom' ? 'block' : 'none';
+}
+
+async function saveChannelSettings() {
+  const btn = document.querySelector('[onclick="saveChannelSettings()"]');
+  const status = document.getElementById('chSaveStatus');
+  const origText = btn?.textContent;
+  if (btn) { btn.disabled = true; btn.textContent = '저장 중...'; }
+  status.style.display = 'none';
+
+  const fanNick = document.getElementById('chFanNickname')?.value;
+  const data = {
+    channelCategory:    document.getElementById('chChannelCategory')?.value || '',
+    fanNickname:        fanNick || '팬님',
+    fanNicknameCustom:  fanNick === 'custom' ? (document.getElementById('chFanNicknameCustom')?.value || '') : '',
+    youtubeUrl:         document.getElementById('chYoutubeUrl')?.value?.trim() || '',
+    instagramUrl:       document.getElementById('chInstagramUrl')?.value?.trim() || '',
+    twitchUrl:          document.getElementById('chTwitchUrl')?.value?.trim() || '',
+    channelSlogan:      document.getElementById('chChannelSlogan')?.value?.trim() || '',
+    latestContent:      document.getElementById('chLatestContent')?.value?.trim() || '',
+    channelPromoLine:   document.getElementById('chChannelPromoLine')?.value?.trim() || '',
+  };
+
+  // wizardData에도 반영
+  Object.assign(wizardData, data);
+
+  try {
+    if (typeof window._saveCreatorChannelSettings === 'function') {
+      await window._saveCreatorChannelSettings(data);
+    }
+    status.style.display = 'block';
+    status.style.color = 'var(--success)';
+    status.textContent = '✅ 저장 완료';
+    setTimeout(() => { status.style.display = 'none'; }, 2500);
+  } catch(e) {
+    status.style.display = 'block';
+    status.style.color = 'var(--danger)';
+    status.textContent = '저장 실패: ' + e.message;
+  }
+  if (btn) { btn.disabled = false; btn.textContent = origText; }
+}
+
+function loadChannelSettingsUI(data) {
+  renderChannelSettingsOptions();
+  if (!data) return;
+  const set = (id, val) => { const el = document.getElementById(id); if(el) el.value = val || ''; };
+  set('chChannelCategory', data.channelCategory);
+  set('chYoutubeUrl', data.youtubeUrl);
+  set('chInstagramUrl', data.instagramUrl);
+  set('chTwitchUrl', data.twitchUrl);
+  set('chChannelSlogan', data.channelSlogan);
+  set('chLatestContent', data.latestContent);
+  set('chChannelPromoLine', data.channelPromoLine);
+
+  const nickSel = document.getElementById('chFanNickname');
+  const nickCustom = document.getElementById('chFanNicknameCustom');
+  if (nickSel) {
+    const knownNicks = ['팬님', '구독자님', '시청자님'];
+    if (knownNicks.includes(data.fanNickname)) {
+      nickSel.value = data.fanNickname;
+    } else if (data.fanNickname) {
+      nickSel.value = 'custom';
+      if (nickCustom) { nickCustom.value = data.fanNicknameCustom || data.fanNickname; nickCustom.style.display = 'block'; }
+    }
+  }
+
+  // wizardData에도 반영
+  Object.assign(wizardData, data);
+}
+
 /* ─── init (called from module script after auth) ────────── */
 
 window.initAvatarPage = async function() {
@@ -1275,31 +2057,45 @@ window.initAvatarPage = async function() {
   document.getElementById('avatar-existing').style.display = 'none';
   document.getElementById('avatar-empty').style.display = 'none';
   document.getElementById('avatar-wizard').style.display = 'none';
+  document.getElementById('avatar-edit').style.display = 'none';
 
   try {
-    const token = window.firebaseIdToken;
-    if (!token) throw new Error('토큰 없음');
+    const token = await getFreshToken();
+    const existingCharId = window.firebaseCreatorCharacterId;
 
-    const res = await fetch(`${CHEEZ_API_URL}/api/v1/creator/characters`, {
+    // Firestore에 저장된 characterId가 있으면 특정 엔드포인트 사용 (목록 엔드포인트는 404 반환)
+    const url = existingCharId
+      ? `${CHEEZ_API_URL}/api/v1/creator/characters/${existingCharId}`
+      : `${CHEEZ_API_URL}/api/v1/creator/characters`;
+
+    const res = await fetch(url, {
       headers: { 'Authorization':`Bearer ${token}`, 'X-API-Key':CHEEZ_API_KEY }
     });
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
     document.getElementById('avatar-loading').style.display = 'none';
 
-    const list = json.data || json;
-    if (Array.isArray(list) && list.length > 0) {
-      const ch = list[0];
-      // pre-populate for edit
-      wizardData.existingId        = ch.id;
-      wizardData.name              = ch.name || '';
-      wizardData.gender            = ch.gender || 'other';
-      wizardData.imageUrl          = ch.imageUrl || '';
-      wizardData.corePersona       = ch.corePersona || '';
+    // 단건 응답(특정 엔드포인트) 또는 목록 응답 모두 처리
+    const single = json.data && !Array.isArray(json.data) ? json.data : null;
+    const list = Array.isArray(json.data) ? json.data : Array.isArray(json) ? json : null;
+    const ch = single || (list && list.length > 0 ? list[0] : null);
+
+    if (ch) {
+      // 기본값 먼저 세팅 후 기존 데이터로 덮어쓰기 (누락 필드 방지)
+      resetWizardData();
+      wizardData.existingId          = ch.id;
+      wizardData.name                = ch.name || '';
+      wizardData.gender              = ch.gender || 'other';
+      wizardData.imageUrl            = ch.imageUrl || '';
+      wizardData.corePersona         = ch.corePersona || '';
       wizardData.personalityKeywords = ch.personalityKeywords || [];
-      wizardData.speechPattern     = ch.speechPattern || '';
-      wizardData.speechExamples    = ch.speechExamples ? ch.speechExamples.split('\n').filter(Boolean) : [''];
-      wizardData.introMessage      = ch.introMessage || '';
+      wizardData.speechPattern       = ch.speechPattern || '';
+      wizardData.speechExamples      = ch.speechExamples ? ch.speechExamples.split('\n').filter(Boolean) : [''];
+      wizardData.introMessage        = ch.introMessage || '';
       wizardData.defaultSafetyFilter = ch.defaultSafetyFilter || 'all';
+      wizardData.defaultStoryStyle   = ch.defaultStoryStyle || 'live';
+      wizardData.defaultWritingStyle = ch.defaultWritingStyle || 'light-novel';
       showExistingAvatar(ch);
     } else {
       resetWizardData();
@@ -1317,17 +2113,551 @@ window.initAvatarPage = async function() {
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js';
-import { getFirestore, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js';
+import { getFirestore, collection, query, where, orderBy, limit, getDocs, getDoc, doc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js';
+// Firebase Storage SDK 불필요 — R2 업로드 사용
 
-const app  = initializeApp({ apiKey:'AIzaSyAsQZo491B1W3s_s2WcqrTMdgH810Putao', authDomain:'fanup-app.firebaseapp.com', projectId:'fanup-app', storageBucket:'fanup-app-storage', messagingSenderId:'542708276250', appId:'1:542708276250:web:a2f01ca6b84ed1d50845a3' });
-const auth = getAuth(app);
-const db   = getFirestore(app);
+const app     = initializeApp({ apiKey:'AIzaSyAsQZo491B1W3s_s2WcqrTMdgH810Putao', authDomain:'fanup-app.firebaseapp.com', projectId:'fanup-app', storageBucket:'fanup-app-storage', messagingSenderId:'542708276250', appId:'1:542708276250:web:a2f01ca6b84ed1d50845a3' });
+const auth    = getAuth(app);
+const db      = getFirestore(app);
 
 async function fetchCreator(uid) {
   const snap = await getDocs(query(collection(db, 'creators'), where('uid', '==', uid)));
   if (snap.empty) return null;
-  return snap.docs[0].data();
+  return { docId: snap.docs[0].id, ...snap.docs[0].data() };
 }
+
+// 크리에이터 Firestore 문서에 characterId 저장 (studio.html 비모듈 스크립트에서 호출)
+window.updateCreatorCharacterId = async function(characterId) {
+  const docId = window.firebaseCreatorDocId;
+  if (!docId) { console.warn('[Firestore] creatorDocId 없음 — characterId 저장 건너뜀'); return; }
+  try {
+    await updateDoc(doc(db, 'creators', docId), { characterId });
+    console.log('[Firestore] characterId 저장 완료:', characterId);
+  } catch (e) {
+    console.error('[Firestore] characterId 저장 실패:', e.message);
+  }
+};
+
+// ── 계정 설정 ────────────────────────────────────────────────────────────
+
+window.loadSettingsPage = async function() {
+  const user = window.firebaseCurrentUser;
+  if (!user) return;
+  const creatorDocId = window.firebaseCreatorDocId;
+  if (!creatorDocId) return;
+  try {
+    const snap = await getDoc(doc(db, 'creators', creatorDocId));
+    if (!snap.exists()) return;
+    const d = snap.data();
+    document.getElementById('settings-display-name').value = d.channelName || d.displayName || d.name || '';
+    document.getElementById('settings-email').value = user.email || '';
+    document.getElementById('settings-email-inline').textContent = user.email || '—';
+    document.getElementById('settings-youtube').value = d.channels?.youtube || '';
+    document.getElementById('settings-instagram').value = d.channels?.instagram || '';
+    document.getElementById('settings-tiktok').value = d.channels?.tiktok || '';
+    // 신원 정보
+    document.getElementById('identity-legalName').value = d.identity?.legalName || '';
+    document.getElementById('identity-birthdate').value = d.identity?.birthdate || '';
+    document.getElementById('identity-phone').value = d.identity?.phone || '';
+    document.getElementById('identity-country').value = d.identity?.country || '';
+  } catch(e) { console.warn('[Settings] 로드 실패:', e.message); }
+};
+
+window.saveIdentity = async function() {
+  const creatorDocId = window.firebaseCreatorDocId;
+  if (!creatorDocId) return;
+  const identity = {
+    legalName: document.getElementById('identity-legalName').value.trim(),
+    birthdate: document.getElementById('identity-birthdate').value,
+    phone: document.getElementById('identity-phone').value.trim(),
+    country: document.getElementById('identity-country').value,
+  };
+  try {
+    await updateDoc(doc(db, 'creators', creatorDocId), { identity, updatedAt: new Date().toISOString() });
+    const msg = document.getElementById('identity-save-msg');
+    msg.style.display = 'inline';
+    setTimeout(() => { msg.style.display = 'none'; }, 3000);
+  } catch(e) { alert('저장 실패: ' + e.message); }
+};
+
+window.saveSettings = async function() {
+  const creatorDocId = window.firebaseCreatorDocId;
+  if (!creatorDocId) return;
+  const displayName = document.getElementById('settings-display-name').value.trim();
+  const youtube = document.getElementById('settings-youtube').value.trim();
+  const instagram = document.getElementById('settings-instagram').value.trim();
+  const tiktok = document.getElementById('settings-tiktok').value.trim();
+  try {
+    await updateDoc(doc(db, 'creators', creatorDocId), {
+      channelName: displayName, displayName,
+      channels: { youtube, instagram, tiktok },
+      updatedAt: new Date().toISOString(),
+    });
+    const msg = document.getElementById('settings-save-msg');
+    msg.style.display = 'inline';
+    setTimeout(() => { msg.style.display = 'none'; }, 3000);
+    // 사이드바 이름 업데이트
+    const nameEl = document.getElementById('sidebar-user-name');
+    if (nameEl && displayName) nameEl.textContent = displayName;
+  } catch(e) { alert('저장 실패: ' + e.message); }
+};
+
+window.doSignOut = async function() {
+  if (!confirm('로그아웃 하시겠습니까?')) return;
+  try {
+    const { getAuth, signOut } = await import('https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js');
+    await signOut(getAuth());
+  } catch(e) { /* ignore */ }
+  location.replace('studio-login.html');
+};
+
+// ── 대시보드 ────────────────────────────────────────────────────────────
+
+window.loadDashboard = async function() {
+  const user = window.firebaseCurrentUser;
+  if (!user) return;
+  const uid = user.uid;
+  const creatorDocId = window.firebaseCreatorDocId;
+
+  // 인사말: creators 문서에서 이름
+  if (creatorDocId) {
+    try {
+      const snap = await getDoc(doc(db, 'creators', creatorDocId));
+      if (snap.exists()) {
+        const d = snap.data();
+        const name = d.channelName || d.displayName || d.name || '크리에이터';
+        document.getElementById('dashboard-greeting').textContent =
+          `안녕하세요, ${name}님. 오늘도 팬들이 기다리고 있어요.`;
+      }
+    } catch(e) { console.warn('[Dashboard] 인사말 로드 실패:', e.message); }
+  }
+
+  // 보유 치즈
+  try {
+    const r = await fetch(`${CHEEZ_API_URL}/api/v1/creator/balance?creator_id=${uid}`, {
+      headers: { 'X-API-Key': CHEEZ_API_KEY }
+    });
+    if (r.ok) {
+      const { data } = await r.json();
+      document.getElementById('dashboard-cheese-value').textContent = (data.balance_cheese ?? 0).toLocaleString();
+      document.getElementById('dashboard-cheese-sub').textContent = '≈ ₩' + (data.balance_krw ?? 0).toLocaleString();
+    }
+  } catch(e) { console.warn('[Dashboard] 치즈 잔액 실패:', e.message); }
+
+  // 이번 달 예상 수익
+  const now = new Date();
+  const period = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  try {
+    const r = await fetch(`${CHEEZ_API_URL}/api/v1/settlement/preview/${uid}?period=${period}`, {
+      headers: { 'X-API-Key': CHEEZ_API_KEY }
+    });
+    if (r.ok) {
+      const { data } = await r.json();
+      document.getElementById('dashboard-revenue-value').textContent = '₩' + (data.net_krw ?? 0).toLocaleString();
+    } else if (r.status !== 404) {
+      console.warn('[Dashboard] 수익 API 오류:', r.status);
+    }
+  } catch(e) { /* 네트워크 오류 무시 */ }
+
+  // 전체 팬 채팅방 수 (creator/stats)
+  try {
+    const token = window.firebaseIdToken;
+    const r = await fetch(`${CHEEZ_API_URL}/api/v1/creator/stats?creator_id=${uid}`, {
+      headers: { 'Authorization': `Bearer ${token}`, 'X-API-Key': CHEEZ_API_KEY }
+    });
+    if (r.ok) {
+      const { data } = await r.json();
+      document.getElementById('dashboard-chat-value').textContent = (data.totalChatRooms ?? 0).toLocaleString();
+      document.getElementById('dashboard-chat-sub').textContent = `활성 아바타 ${data.activeCharacters ?? 0}개`;
+    }
+  } catch(e) { console.warn('[Dashboard] 채팅방 통계 실패:', e.message); }
+
+  // 이번 주 수익 차트 (ledger_entries 지난 7일)
+  try {
+    const today = new Date();
+    const from = new Date(today); from.setDate(today.getDate() - 6); from.setHours(0,0,0,0);
+    const fromStr = from.toISOString().slice(0,10);
+    const toStr = today.toISOString().slice(0,10);
+    const r = await fetch(
+      `${CHEEZ_API_URL}/api/v1/settlement/ledger?creator_id=${uid}&from=${fromStr}&to=${toStr}&limit=500`,
+      { headers: { 'X-API-Key': CHEEZ_API_KEY } }
+    );
+    if (r.ok) {
+      const { data: entries } = await r.json();
+      // 일별 치즈 집계
+      const dayMap = {};
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(from); d.setDate(from.getDate() + i);
+        dayMap[d.toISOString().slice(0,10)] = 0;
+      }
+      (entries || []).forEach(e => {
+        const sec = e.created_at?._seconds;
+        if (!sec) return;
+        const key = new Date(sec * 1000).toISOString().slice(0,10);
+        if (dayMap[key] !== undefined) dayMap[key] += (e.amount_cheese || 0);
+      });
+      const days = Object.keys(dayMap).sort();
+      const vals = days.map(k => dayMap[k]);
+      const maxVal = Math.max(...vals, 1);
+      const totalCheese = vals.reduce((a, b) => a + b, 0);
+      const totalKrw = totalCheese * 10;
+      // 요일 레이블 업데이트
+      const DAY_KR = ['일','월','화','수','목','금','토'];
+      const bars = document.querySelectorAll('#dashboard-chart-bars .chart-bar');
+      const labels = document.querySelectorAll('#dashboard-chart-labels .chart-label');
+      days.forEach((dateStr, i) => {
+        const pct = Math.max(vals[i] / maxVal * 90, vals[i] > 0 ? 5 : 0);
+        const isToday = dateStr === toStr;
+        if (bars[i]) {
+          bars[i].style.height = pct + '%';
+          bars[i].classList.toggle('active', isToday);
+        }
+        if (labels[i]) labels[i].textContent = DAY_KR[new Date(dateStr+'T12:00:00').getDay()];
+      });
+      document.getElementById('dashboard-week-revenue').textContent = '₩' + totalKrw.toLocaleString();
+      document.getElementById('dashboard-week-cheese').textContent = totalCheese.toLocaleString() + ' 🧀';
+    }
+  } catch(e) { /* 주간 차트 로드 실패 무시 */ }
+
+  // 아바타 정보
+  const charId = window.firebaseCreatorCharacterId;
+  if (charId) {
+    try {
+      const token = window.firebaseIdToken;
+      const r = await fetch(`${CHEEZ_API_URL}/api/v1/creator/characters/${charId}`, {
+        headers: { 'Authorization': `Bearer ${token}`, 'X-API-Key': CHEEZ_API_KEY }
+      });
+      if (r.ok) {
+        const { data: ch } = await r.json();
+        document.getElementById('dashboard-avatar-name').textContent = (ch.name || '아바타') + ' AI 아바타';
+        const isActive = ch.isActive !== false;
+        const dot = document.querySelector('#dashboard-avatar-status .dot-live');
+        if (dot) dot.style.background = isActive ? 'var(--success)' : 'var(--text-muted)';
+        document.getElementById('dashboard-avatar-status-text').textContent =
+          isActive ? '현재 활성화' : '비활성화 상태';
+        if (ch.imageUrl) {
+          const imgEl = document.getElementById('dashboard-avatar-img');
+          imgEl.innerHTML = `<img src="${ch.imageUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" onerror="this.style.display='none'">`;
+        }
+        const toggleWrap = document.getElementById('dashboard-avatar-toggle-wrap');
+        const toggle = document.getElementById('dashboard-avatar-toggle');
+        const label = document.getElementById('dashboard-avatar-toggle-label');
+        toggleWrap.style.display = '';
+        toggle.checked = isActive;
+        label.textContent = isActive ? '활성화' : '비활성화';
+        toggle.onchange = async function() {
+          const newActive = toggle.checked;
+          label.textContent = newActive ? '활성화' : '비활성화';
+          try {
+            const tok = await window.firebaseCurrentUser.getIdToken();
+            await fetch(`${CHEEZ_API_URL}/api/v1/creator/characters/${charId}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${tok}`, 'X-API-Key': CHEEZ_API_KEY },
+              body: JSON.stringify({ isActive: newActive })
+            });
+          } catch(err) { console.warn('[Dashboard] 아바타 토글 실패:', err.message); }
+        };
+      }
+    } catch(e) { console.warn('[Dashboard] 아바타 정보 실패:', e.message); }
+  } else {
+    document.getElementById('dashboard-avatar-name').textContent = '아바타 미설정';
+    document.getElementById('dashboard-avatar-status-text').textContent = '아바타 설정 탭에서 생성하세요';
+  }
+};
+
+// ── 선물 보관함 ──────────────────────────────────────────────────────────
+
+const GIFT_STATUS_LABEL = { paid:'결제완료', preparing:'준비중', shipping:'배송중', delivered:'수령 완료', cancelled:'취소됨' };
+const GIFT_STATUS_CLS   = { paid:'status-info', preparing:'status-info', shipping:'status-warning', delivered:'status-success', cancelled:'status-danger' };
+
+let _allGifts = [];
+
+function renderGiftsTable(gifts) {
+  const tbody = document.getElementById('gifts-tbody');
+  if (!tbody) return;
+  if (gifts.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text-muted)">선물 내역이 없습니다.</td></tr>';
+    return;
+  }
+  const giftIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>`;
+  tbody.innerHTML = gifts.map(o => {
+    const date = o.createdAt?.toDate ? o.createdAt.toDate().toLocaleDateString('ko-KR') : '-';
+    const st = o.status || 'paid';
+    const fanCode = 'fan_****' + (o.id || '').slice(-4).toUpperCase();
+    const isDelivered = st === 'delivered';
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:10px;">
+        <div class="gift-thumb" style="width:36px;height:36px;border-radius:8px;">${giftIcon}</div>
+        <span class="td-main">${o.productName || '-'}</span>
+      </div></td>
+      <td class="td-code">${fanCode}</td>
+      <td><span class="status status-success">보호됨</span></td>
+      <td class="text-sm text-muted">${date}</td>
+      <td><span class="status ${GIFT_STATUS_CLS[st]||''}">${GIFT_STATUS_LABEL[st]||st}</span></td>
+      <td>
+        ${isDelivered
+          ? `<button class="btn btn-primary btn-sm">감사 메시지 보내기</button>`
+          : `<button class="btn btn-ghost btn-sm">감사 메시지</button>`}
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function renderDashboardGifts(gifts) {
+  const container = document.getElementById('dashboard-gifts-list');
+  if (!container) return;
+  if (gifts.length === 0) {
+    container.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:0.85rem;">받은 선물이 없습니다.</div>';
+    return;
+  }
+  const giftIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>`;
+  container.innerHTML = gifts.slice(0, 3).map(o => {
+    const st = o.status || 'paid';
+    const date = o.createdAt?.toDate ? (() => {
+      const d = o.createdAt.toDate(), now = new Date();
+      const diff = Math.floor((now - d) / 86400000);
+      return diff === 0 ? '오늘' : diff === 1 ? '어제' : `${diff}일 전`;
+    })() : '-';
+    return `<div class="gift-item">
+      <div class="gift-thumb">${giftIcon}</div>
+      <div class="gift-info">
+        <div class="gift-name">${o.productName || '-'}</div>
+        <div class="gift-from">팬 익명 · ${date}</div>
+      </div>
+      <span class="status ${GIFT_STATUS_CLS[st]||''}">${GIFT_STATUS_LABEL[st]||st}</span>
+    </div>`;
+  }).join('');
+}
+
+window.loadGiftsPage = async function() {
+  const creator = window.firebaseCurrentUser;
+  if (!creator) return;
+  // creators 문서에서 채널명/displayName 가져오기 (이미 loaded)
+  const creatorDocId = window.firebaseCreatorDocId;
+  if (!creatorDocId) return;
+
+  try {
+    const creatorSnap = await getDoc(doc(db, 'creators', creatorDocId));
+    const creatorData = creatorSnap.exists() ? creatorSnap.data() : {};
+    const creatorName = creatorData.channelName || creatorData.displayName || creatorData.name || '';
+
+    if (!creatorName) {
+      document.getElementById('gifts-tbody').innerHTML =
+        '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text-muted)">채널명이 등록되지 않아 선물을 조회할 수 없습니다.</td></tr>';
+      return;
+    }
+
+    const snap = await getDocs(query(
+      collection(db, 'orders'),
+      where('creatorNames', 'array-contains', creatorName),
+      orderBy('createdAt', 'desc'),
+      limit(100)
+    ));
+    _allGifts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    // 탭 카운트 업데이트
+    const shipping = _allGifts.filter(o => o.status === 'shipping').length;
+    const delivered = _allGifts.filter(o => o.status === 'delivered').length;
+    document.getElementById('gifts-count-all').textContent = _allGifts.length;
+    document.getElementById('gifts-count-shipping').textContent = shipping;
+    document.getElementById('gifts-count-delivered').textContent = delivered;
+
+    // 대시보드 stat card
+    const pendingEl = document.getElementById('dashboard-pending-gifts');
+    const pendingSubEl = document.getElementById('dashboard-pending-gifts-sub');
+    const pendingCount = _allGifts.filter(o => o.status === 'shipping' || o.status === 'preparing').length;
+    if (pendingEl) pendingEl.textContent = pendingCount;
+    if (pendingSubEl) pendingSubEl.textContent = pendingCount > 0 ? '배송 확인 필요' : '모두 수령 완료';
+
+    renderGiftsTable(_allGifts);
+    renderDashboardGifts(_allGifts);
+
+    // nav badge + 알림 dot 업데이트
+    const badge = document.getElementById('gifts-nav-badge');
+    if (badge) { badge.textContent = pendingCount || ''; badge.style.display = pendingCount ? '' : 'none'; }
+    const notifDot = document.getElementById('topbar-notif-dot');
+    if (notifDot) notifDot.style.display = pendingCount > 0 ? '' : 'none';
+  } catch(e) {
+    console.warn('[Gifts] 로드 실패:', e.message);
+    document.getElementById('gifts-tbody').innerHTML =
+      '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text-muted)">선물 데이터를 불러올 수 없습니다.</td></tr>';
+  }
+};
+
+window.filterGifts = function(type) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`gifts-tab-${type}`)?.classList.add('active');
+  if (type === 'all') renderGiftsTable(_allGifts);
+  else if (type === 'shipping') renderGiftsTable(_allGifts.filter(o => o.status === 'shipping'));
+  else if (type === 'delivered') renderGiftsTable(_allGifts.filter(o => o.status === 'delivered'));
+};
+
+// ── 치즈 정산 페이지 ─────────────────────────────────────────────────────
+
+window.loadCheezPage = async function() {
+  const user = window.firebaseCurrentUser;
+  if (!user) return;
+  const uid = user.uid;
+  const creatorDocId = window.firebaseCreatorDocId;
+
+  // 1. 계좌 정보 불러오기
+  if (creatorDocId) {
+    try {
+      const snap = await getDoc(doc(db, 'creators', creatorDocId));
+      if (snap.exists()) {
+        const ba = snap.data().bankAccount || {};
+        document.getElementById('bank-holder').value = ba.holder || '';
+        document.getElementById('bank-name').value = ba.bank || '';
+        document.getElementById('bank-number').value = ba.number || '';
+        document.getElementById('bank-rrn').value = ba.rrn || '';
+        const badge = document.getElementById('bank-account-status-badge');
+        if (ba.holder && ba.bank && ba.number) {
+          badge.textContent = '등록됨';
+          badge.style.cssText = 'font-size:0.75rem;padding:2px 8px;border-radius:12px;background:#D1FAE5;color:#10B981;font-weight:600';
+          document.getElementById('cheez-request-btn').disabled = false;
+        } else {
+          badge.textContent = '미등록';
+          badge.style.cssText = 'font-size:0.75rem;padding:2px 8px;border-radius:12px;background:#FEE2E2;color:#EF4444;font-weight:600';
+        }
+      }
+    } catch(e) { console.warn('[Cheez] 계좌 로드 실패:', e.message); }
+  }
+
+  // 2. 치즈 잔액 (creator_cheese/{uid}.balance)
+  const now = new Date();
+  const period = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  try {
+    const balRes = await fetch(`${CHEEZ_API_URL}/api/v1/creator/balance?creator_id=${uid}`, {
+      headers: { 'X-API-Key': CHEEZ_API_KEY }
+    });
+    if (balRes.ok) {
+      const balJson = await balRes.json();
+      const bd = balJson.data || {};
+      document.getElementById('cheez-balance-value').textContent = (bd.balance_cheese ?? 0).toLocaleString() + ' 🧀';
+      document.getElementById('cheez-balance-krw').textContent = '≈ ' + (bd.balance_krw ?? 0).toLocaleString() + '원 상당';
+    }
+  } catch(e) { console.warn('[Cheez] 잔액 로드 실패:', e.message); }
+
+  // 3. 이번 달 통계 (Settlement Preview API)
+  try {
+    const res = await fetch(`${CHEEZ_API_URL}/api/v1/settlement/preview/${uid}?period=${period}`, {
+      headers: { 'X-API-Key': CHEEZ_API_KEY }
+    });
+    if (res.ok) {
+      const json = await res.json();
+      const d = json.data || {};
+      document.getElementById('cheez-this-month').textContent = (d.total_donated_cheese ?? 0).toLocaleString();
+      document.getElementById('cheez-this-month-krw').textContent = '≈ ₩' + (d.gross_krw ?? 0).toLocaleString();
+      document.getElementById('cheez-fee').textContent = (d.platform_fee_krw ?? 0).toLocaleString() + '원';
+      document.getElementById('cheez-net-krw').textContent = (d.net_krw ?? 0).toLocaleString() + '원';
+    }
+  } catch(e) { /* preview 로드 실패 무시 */ }
+
+  // 4. 정산 내역
+  try {
+    const res = await fetch(`${CHEEZ_API_URL}/api/v1/settlement/batches?limit=50`, {
+      headers: { 'X-API-Key': CHEEZ_API_KEY }
+    });
+    if (res.ok) {
+      const json = await res.json();
+      const batches = (json.data || []).filter(b => b.creator_id === uid);
+      const tbody = document.getElementById('cheez-history-tbody');
+      const periodEl = document.getElementById('cheez-history-period');
+      if (batches.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted" style="padding:24px">정산 내역이 없습니다.</td></tr>';
+      } else {
+        periodEl.textContent = `최근 ${batches.length}건`;
+        const statusLabel = { pending:'검토중', approved:'승인됨', processing:'처리중', completed:'완료', failed:'실패' };
+        const statusColor = { pending:'var(--text-muted)', approved:'var(--brand)', processing:'#F59E0B', completed:'var(--success)', failed:'var(--danger)' };
+        tbody.innerHTML = batches.map(b => {
+          const sec = b.created_at?._seconds ?? (b.created_at ? Date.parse(b.created_at)/1000 : 0);
+          const dateStr = sec ? new Date(sec * 1000).toLocaleDateString('ko-KR') : '-';
+          const pSec = b.period_start?._seconds;
+          const pLabel = pSec ? new Date(pSec*1000).toLocaleDateString('ko-KR',{year:'numeric',month:'long'}) : (b.period_label || '-');
+          const st = b.status || 'pending';
+          return `<tr>
+            <td>${dateStr}</td>
+            <td>${pLabel}</td>
+            <td style="text-align:right">${(b.gross_cheese ?? '-').toLocaleString()}</td>
+            <td style="text-align:right">${typeof b.net_krw === 'number' ? b.net_krw.toLocaleString()+'원' : '-'}</td>
+            <td><span style="color:${statusColor[st]||'inherit'};font-weight:600">${statusLabel[st]||st}</span></td>
+          </tr>`;
+        }).join('');
+      }
+    }
+  } catch(e) { console.warn('[Cheez] 정산 내역 로드 실패:', e.message); }
+};
+
+window.saveBankAccount = async function() {
+  const holder = document.getElementById('bank-holder').value.trim();
+  const bank = document.getElementById('bank-name').value;
+  const number = document.getElementById('bank-number').value.trim().replace(/\D/g, '');
+  const rrn = document.getElementById('bank-rrn').value.trim();
+
+  if (!holder || !bank || !number) {
+    alert('예금주명, 은행, 계좌번호는 필수 입력입니다.'); return;
+  }
+  if (rrn && !/^\d{6}$/.test(rrn)) {
+    alert('주민등록번호 앞 6자리는 숫자 6자리로 입력해주세요.'); return;
+  }
+
+  const docId = window.firebaseCreatorDocId;
+  if (!docId) { alert('크리에이터 정보를 불러올 수 없습니다.'); return; }
+
+  try {
+    await updateDoc(doc(db, 'creators', docId), {
+      bankAccount: { holder, bank, number, rrn, updatedAt: new Date().toISOString() }
+    });
+    const msg = document.getElementById('bank-save-msg');
+    msg.style.display = 'inline';
+    setTimeout(() => { msg.style.display = 'none'; }, 3000);
+    document.getElementById('cheez-request-btn').disabled = false;
+    const badge = document.getElementById('bank-account-status-badge');
+    badge.textContent = '등록됨';
+    badge.style.cssText = 'font-size:0.75rem;padding:2px 8px;border-radius:12px;background:#D1FAE5;color:#10B981;font-weight:600';
+  } catch(e) { alert('저장 실패: ' + e.message); }
+};
+
+window.requestSettlement = async function() {
+  const uid = window.firebaseCurrentUser?.uid;
+  if (!uid) return;
+  const now = new Date();
+  const period = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  if (!confirm(`${period} 기간 정산을 신청하시겠습니까?\n검토 후 순차적으로 처리됩니다.`)) return;
+
+  const btn = document.getElementById('cheez-request-btn');
+  btn.disabled = true;
+  btn.textContent = '신청 중...';
+  try {
+    const res = await fetch(`${CHEEZ_API_URL}/api/v1/settlement/batches`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-API-Key': CHEEZ_API_KEY },
+      body: JSON.stringify({ creator_id: uid, period })
+    });
+    const json = await res.json();
+    if (json.success) {
+      alert('정산 신청이 완료되었습니다.\n검토 후 등록된 계좌로 지급됩니다.');
+      window.loadCheezPage();
+    } else {
+      alert('정산 신청 실패: ' + (json.error?.message || '알 수 없는 오류'));
+    }
+  } catch(e) {
+    alert('오류: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '현금 정산 신청';
+  }
+};
+
+// 채널 설정 Firestore 저장 브릿지
+window._saveCreatorChannelSettings = async function(data) {
+  const user = window.firebaseCurrentUser;
+  if (!user) throw new Error('로그인 필요');
+  const snap = await getDocs(query(collection(db, 'creators'), where('uid', '==', user.uid)));
+  if (snap.empty) throw new Error('크리에이터 문서 없음');
+  const docRef = snap.docs[0].ref;
+  await updateDoc(docRef, { channelSettings: data, updatedAt: new Date().toISOString() });
+};
 
 onAuthStateChanged(auth, async user => {
   if (!user) { location.replace('studio-login.html'); return; }
@@ -1336,9 +2666,23 @@ onAuthStateChanged(auth, async user => {
     if (!creator) { location.replace('studio-login.html'); return; }
     if (creator.status !== 'approved') { location.replace('studio-login.html'); return; }
 
-    // 글로벌에 토큰/유저 노출 (위자드에서 사용)
+    // 글로벌에 토큰/유저/docId/characterId 노출 (위자드에서 사용)
     window.firebaseCurrentUser = user;
     window.firebaseIdToken = await user.getIdToken();
+    window.firebaseCreatorDocId = creator.docId;
+    window.firebaseCreatorCharacterId = creator.characterId || null;
+
+    // 채널 설정 UI 초기화
+    if (typeof loadChannelSettingsUI === 'function') {
+      loadChannelSettingsUI(creator.channelSettings || {});
+    }
+
+    // 사이드바 하단 프로필 업데이트
+    const displayName = creator.channelName || creator.displayName || creator.name || user.email || '크리에이터';
+    const nameEl = document.getElementById('sidebar-user-name');
+    const roleEl = document.getElementById('sidebar-user-role');
+    if (nameEl) nameEl.textContent = displayName;
+    if (roleEl) roleEl.textContent = creator.partnerType === 'partner' ? '파트너 크리에이터' : '크리에이터';
 
     document.body.classList.add('ui-ready');
 
@@ -1347,6 +2691,10 @@ onAuthStateChanged(auth, async user => {
     if (avatarPage && avatarPage.style.display !== 'none') {
       window.initAvatarPage();
     }
+
+    // 대시보드 초기 로드 (백그라운드)
+    if (window.loadDashboard) window.loadDashboard().catch(() => {});
+    if (window.loadGiftsPage) window.loadGiftsPage().catch(() => {});
   } catch {
     location.replace('studio-login.html');
   }

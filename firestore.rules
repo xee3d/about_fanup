@@ -1,0 +1,70 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── 어드민 UID 함수 ─────────────────────────────────────
+    function isAdmin() {
+      return request.auth != null &&
+        request.auth.uid in [
+          '4Kws6RrLa2UIES3gYePDNT39ZDs2'
+        ];
+    }
+
+    // ── creators ────────────────────────────────────────────
+    match /creators/{docId} {
+      // 본인 문서: 읽기/쓰기
+      allow read, write: if request.auth != null &&
+        (resource.data.uid == request.auth.uid || isAdmin());
+      // 인증 유저: 자신의 creator 문서 쿼리 허용 (fetchCreator)
+      allow list: if request.auth != null;
+      allow create: if request.auth != null;
+    }
+
+    // ── sellers ─────────────────────────────────────────────
+    match /sellers/{docId} {
+      allow read, write: if request.auth != null &&
+        (resource.data.uid == request.auth.uid || isAdmin());
+      allow list: if isAdmin();
+      allow create: if request.auth != null;
+    }
+
+    // ── seller_settlements ──────────────────────────────────
+    match /seller_settlements/{docId} {
+      allow read, write, list: if isAdmin();
+    }
+
+    // ── orders ──────────────────────────────────────────────
+    match /orders/{docId} {
+      // 판매자: vendorId로 자기 주문 읽기
+      // 어드민: 전체
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+      allow list:  if request.auth != null;
+    }
+
+    // ── products ────────────────────────────────────────────
+    match /products/{docId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+      allow list:  if request.auth != null;
+    }
+
+    // ── banners ─────────────────────────────────────────────
+    match /banners/{docId} {
+      allow read, list: if true;
+      allow write: if isAdmin();
+    }
+
+    // ── notices ─────────────────────────────────────────────
+    match /notices/{docId} {
+      allow read, list: if true;
+      allow write: if isAdmin();
+    }
+
+    // ── 그 외: 인증된 사용자만 읽기 ────────────────────────
+    match /{document=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+  }
+}
