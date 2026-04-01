@@ -391,3 +391,17 @@ body.theme-ready .topnav{transition:box-shadow 0.25s}
   .footer-grid{grid-template-columns:1fr}
   .cf-track{flex-direction:column}
 }
+
+/* ═══════════════════════════ FAN LOGIN MODAL ═══════════════════════════ */
+.modal-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);opacity:0;visibility:hidden;transition:opacity 0.25s,visibility 0.25s}
+.modal-overlay.active{opacity:1;visibility:visible}
+.modal-box{position:relative;background:var(--bg);border-radius:var(--radius-lg);padding:48px 40px 40px;width:min(420px,92vw);box-shadow:0 24px 64px rgba(0,0,0,0.18);text-align:center;transform:translateY(16px);transition:transform 0.25s}
+.modal-overlay.active .modal-box{transform:translateY(0)}
+.modal-close{position:absolute;top:16px;right:16px;background:none;border:none;cursor:pointer;color:var(--gray-400);padding:6px;line-height:0;transition:color 0.2s}
+.modal-close:hover{color:var(--text-primary)}
+.modal-logo{margin-bottom:20px}
+.modal-logo .logo-img{height:28px}
+.modal-title{font-size:1.5rem;font-weight:800;color:var(--text-primary);margin-bottom:10px}
+.modal-desc{font-size:0.95rem;color:var(--text-secondary);line-height:1.7;margin-bottom:28px}
+.modal-cta{width:100%;justify-content:center}
+[data-theme="dark"] .modal-box{background:#1A1625}
