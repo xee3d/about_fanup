@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>환불정책 | FANUP</title>
+  <meta name="description" content="판업(Fanup) 환불정책">
+  <meta name="author" content="TINROBOT">
+  <meta name="theme-color" content="#7C3AED">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preload" as="style" crossorigin
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
+    onload="this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"></noscript>
+  <link rel="stylesheet" href="css/styles.css">
+  <script>
+    (function(){
+      var t = localStorage.getItem('fanup-theme');
+      if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <style>
+  .legal-wrap {
+    padding-top: var(--nav-offset);
+    min-height: 100vh;
+  }
+  .legal-inner {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+  .breadcrumb {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .breadcrumb a { color: var(--brand); font-weight: 600; }
+  .breadcrumb a:hover { text-decoration: underline; }
+  .breadcrumb-sep { color: var(--gray-400); }
+  .legal-prose {
+    font-size: 0.9rem;
+    line-height: 1.85;
+    color: var(--text-primary);
+  }
+  .legal-prose h1 {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+  .legal-prose h2 {
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-top: 40px;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--gray-200);
+    line-height: 1.4;
+  }
+  .legal-prose h3 {
+    font-size: 0.97rem;
+    font-weight: 700;
+    margin-top: 24px;
+    margin-bottom: 10px;
+  }
+  .legal-prose h4 {
+    font-size: 0.92rem;
+    font-weight: 700;
+    margin-top: 18px;
+    margin-bottom: 8px;
+    color: var(--text-secondary);
+  }
+  .legal-prose p { margin-bottom: 12px; }
+  .legal-prose ul, .legal-prose ol {
+    padding-left: 1.4em;
+    margin-bottom: 12px;
+  }
+  .legal-prose li { margin-bottom: 4px; }
+  .legal-prose strong { font-weight: 700; }
+  .legal-prose em {
+    font-style: italic;
+    background: none;
+    -webkit-text-fill-color: unset;
+    color: inherit;
+  }
+  .legal-prose table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    margin: 16px 0;
+    overflow-x: auto;
+    display: block;
+  }
+  .legal-prose th {
+    background: var(--gray-100);
+    font-weight: 700;
+    text-align: left;
+    padding: 8px 12px;
+    border: 1px solid var(--gray-200);
+    white-space: nowrap;
+  }
+  .legal-prose td {
+    padding: 8px 12px;
+    border: 1px solid var(--gray-200);
+    vertical-align: top;
+  }
+  .legal-prose blockquote {
+    border-left: 3px solid var(--brand);
+    background: var(--gray-50);
+    margin: 16px 0;
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    color: var(--text-secondary);
+    font-size: 0.88rem;
+  }
+  .legal-prose code {
+    background: var(--gray-100);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-family: 'Courier New', monospace;
+  }
+  .legal-prose pre {
+    background: var(--gray-100);
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 0.85rem;
+    line-height: 1.7;
+    margin: 12px 0;
+  }
+  .legal-prose pre code { background: none; padding: 0; }
+  .legal-prose hr {
+    border: none;
+    border-top: 1px solid var(--gray-200);
+    margin: 32px 0;
+  }
+  @media (max-width: 600px) {
+    .legal-inner { padding: 32px 16px 64px; }
+    .legal-prose h2 { font-size: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topnav">
+  <div class="container nav-inner">
+    <a href="index.html" class="nav-logo">
+      <img src="assets/fanup_logo.png" alt="FANUP" class="logo-img">
+    </a>
+    <nav class="nav-menu">
+      <a href="index.html#safety">안전 선물</a>
+      <a href="index.html#avatar">AI 아바타</a>
+      <a href="index.html#cheez">치즈 플로우</a>
+    </nav>
+    <div class="nav-right">
+      <button class="theme-toggle" id="themeToggle" aria-label="테마 전환">
+        <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+    </div>
+    <button class="nav-hamburger" aria-label="메뉴"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<div class="legal-wrap">
+  <div class="legal-inner">
+    <nav class="breadcrumb">
+      <a href="index.html">FANUP</a>
+      <span class="breadcrumb-sep">/</span>
+      <span>환불정책</span>
+    </nav>
+    <div class="legal-prose" id="legal-content"></div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <img src="assets/fanup_logo.png" alt="FANUP" class="logo-img-footer">
+        </div>
+        <p class="footer-desc">크리에이터와 팬을 잇는 새로운 팬덤 커머스 플랫폼.</p>
+      </div>
+      <div class="footer-col">
+        <h5>서비스</h5>
+        <ul class="footer-links">
+          <li><a href="index.html#safety">안전한 선물 수령</a></li>
+          <li><a href="index.html#avatar">AI 아바타 채팅</a></li>
+          <li><a href="index.html#cheez">치즈 에코시스템</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>크리에이터</h5>
+        <ul class="footer-links">
+          <li><a href="creator-apply.html">파트너 신청</a></li>
+          <li><a href="studio-login.html">아바타 만들기</a></li>
+          <li><a href="creator-apply.html">수익 정산 안내</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>파트너</h5>
+        <ul class="footer-links">
+          <li><a href="login.html">판매자 센터</a></li>
+          <li><a href="studio-login.html">크리에이터 스튜디오</a></li>
+          <li><a href="mailto:hello@fanup.im">문의하기</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 TINROBOT Inc. All rights reserved.</p>
+      <div class="footer-legal">
+        <a href="terms-of-service.html">이용약관</a>
+        <a href="privacy-policy.html">개인정보처리방침</a>
+        <a href="mailto:hello@fanup.im">hello@fanup.im</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+  (function(){
+    var md = "# 판업(Fanup) 환불정책\n\n**시행일: 2026년 4월 1일**\n\n주식회사 틴로봇(이하 \"회사\")이 운영하는 판업(Fanup, 이하 \"서비스\")의 환불·반품·교환 정책을 아래와 같이 안내합니다.\n\n---\n\n## 회사 정보\n\n| 항목 | 내용 |\n|------|------|\n| 상호 | 주식회사 틴로봇 (Tinrobot Inc.) |\n| 대표이사 | 최상열 |\n| 주소 | 서울시 서초구 강남대로 53길 8, 8층 12-1호 |\n| 사업자등록번호 | 120-87-41039 |\n| 통신판매업신고번호 | 2025-서울서초-3363호 |\n| 대표 전화 | 031-8016-5242 |\n| 이메일 | hello@fanup.im |\n\n---\n\n## 제1조 (청약철회)\n\n### 1.1 청약철회 기본 원칙\n\n「전자상거래 등에서의 소비자보호에 관한 법률」(이하 \"전자상거래법\") 제17조에 따라, 구매자는 다음 기간 내에 청약철회(주문 취소)를 신청할 수 있습니다.\n\n### 1.2 청약철회 기간\n\n| 구분 | 기간 | 기산점 |\n|------|------|--------|\n| 일반 청약철회 | **7일 이내** | 상품 수령일 (배송 완료일) |\n| 계약 내용이 다른 경우 | **30일 이내** | 상품 수령일 또는 계약 내용을 알 수 있는 날 |\n| 상품 정보 미제공 시 | **3개월 이내** | 상품 수령일 |\n\n① **7일 청약철회**: 구매자가 상품을 수령한 날로부터 7일 이내에 청약철회를 신청할 수 있습니다. 단, 상품의 내용이 표시·광고 내용과 다르거나 계약 내용과 다르게 이행된 경우에는 수령일로부터 **30일** 또는 그 사실을 안 날로부터 **30일** 중 빠른 날까지 청약철회가 가능합니다.\n\n② 청약철회는 서비스 내 주문 상세 화면 또는 고객센터(hello@fanup.im)를 통해 신청할 수 있습니다.\n\n③ 전자상거래법 제17조 제2항에 해당하는 경우(청약철회가 제한되는 사유)에는 위 기간 이내라도 청약철회가 제한될 수 있으며, 해당 사유는 제4조에 명시합니다.\n\n---\n\n## 제2조 (실물 상품 환불 조건 및 절차)\n\n### 2.1 환불 가능 조건\n\n다음 각 호에 해당하는 경우 실물 상품의 환불이 가능합니다.\n\n1. 청약철회 기간(제1조) 이내에 신청한 경우\n2. 상품에 하자(파손, 불량, 오배송)가 있는 경우 (수령일로부터 **6개월** 이내)\n3. 표시·광고 내용과 실제 상품이 상이한 경우\n4. 판매자의 귀책으로 배송이 현저히 지연된 경우\n\n### 2.2 환불 신청 절차\n\n① 구매자는 다음 절차에 따라 환불을 신청합니다.\n\n1. 서비스 앱 → 마이페이지 → 주문 내역 → 해당 주문 선택 → 환불/반품 신청\n2. 신청 사유 및 증빙 자료(사진 등) 첨부\n3. 고객센터 확인 후 반품 주소 안내 (판매자 귀책 시 반품 배송비 선불 처리 후 환급)\n\n② 회사 또는 판매자는 환불 신청 접수 후 영업일 기준 3일 이내에 처리 방향을 안내합니다.\n\n③ 반품 상품의 회수 확인 후 환불이 진행됩니다.\n\n### 2.3 환불 불가 조건\n\n다음 경우에는 환불이 불가합니다.\n\n1. 구매자의 사용·훼손으로 상품 가치가 현저히 감소한 경우\n2. 포장 훼손으로 재판매가 불가능한 경우 (포장 개봉이 상품 가치에 직접적 영향을 미치는 경우)\n3. 청약철회 기간이 경과한 경우\n4. 맞춤 제작(주문 제작) 상품으로 제작이 이미 완료된 경우\n\n---\n\n## 제3조 (디지털 상품 환불 조건)\n\n### 3.1 디지털 상품 환불 원칙\n\n전자상거래법 제17조 제2항 제5호에 따라, 디지털 상품은 원칙적으로 다음 기준이 적용됩니다.\n\n① **다운로드·열람 이전**: 구매일로부터 7일 이내에 다운로드·사용이 개시되지 않은 경우 환불 가능합니다.\n\n② **다운로드·열람 이후**: 파일 다운로드, 코드 열람, 스트리밍 시청 등 콘텐츠의 이용이 개시된 경우 원칙적으로 환불이 불가합니다. 단, 다음 경우는 예외입니다.\n\n1. 디지털 상품 자체에 심각한 오류·결함이 있어 정상적인 이용이 불가능한 경우\n2. 표시·광고 내용과 실제 제공 콘텐츠가 현저히 상이한 경우\n\n③ 디지털 상품 환불 시청약철회 의사표시와 함께 이용을 즉시 중단하여야 합니다.\n\n### 3.2 디지털 상품 환불 신청 방법\n\n고객센터(hello@fanup.im)를 통해 구매 정보, 환불 사유, 증빙 자료를 첨부하여 신청합니다.\n\n---\n\n## 제4조 (교환·반품 불가 상품 목록)\n\n전자상거래법 제17조 제2항에 따라 다음 상품은 교환·반품이 제한됩니다.\n\n1. 구매자의 지시에 따라 개별적으로 제작된 맞춤 상품 (주문 제작 굿즈 등)\n2. 복제가 가능한 디지털 콘텐츠로서 포장이 훼손된 경우 (CD, DVD 등)\n3. 시간의 경과에 의해 재판매가 곤란한 정도로 가치가 현저히 감소하는 상품\n4. 개봉 시 상품 가치가 훼손되어 복원이 불가능한 위생 관련 상품\n5. 이미 이용된 서비스 또는 소비된 재화\n\n단, 위 경우라도 상품에 하자가 있거나 표시·광고 내용과 상이한 경우에는 반품·환불이 가능합니다.\n\n---\n\n## 제5조 (환불 처리 기간 및 방법)\n\n### 5.1 원결제수단 환불 원칙\n\n환불은 원칙적으로 구매 시 사용한 결제 수단으로 진행됩니다.\n\n| 결제 수단 | 환불 방법 | 처리 기간 |\n|-----------|-----------|-----------|\n| 신용카드 | 카드 취소 (매입 취소 또는 카드사 환불) | 영업일 기준 3~5일 |\n| 체크카드 | 카드 취소 | 영업일 기준 3~5일 |\n| 계좌이체 | 등록 계좌로 환불 | 영업일 기준 3~5일 |\n| 휴대폰 결제 | 다음 달 청구 차감 또는 현금 환불 | 영업일 기준 3~7일 |\n| 치즈(Cheez) 포인트 | 포인트 복원 | 즉시 처리 |\n\n### 5.2 환불 처리 기간\n\n① 환불 신청이 승인된 날로부터 위 표의 처리 기간 이내에 환불이 완료됩니다.\n\n② 반품이 필요한 경우 반품 물품 회수 완료 후 처리 기간이 기산됩니다.\n\n③ 카드사·PG사의 처리 일정에 따라 실제 환불 반영까지 추가 시간이 소요될 수 있습니다.\n\n---\n\n## 제6조 (치즈(Cheez) 포인트 환불 정책)\n\n### 6.1 유료 구매 포인트 환불\n\n① 유료로 구매한 치즈 포인트 잔액의 환불은 「전자금융거래법」 관련 규정에 따릅니다.\n\n② 다음 요건을 충족하는 경우 환불을 신청할 수 있습니다.\n\n1. 구매한 치즈 포인트의 잔액이 구매 금액의 60% 이상인 경우\n2. 포인트 구매일로부터 1년이 경과하지 않은 경우\n3. 위 두 요건 중 하나에 해당하거나, 서비스 이용 계약 해지 시\n\n③ 환불 금액은 잔여 포인트를 기준으로 산정되며, 처리에 소요된 실비가 있는 경우 해당 금액이 공제될 수 있습니다.\n\n### 6.2 무료(이벤트·활동) 포인트\n\n이벤트 참여, 출석 체크, 리뷰 작성 등을 통해 무상으로 지급된 치즈 포인트는 현금 환불의 대상이 되지 않습니다.\n\n### 6.3 포인트 사용 후 상품 환불\n\n① 치즈 포인트와 다른 결제 수단을 혼합하여 결제한 경우, 환불 시 현금성 결제 수단이 우선 환불되고 잔여 금액은 포인트로 복원됩니다.\n\n② 치즈 포인트만으로 결제한 경우, 환불 시 해당 포인트가 복원됩니다.\n\n---\n\n## 제7조 (판매자 귀책 vs 구매자 귀책 비용 부담)\n\n### 7.1 판매자 귀책 사유\n\n다음 경우 반품 배송비 등 부대 비용은 판매자가 부담합니다.\n\n1. 상품에 하자(불량, 파손)가 있는 경우\n2. 오배송(다른 상품이 배송된 경우)\n3. 표시·광고 내용과 실제 상품이 상이한 경우\n4. 배송이 현저히 지연된 판매자의 귀책 사유인 경우\n\n### 7.2 구매자 귀책 사유\n\n다음 경우 반품 배송비 등 부대 비용은 구매자가 부담합니다.\n\n1. 단순 변심에 의한 청약철회 (7일 이내)\n2. 구매자의 부주의로 상품이 훼손된 경우 (환불 불가 사유 해당 시 환불 자체 불가)\n3. 구매자가 반품 의사를 표시한 후 실제로 반품하지 않은 경우\n\n### 7.3 배송비 안내\n\n① 반품 배송비는 판매자가 설정한 정책에 따르며, 상품 구매 페이지에 표시됩니다.\n\n② 왕복 배송비가 발생하는 경우 청약철회 시에는 왕복 배송비가 부과될 수 있습니다.\n\n---\n\n## 제8조 (분쟁 해결 절차)\n\n### 8.1 1차 분쟁 해결\n\n① 구매자와 판매자 간 환불·반품 관련 분쟁이 발생한 경우, 먼저 고객센터(hello@fanup.im, 031-8016-5242)를 통해 조정을 신청할 수 있습니다.\n\n② 회사는 분쟁 접수 후 영업일 기준 14일 이내에 처리 결과를 안내합니다.\n\n### 8.2 외부 분쟁 해결\n\n① 회사의 조정으로 해결되지 않는 경우, 다음 외부 기관에 분쟁 해결을 신청할 수 있습니다.\n\n| 기관 | 연락처 |\n|------|--------|\n| 한국소비자원 | 국번 없이 1372 |\n| 전자상거래분쟁조정위원회 | www.ecmc.or.kr |\n| 공정거래위원회 | www.ftc.go.kr |\n| 법원 전자소송 | ecfs.scourt.go.kr |\n\n② 본 정책과 관련된 소송의 관할법원은 회사 소재지를 관할하는 법원으로 합니다.\n\n---\n\n**시행일: 2026년 4월 1일**\n\n주식회사 틴로봇 (Tinrobot Inc.)\n대표이사 최상열\n";
+    document.getElementById('legal-content').innerHTML = marked.parse(md);
+  })();
+</script>
+<script src="js/main.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>데이터 삭제 안내 | FANUP</title>
+  <meta name="description" content="판업(Fanup) 데이터 삭제 안내">
+  <meta name="author" content="TINROBOT">
+  <meta name="theme-color" content="#7C3AED">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preload" as="style" crossorigin
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
+    onload="this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"></noscript>
+  <link rel="stylesheet" href="css/styles.css">
+  <script>
+    (function(){
+      var t = localStorage.getItem('fanup-theme');
+      if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <style>
+  .legal-wrap {
+    padding-top: var(--nav-offset);
+    min-height: 100vh;
+  }
+  .legal-inner {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+  .breadcrumb {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .breadcrumb a { color: var(--brand); font-weight: 600; }
+  .breadcrumb a:hover { text-decoration: underline; }
+  .breadcrumb-sep { color: var(--gray-400); }
+  .legal-prose {
+    font-size: 0.9rem;
+    line-height: 1.85;
+    color: var(--text-primary);
+  }
+  .legal-prose h1 {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+  .legal-prose h2 {
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-top: 40px;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--gray-200);
+    line-height: 1.4;
+  }
+  .legal-prose h3 {
+    font-size: 0.97rem;
+    font-weight: 700;
+    margin-top: 24px;
+    margin-bottom: 10px;
+  }
+  .legal-prose h4 {
+    font-size: 0.92rem;
+    font-weight: 700;
+    margin-top: 18px;
+    margin-bottom: 8px;
+    color: var(--text-secondary);
+  }
+  .legal-prose p { margin-bottom: 12px; }
+  .legal-prose ul, .legal-prose ol {
+    padding-left: 1.4em;
+    margin-bottom: 12px;
+  }
+  .legal-prose li { margin-bottom: 4px; }
+  .legal-prose strong { font-weight: 700; }
+  .legal-prose em {
+    font-style: italic;
+    background: none;
+    -webkit-text-fill-color: unset;
+    color: inherit;
+  }
+  .legal-prose table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    margin: 16px 0;
+    overflow-x: auto;
+    display: block;
+  }
+  .legal-prose th {
+    background: var(--gray-100);
+    font-weight: 700;
+    text-align: left;
+    padding: 8px 12px;
+    border: 1px solid var(--gray-200);
+    white-space: nowrap;
+  }
+  .legal-prose td {
+    padding: 8px 12px;
+    border: 1px solid var(--gray-200);
+    vertical-align: top;
+  }
+  .legal-prose blockquote {
+    border-left: 3px solid var(--brand);
+    background: var(--gray-50);
+    margin: 16px 0;
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    color: var(--text-secondary);
+    font-size: 0.88rem;
+  }
+  .legal-prose code {
+    background: var(--gray-100);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-family: 'Courier New', monospace;
+  }
+  .legal-prose pre {
+    background: var(--gray-100);
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 0.85rem;
+    line-height: 1.7;
+    margin: 12px 0;
+  }
+  .legal-prose pre code { background: none; padding: 0; }
+  .legal-prose hr {
+    border: none;
+    border-top: 1px solid var(--gray-200);
+    margin: 32px 0;
+  }
+  @media (max-width: 600px) {
+    .legal-inner { padding: 32px 16px 64px; }
+    .legal-prose h2 { font-size: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topnav">
+  <div class="container nav-inner">
+    <a href="index.html" class="nav-logo">
+      <img src="assets/fanup_logo.png" alt="FANUP" class="logo-img">
+    </a>
+    <nav class="nav-menu">
+      <a href="index.html#safety">안전 선물</a>
+      <a href="index.html#avatar">AI 아바타</a>
+      <a href="index.html#cheez">치즈 플로우</a>
+    </nav>
+    <div class="nav-right">
+      <button class="theme-toggle" id="themeToggle" aria-label="테마 전환">
+        <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+    </div>
+    <button class="nav-hamburger" aria-label="메뉴"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<div class="legal-wrap">
+  <div class="legal-inner">
+    <nav class="breadcrumb">
+      <a href="index.html">FANUP</a>
+      <span class="breadcrumb-sep">/</span>
+      <span>데이터 삭제 안내</span>
+    </nav>
+    <div class="legal-prose" id="legal-content"></div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <img src="assets/fanup_logo.png" alt="FANUP" class="logo-img-footer">
+        </div>
+        <p class="footer-desc">크리에이터와 팬을 잇는 새로운 팬덤 커머스 플랫폼.</p>
+      </div>
+      <div class="footer-col">
+        <h5>서비스</h5>
+        <ul class="footer-links">
+          <li><a href="index.html#safety">안전한 선물 수령</a></li>
+          <li><a href="index.html#avatar">AI 아바타 채팅</a></li>
+          <li><a href="index.html#cheez">치즈 에코시스템</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>크리에이터</h5>
+        <ul class="footer-links">
+          <li><a href="creator-apply.html">파트너 신청</a></li>
+          <li><a href="studio-login.html">아바타 만들기</a></li>
+          <li><a href="creator-apply.html">수익 정산 안내</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>파트너</h5>
+        <ul class="footer-links">
+          <li><a href="login.html">판매자 센터</a></li>
+          <li><a href="studio-login.html">크리에이터 스튜디오</a></li>
+          <li><a href="mailto:hello@fanup.im">문의하기</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 TINROBOT Inc. All rights reserved.</p>
+      <div class="footer-legal">
+        <a href="terms-of-service.html">이용약관</a>
+        <a href="privacy-policy.html">개인정보처리방침</a>
+        <a href="mailto:hello@fanup.im">hello@fanup.im</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+  (function(){
+    var md = "# 판업(Fanup) 데이터 삭제 안내\n\n**시행일: 2026년 4월 1일**\n\n주식회사 틴로봇(이하 \"회사\")이 운영하는 판업(Fanup, 이하 \"서비스\")은 「개인정보 보호법」 및 관계 법령에 따라 회원의 데이터 삭제 권리를 보장합니다. 본 안내서는 회원이 자신의 데이터를 삭제하는 방법과 관련 정책을 설명합니다.\n\n---\n\n## 회사 정보\n\n| 항목 | 내용 |\n|------|------|\n| 상호 | 주식회사 틴로봇 (Tinrobot Inc.) |\n| 대표이사 | 최상열 |\n| 주소 | 서울시 서초구 강남대로 53길 8, 8층 12-1호 |\n| 사업자등록번호 | 120-87-41039 |\n| 통신판매업신고번호 | 2025-서울서초-3363호 |\n| 대표 전화 | 031-8016-5242 |\n| 이메일 | hello@fanup.im |\n\n---\n\n## 제1조 (회원 탈퇴 및 데이터 삭제 방법)\n\n### 1.1 앱 내 탈퇴 절차\n\n회원은 다음 경로를 통해 직접 탈퇴 신청을 할 수 있습니다.\n\n```\n판업(Fanup) 앱 실행\n  → 하단 탭: 마이페이지(프로필 아이콘)\n  → 상단 우측: 설정(톱니바퀴 아이콘)\n  → 계정 관리\n  → 회원 탈퇴\n  → 탈퇴 사유 선택 및 확인\n  → 최종 탈퇴 신청 완료\n```\n\n### 1.2 고객센터를 통한 탈퇴 신청\n\n앱 내 탈퇴가 어려운 경우, 다음 방법으로 탈퇴를 신청할 수 있습니다.\n\n- **이메일**: hello@fanup.im (제목: 회원 탈퇴 및 데이터 삭제 요청)\n- **처리 기간**: 영업일 기준 3일 이내 처리\n\n### 1.3 탈퇴 전 확인 사항\n\n탈퇴 신청 전 다음 사항을 반드시 확인하시기 바랍니다.\n\n1. 진행 중인 주문 또는 미완료 거래가 없는지 확인\n2. 잔여 치즈(Cheez) 포인트 사용 또는 환불 신청 완료 여부\n3. 판매자 회원의 경우 정산 완료 여부 확인 (제5조 참조)\n4. 소셜 로그인 연동 해제 여부 (선택 사항, 제6조 참조)\n\n---\n\n## 제2조 (삭제되는 데이터 항목)\n\n탈퇴가 완료되면 다음 개인정보 및 서비스 이용 데이터가 삭제됩니다.\n\n### 2.1 회원 기본 정보\n\n- 프로필 정보 (닉네임, 프로필 이미지, 자기소개)\n- 이메일 주소, 연락처 등 계정 정보\n- 소셜 로그인 연동 정보 (Google, Apple, Kakao)\n\n### 2.2 서비스 활동 데이터\n\n- 채팅 및 메시지 내역\n- 작성한 리뷰 및 평점\n- 좋아요·팔로우 목록 (크리에이터, 상품 등)\n- 팬 프로필 및 활동 이력\n- 푸시 알림 수신 설정\n\n### 2.3 판매자 데이터 (판매자 회원의 경우)\n\n- 판매자 프로필 및 샵 정보\n- 등록된 상품 목록 및 상세 정보\n- 정산 계좌 정보\n\n### 2.4 크리에이터 데이터 (크리에이터 회원의 경우)\n\n- 크리에이터 프로필\n- 서비스 내 공식 채널 연동 정보\n\n---\n\n## 제3조 (법정 보관 데이터)\n\n「개인정보 보호법」, 「전자상거래법」, 「국세기본법」 등 관계 법령에 따라 다음 데이터는 탈퇴 후에도 일정 기간 보관됩니다.\n\n| 데이터 항목 | 보존 기간 | 근거 법령 |\n|-------------|-----------|-----------|\n| 주문·결제 기록 | **5년** | 「전자상거래법」 제6조 |\n| 소비자 불만·분쟁 처리 기록 | **3년** | 「전자상거래법」 제6조 |\n| 세금계산서 등 세무 관련 자료 | **5년** | 「국세기본법」 제85조의3 |\n| 표시·광고에 관한 기록 | **6개월** | 「전자상거래법」 제6조 |\n| 계약 또는 청약철회에 관한 기록 | **5년** | 「전자상거래법」 제6조 |\n| 대금결제 및 재화 등의 공급에 관한 기록 | **5년** | 「전자상거래법」 제6조 |\n| 서비스 접속 로그 (IP 등) | **3개월** | 「통신비밀보호법」 제15조의2 |\n| 본인 확인에 관한 기록 | **6개월** | 「정보통신망법」 제44조의5 |\n\n법정 보관 데이터는 해당 보존 기간이 만료된 즉시 삭제됩니다. 이 데이터는 법령에서 정한 목적 이외에는 사용되지 않습니다.\n\n---\n\n## 제4조 (삭제 처리 기간)\n\n① 탈퇴 신청이 완료된 날로부터 **30일 이내**에 개인정보 삭제 처리가 완료됩니다.\n\n② 30일의 처리 기간 동안에는 탈퇴 철회가 가능합니다. 탈퇴 철회를 원하시는 경우 고객센터(hello@fanup.im)로 연락 바랍니다.\n\n③ 처리 기간 중에도 계정 로그인은 제한될 수 있습니다.\n\n④ 삭제 완료 후에는 해당 계정 및 데이터의 복구가 불가합니다.\n\n---\n\n## 제5조 (판매자 계정 삭제 주의사항)\n\n### 5.1 탈퇴 가능 조건\n\n판매자 회원은 다음 모든 조건이 충족된 경우에 탈퇴가 가능합니다.\n\n1. 미정산 잔액이 없을 것\n2. 진행 중인 주문·배송이 없을 것\n3. 미처리된 환불·반품 요청이 없을 것\n4. 처리 중인 분쟁 사안이 없을 것\n\n### 5.2 정산 완료 절차\n\n① 미정산 잔액이 있는 경우, 탈퇴 전 정산 신청 및 수령 완료 후 탈퇴하여야 합니다.\n\n② 정산 미완료 상태에서 탈퇴 신청 시 회사는 탈퇴 처리를 보류하고 정산 완료를 안내합니다.\n\n③ 탈퇴 이후에도 법정 보관 의무에 따라 거래 기록은 보존됩니다. (제3조 참조)\n\n### 5.3 등록 상품 처리\n\n탈퇴 시 등록된 모든 상품은 서비스에서 삭제되며, 이로 인한 피해에 대해 회사는 책임을 지지 않습니다.\n\n---\n\n## 제6조 (Google/Apple/Kakao 소셜 연동 해제 방법)\n\n소셜 로그인 연동 해제는 판업 앱 탈퇴와 별도로 각 플랫폼에서 직접 처리하여야 합니다.\n\n### 6.1 Google 계정 연동 해제\n\n1. Google 계정 설정 접속 (myaccount.google.com)\n2. 보안 → 타사 앱 및 서비스 접근 권한\n3. Fanup(판업) 선택 → 액세스 권한 취소\n\n또는\n\n- Android: 설정 → 계정 → Google → 앱 권한 → Fanup 제거\n- iOS: 설정 → [본인 이름] → 암호 및 보안 → 앱 로그인 정보 → Fanup 제거\n\n### 6.2 Apple 계정 연동 해제 (Sign in with Apple)\n\n1. iOS 설정 앱 → [본인 이름] → 암호 및 보안\n2. Apple ID를 사용하는 앱 → Fanup 선택\n3. Apple ID 사용 중단 선택\n\n### 6.3 Kakao 계정 연동 해제\n\n1. 카카오 앱 실행 → 더보기(···) → 설정 → 개인정보 보호\n2. 앱 관리 → 판업(Fanup) 선택\n3. 연결 끊기 선택\n\n---\n\n## 제7조 (개인정보 이전/다운로드 방법)\n\n### 7.1 개인정보 열람 및 다운로드 요청\n\n「개인정보 보호법」 제35조에 따라 회원은 자신의 개인정보 열람 및 사본 발급을 요청할 수 있습니다.\n\n① **요청 방법**: 고객센터(hello@fanup.im)에 이메일로 요청\n\n② **요청 시 포함할 내용**:\n   - 회원 이름(닉네임) 및 계정 이메일\n   - 요청 항목 (전체 데이터 또는 특정 항목)\n   - 수신 방법 (이메일 첨부 등)\n\n③ **처리 기간**: 접수일로부터 영업일 기준 10일 이내 제공\n\n### 7.2 제공 데이터 형식\n\n개인정보 사본은 CSV, JSON 등 일반적으로 사용 가능한 형식으로 제공됩니다.\n\n### 7.3 개인정보 정정·삭제 요청\n\n탈퇴 외에도 특정 개인정보의 정정 또는 삭제를 요청할 수 있습니다. 고객센터(hello@fanup.im)로 연락하시면 영업일 기준 10일 이내에 처리합니다.\n\n---\n\n## 제8조 (Meta App 데이터 삭제 페이지 안내)\n\n### 8.1 Meta 플랫폼 데이터 삭제\n\nFacebook(Meta)을 통해 판업(Fanup) 서비스에 접근하였거나, Meta 플랫폼과 연동된 데이터의 삭제를 원하시는 경우 아래 전용 페이지를 이용하시기 바랍니다.\n\n**데이터 삭제 요청 페이지**\n```\nhttps://fanup.kr/data-deletion\n```\n\n### 8.2 데이터 삭제 요청 처리\n\n① 위 페이지를 통해 삭제 요청을 접수하면, 회사는 Meta 플랫폼 연동을 통해 수집된 데이터를 삭제 처리합니다.\n\n② 처리 기간: 요청 접수일로부터 **30일 이내**\n\n③ 삭제 완료 후 요청하신 이메일로 처리 결과를 통보합니다.\n\n### 8.3 Meta 플랫폼 자체 데이터 삭제\n\nMeta(Facebook, Instagram) 계정에 저장된 데이터의 삭제는 각 플랫폼의 데이터 삭제 정책에 따라 별도로 처리해야 합니다.\n\n- Facebook 설정: www.facebook.com/settings → 개인정보 → 회원님의 Facebook 정보 → 계정 비활성화 또는 삭제\n- 데이터 포터빌리티: www.facebook.com/dyi\n\n---\n\n## 제9조 (개인정보 보호 문의)\n\n개인정보 삭제, 열람, 정정 등 개인정보 관련 모든 문의는 아래로 연락 바랍니다.\n\n- **개인정보보호책임자**: 대표이사 최상열\n- **이메일**: hello@fanup.im\n- **전화**: 031-8016-5242\n- **주소**: 서울시 서초구 강남대로 53길 8, 8층 12-1호\n\n회원의 데이터 삭제 요청은 「개인정보 보호법」 제36조에 따라 처리되며, 정당한 사유 없이 거부하거나 지연하지 않습니다.\n\n---\n\n**시행일: 2026년 4월 1일**\n\n주식회사 틴로봇 (Tinrobot Inc.)\n대표이사 최상열\n";
+    document.getElementById('legal-content').innerHTML = marked.parse(md);
+  })();
+</script>
+<script src="js/main.js" defer></script>
+</body>
+</html>
