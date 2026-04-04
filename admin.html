@@ -206,6 +206,11 @@
         판매자 정산
         <span class="nav-badge" id="pending-seller-settle-count" style="display:none;"></span>
       </a>
+      <a class="nav-item" data-tab="orders" onclick="switchTab('orders'); return false;" href="#">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6"/><path d="M9 16h4"/></svg>
+        주문 관리
+        <span class="nav-badge" id="pending-orders-count" style="display:none;"></span>
+      </a>
     </nav>
 
     <div class="sidebar-footer">
@@ -357,6 +362,93 @@
       </div>
     </div>
 
+    <!-- ── 주문 관리 탭 ── -->
+    <div class="page-content tab-panel" id="tab-orders">
+      <div class="page-header">
+        <h1>주문 관리</h1>
+        <p>주문 상태 변경, 송장 입력, 배송 처리를 합니다.</p>
+      </div>
+
+      <div class="stat-mini" id="order-stats"></div>
+
+      <div class="card">
+        <div class="card-header" style="flex-wrap:wrap;gap:8px;">
+          <div class="filter-chips" id="order-filter-chips">
+            <button class="chip active" data-order-status="all" onclick="filterOrders(this,'all')">전체</button>
+            <button class="chip" data-order-status="paid" onclick="filterOrders(this,'paid')">결제완료</button>
+            <button class="chip" data-order-status="preparing" onclick="filterOrders(this,'preparing')">상품준비중</button>
+            <button class="chip" data-order-status="shipping" onclick="filterOrders(this,'shipping')">배송중</button>
+            <button class="chip" data-order-status="delivered" onclick="filterOrders(this,'delivered')">배송완료</button>
+            <button class="chip" data-order-status="refund_requested" onclick="filterOrders(this,'refund_requested')" style="color:var(--danger);">환불요청</button>
+          </div>
+        </div>
+        <div id="order-list"><div class="loading-row">불러오는 중...</div></div>
+      </div>
+    </div>
+
+    <!-- ── 주문 상세 모달 ── -->
+    <div id="orderDetailModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;">
+      <div style="background:var(--surface);border-radius:16px;padding:28px;max-width:540px;width:92%;max-height:90vh;overflow-y:auto;position:relative;">
+        <button onclick="closeOrderModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:1.2rem;">✕</button>
+        <h2 style="margin:0 0 20px;font-size:1.1rem;">주문 상세</h2>
+
+        <!-- 썸네일 + 상품명 -->
+        <div style="display:flex;gap:14px;margin-bottom:20px;align-items:center;">
+          <img id="od-thumbnail" src="" alt="" style="width:80px;height:80px;object-fit:cover;border-radius:10px;background:var(--border);">
+          <div>
+            <div id="od-product-name" style="font-weight:700;font-size:1rem;margin-bottom:6px;"></div>
+            <span id="od-status-badge" style="display:inline-block;padding:2px 10px;border-radius:99px;font-size:0.75rem;font-weight:700;color:#fff;"></span>
+          </div>
+        </div>
+
+        <!-- 주문 정보 테이블 -->
+        <table style="width:100%;border-collapse:collapse;font-size:0.85rem;margin-bottom:20px;">
+          <tbody id="od-info-rows"></tbody>
+        </table>
+
+        <!-- 상태 변경 -->
+        <div style="background:var(--bg);border-radius:10px;padding:16px;margin-bottom:16px;">
+          <div style="font-weight:600;font-size:0.9rem;margin-bottom:10px;">상태 변경</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button onclick="updateOrderStatus('preparing')" class="btn btn-outline btn-sm">상품준비중</button>
+            <button onclick="updateOrderStatus('shipping')"  class="btn btn-sm" style="background:var(--primary);color:#fff;">배송중</button>
+            <button onclick="updateOrderStatus('delivered')" class="btn btn-sm" style="background:var(--success);color:#fff;">배송완료</button>
+            <button onclick="updateOrderStatus('cancelled')" class="btn btn-outline btn-sm" style="color:var(--danger);border-color:var(--danger);">취소</button>
+            <button onclick="updateOrderStatus('refunded')"  class="btn btn-outline btn-sm" style="color:var(--danger);border-color:var(--danger);">환불완료</button>
+          </div>
+        </div>
+
+        <!-- 송장 입력 -->
+        <div style="background:var(--bg);border-radius:10px;padding:16px;margin-bottom:16px;">
+          <div style="font-weight:600;font-size:0.9rem;margin-bottom:10px;">송장 입력</div>
+          <div style="display:flex;gap:8px;margin-bottom:8px;">
+            <select id="od-carrier" style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:0.85rem;">
+              <option value="">택배사 선택</option>
+              <option>CJ대한통운</option>
+              <option>한진택배</option>
+              <option>롯데택배</option>
+              <option>우체국택배</option>
+              <option>로젠택배</option>
+              <option>기타</option>
+            </select>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <input id="od-tracking" type="text" placeholder="송장 번호 입력" style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:0.85rem;font-family:monospace;">
+            <button onclick="saveTracking()" class="btn btn-sm" style="background:var(--primary);color:#fff;white-space:nowrap;">저장</button>
+          </div>
+        </div>
+
+        <!-- 판매자 메모 -->
+        <div style="background:var(--bg);border-radius:10px;padding:16px;">
+          <div style="font-weight:600;font-size:0.9rem;margin-bottom:10px;">판매자 메모</div>
+          <div style="display:flex;gap:8px;">
+            <input id="od-memo" type="text" placeholder="구매자에게 보여지는 메모 (선택)" style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:0.85rem;">
+            <button onclick="saveMemo()" class="btn btn-outline btn-sm">저장</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- ── 판매자 관리 탭 ── -->
     <div class="page-content tab-panel" id="tab-sellers">
       <div class="page-header">
@@ -475,6 +567,7 @@ window.reloadCurrentTab = function() {
   const active = document.querySelector('.tab-panel.active');
   if (active?.id === 'tab-creators') loadCreators();
   else if (active?.id === 'tab-settlement') loadBatches();
+  else if (active?.id === 'tab-orders') loadOrders();
   else loadSellers();
 };
 
@@ -1174,16 +1267,185 @@ window.filterSellerBatches = function(el, status) {
   loadSellerBatches();
 };
 
+// ── 주문 관리 ────────────────────────────────────────────────
+let allOrders = [];
+let orderFilter = 'all';
+let currentOrderId = null;
+
+const ORDER_STATUS_LABEL = { paid:'결제완료', preparing:'상품준비중', shipping:'배송중', delivered:'배송완료', refund_requested:'환불요청', refunded:'환불완료', cancelled:'취소' };
+const ORDER_STATUS_COLOR = { paid:'#0A84FF', preparing:'#FF9500', shipping:'#5856D6', delivered:'#34C759', refund_requested:'#FF3B30', refunded:'#8E8E93', cancelled:'#8E8E93' };
+
+async function loadOrders() {
+  document.getElementById('order-list').innerHTML = '<div class="loading-row">불러오는 중...</div>';
+  const snap = await getDocs(query(collection(db, 'orders'), orderBy('createdAt', 'desc')));
+  allOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  updateOrderStats();
+  renderOrders();
+}
+
+function updateOrderStats() {
+  const counts = {};
+  allOrders.forEach(o => { counts[o.status] = (counts[o.status] || 0) + 1; });
+  const paid = counts['paid'] || 0;
+  document.getElementById('order-stats').innerHTML = `
+    <div class="stat-mini-item"><div class="stat-mini-num">${allOrders.length}</div><div class="stat-mini-label">전체</div></div>
+    <div class="stat-mini-item" style="border-color:#0A84FF;"><div class="stat-mini-num" style="color:#0A84FF;">${paid}</div><div class="stat-mini-label">결제완료</div></div>
+    <div class="stat-mini-item" style="border-color:#FF9500;"><div class="stat-mini-num" style="color:#FF9500;">${counts['preparing']||0}</div><div class="stat-mini-label">준비중</div></div>
+    <div class="stat-mini-item" style="border-color:#5856D6;"><div class="stat-mini-num" style="color:#5856D6;">${counts['shipping']||0}</div><div class="stat-mini-label">배송중</div></div>
+    <div class="stat-mini-item" style="border-color:var(--success);"><div class="stat-mini-num" style="color:var(--success);">${counts['delivered']||0}</div><div class="stat-mini-label">완료</div></div>
+    <div class="stat-mini-item" style="border-color:var(--danger);"><div class="stat-mini-num" style="color:var(--danger);">${counts['refund_requested']||0}</div><div class="stat-mini-label">환불요청</div></div>
+  `;
+  // 결제완료(배송 전) 주문 뱃지
+  if (paid > 0) {
+    const badge = document.getElementById('pending-orders-count');
+    badge.textContent = paid;
+    badge.style.display = '';
+  } else {
+    document.getElementById('pending-orders-count').style.display = 'none';
+  }
+}
+
+function renderOrders() {
+  const filtered = orderFilter === 'all' ? allOrders : allOrders.filter(o => o.status === orderFilter);
+  const el = document.getElementById('order-list');
+  if (!filtered.length) { el.innerHTML = '<div class="loading-row" style="color:var(--text-muted);">주문 없음</div>'; return; }
+
+  const fmtDate = (ts) => {
+    if (!ts) return '-';
+    const d = ts.toDate ? ts.toDate() : new Date(ts.seconds ? ts.seconds * 1000 : ts);
+    return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+  };
+
+  el.innerHTML = `<table class="data-table">
+    <thead><tr><th style="width:64px;">썸네일</th><th>상품명</th><th>구매자</th><th>크리에이터</th><th>상태</th><th>날짜</th><th>금액</th><th></th></tr></thead>
+    <tbody>
+    ${filtered.map(o => `
+      <tr style="cursor:pointer;" onclick="showOrderDetail('${o.id}')">
+        <td><img src="${o.productThumbnail || ''}" onerror="this.style.display='none'" style="width:52px;height:52px;object-fit:cover;border-radius:6px;background:var(--border);display:block;"></td>
+        <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${o.productName || '-'}</td>
+        <td style="font-size:0.8rem;color:var(--text-muted);">${o.buyerName || '-'}</td>
+        <td style="font-size:0.8rem;color:var(--text-muted);">${(o.creatorNames||[]).join(', ') || '-'}</td>
+        <td><span style="display:inline-block;padding:2px 8px;border-radius:99px;font-size:0.72rem;font-weight:700;color:#fff;background:${ORDER_STATUS_COLOR[o.status]||'#999'};">${ORDER_STATUS_LABEL[o.status]||o.status}</span></td>
+        <td style="font-size:0.8rem;color:var(--text-muted);white-space:nowrap;">${fmtDate(o.createdAt)}</td>
+        <td style="font-weight:600;white-space:nowrap;">${(o.totalAmount||0).toLocaleString()}원</td>
+        <td><button class="btn btn-outline btn-sm" onclick="event.stopPropagation();showOrderDetail('${o.id}')">상세</button></td>
+      </tr>`).join('')}
+    </tbody>
+  </table>`;
+}
+
+window.filterOrders = function(el, status) {
+  document.querySelectorAll('[data-order-status]').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  orderFilter = status;
+  renderOrders();
+};
+
+window.showOrderDetail = function(orderId) {
+  const o = allOrders.find(x => x.id === orderId);
+  if (!o) return;
+  currentOrderId = orderId;
+
+  const fmtDate = (ts) => {
+    if (!ts) return '-';
+    const d = ts.toDate ? ts.toDate() : new Date(ts.seconds ? ts.seconds*1000 : ts);
+    return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+  };
+
+  document.getElementById('od-thumbnail').src = o.productThumbnail || '';
+  document.getElementById('od-product-name').textContent = o.productName || '-';
+  const badge = document.getElementById('od-status-badge');
+  badge.textContent = ORDER_STATUS_LABEL[o.status] || o.status;
+  badge.style.background = ORDER_STATUS_COLOR[o.status] || '#999';
+
+  const rows = [
+    ['주문 ID', `<span style="font-family:monospace;font-size:0.8rem;">${o.id}</span>`],
+    ['주문일시', fmtDate(o.createdAt)],
+    ['구매자', o.buyerName || '-'],
+    ['크리에이터', (o.creatorNames||[]).join(', ') || '-'],
+    ['판매자', o.vendorName || '-'],
+    ['결제 금액', `<strong>${(o.totalAmount||0).toLocaleString()}원</strong>`],
+    ['배송비', `${(o.shippingFee||0).toLocaleString()}원`],
+    ['수수료 (10%)', `${(o.commissionAmount||0).toLocaleString()}원`],
+    ['실지급액', `<strong>${(o.settlementAmount||0).toLocaleString()}원</strong>`],
+    ...(o.message ? [['구매자 메시지', o.message]] : []),
+    ...(o.trackingCarrier ? [['택배사', o.trackingCarrier]] : []),
+    ...(o.trackingNumber ? [['송장번호', `<span style="font-family:monospace;">${o.trackingNumber}</span>`]] : []),
+    ...(o.vendorMemo ? [['판매자 메모', o.vendorMemo]] : []),
+  ];
+
+  document.getElementById('od-info-rows').innerHTML = rows.map(([l, v]) =>
+    `<tr><td style="padding:7px 0;color:var(--text-muted);width:120px;vertical-align:top;">${l}</td><td style="padding:7px 0 7px 12px;">${v}</td></tr>`
+  ).join('');
+
+  // 기존 송장 정보 세팅
+  document.getElementById('od-carrier').value = o.trackingCarrier || '';
+  document.getElementById('od-tracking').value = o.trackingNumber || '';
+  document.getElementById('od-memo').value = o.vendorMemo || '';
+
+  const modal = document.getElementById('orderDetailModal');
+  modal.style.display = 'flex';
+};
+
+window.closeOrderModal = function() {
+  document.getElementById('orderDetailModal').style.display = 'none';
+  currentOrderId = null;
+};
+
+window.updateOrderStatus = async function(status) {
+  if (!currentOrderId) return;
+  await updateDoc(doc(db, 'orders', currentOrderId), { status, updatedAt: serverTimestamp() });
+  const o = allOrders.find(x => x.id === currentOrderId);
+  if (o) o.status = status;
+  const badge = document.getElementById('od-status-badge');
+  badge.textContent = ORDER_STATUS_LABEL[status] || status;
+  badge.style.background = ORDER_STATUS_COLOR[status] || '#999';
+  updateOrderStats();
+  renderOrders();
+};
+
+window.saveTracking = async function() {
+  if (!currentOrderId) return;
+  const carrier = document.getElementById('od-carrier').value.trim();
+  const trackingNumber = document.getElementById('od-tracking').value.trim();
+  if (!carrier || !trackingNumber) { alert('택배사와 송장번호를 모두 입력해주세요.'); return; }
+  await updateDoc(doc(db, 'orders', currentOrderId), {
+    trackingCarrier: carrier,
+    trackingNumber,
+    status: 'shipping',
+    updatedAt: serverTimestamp(),
+  });
+  const o = allOrders.find(x => x.id === currentOrderId);
+  if (o) { o.trackingCarrier = carrier; o.trackingNumber = trackingNumber; o.status = 'shipping'; }
+  alert('송장이 저장되었습니다. 상태가 "배송중"으로 변경되었습니다.');
+  updateOrderStats();
+  renderOrders();
+  // 모달 배지 업데이트
+  const badge = document.getElementById('od-status-badge');
+  badge.textContent = '배송중';
+  badge.style.background = ORDER_STATUS_COLOR['shipping'];
+};
+
+window.saveMemo = async function() {
+  if (!currentOrderId) return;
+  const memo = document.getElementById('od-memo').value.trim();
+  await updateDoc(doc(db, 'orders', currentOrderId), { vendorMemo: memo, updatedAt: serverTimestamp() });
+  const o = allOrders.find(x => x.id === currentOrderId);
+  if (o) o.vendorMemo = memo;
+  alert('메모가 저장되었습니다.');
+};
+
 // ── 탭 전환 ──────────────────────────────────────────────────
 window.switchTab = function(tab) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById(`tab-${tab}`)?.classList.add('active');
   document.querySelector(`.nav-item[data-tab="${tab}"]`)?.classList.add('active');
-  const titles = { creators: '크리에이터 신청', sellers: '판매자 관리', settlement: '크리에이터 정산', 'seller-settlement': '판매자 정산' };
+  const titles = { creators: '크리에이터 신청', sellers: '판매자 관리', settlement: '크리에이터 정산', 'seller-settlement': '판매자 정산', orders: '주문 관리' };
   document.getElementById('pageTitle').textContent = titles[tab] || '';
   if (tab === 'settlement') loadBatches();
   if (tab === 'seller-settlement') loadSellerBatches();
+  if (tab === 'orders') loadOrders();
   closeSidebar();
 };
 
