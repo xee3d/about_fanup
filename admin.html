@@ -383,7 +383,7 @@
 
 <script type="module">
 import { initializeApp }         from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js';
-import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, signOut }
+import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut }
                                   from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js';
 import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, orderBy, query, where, limit as fsLimit, serverTimestamp, Timestamp }
                                   from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js';
@@ -402,41 +402,39 @@ const db   = getFirestore(app);
 
 // ── 어드민 UID 화이트리스트 ──────────────────────────────────
 // ⚠️ 본인의 Google 계정 UID를 추가하세요.
-// Firebase Console → Authentication → Users → UID 열 확인
-const ADMIN_UIDS = [
-  '4Kws6RrLa2UIES3gYePDNT39ZDs2',  // director@tinrobot.co.kr
-];
-
 // ── 상태 ────────────────────────────────────────────────────
 let allCreators = [];
 let allSellers  = [];
 let creatorFilter = 'all';
 let sellerFilter  = 'all';
 
-// ── 인증 ────────────────────────────────────────────────────
-onAuthStateChanged(auth, user => {
-  if (!user) {
-    showAuthScreen();
-    return;
+// ── 인증 (Firebase Custom Claims 기반) ──────────────────────
+onAuthStateChanged(auth, async user => {
+  if (!user) { showAuthScreen(); return; }
+  try {
+    const tokenResult = await user.getIdTokenResult(true);
+    if (!tokenResult.claims.admin) {
+      showAuthScreen(true);
+      await signOut(auth);
+      return;
+    }
+    showDashboard(user);
+    loadAll();
+  } catch (err) {
+    try {
+      const tokenResult = await user.getIdTokenResult(false);
+      if (!tokenResult.claims.admin) { showAuthScreen(true); await signOut(auth); return; }
+      showDashboard(user);
+      loadAll();
+    } catch { showAuthScreen(true); await signOut(auth); }
   }
-  if (!ADMIN_UIDS.includes(user.uid)) {
-    showAuthScreen(true);
-    signOut(auth);
-    return;
-  }
-  showDashboard(user);
-  loadAll();
 });
-
-// redirect 결과 처리 (로그인 후 돌아왔을 때)
-getRedirectResult(auth).catch(e => console.warn('[Admin] redirect result:', e?.message));
 
 document.getElementById('googleLoginBtn').addEventListener('click', async () => {
   try {
-    await signInWithRedirect(auth, new GoogleAuthProvider());
+    await signInWithPopup(auth, new GoogleAuthProvider());
   } catch (e) {
-    // popup fallback
-    try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch(e2) { console.error(e2); }
+    console.error('[Admin] 로그인 실패:', e?.code, e?.message);
   }
 });
 
